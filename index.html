@@ -1410,46 +1410,244 @@
             ];
             const monthName = `${thaiMonths[parseInt(monthNum) - 1]} ${parseInt(year) + 543}`;
             
-            // Add title to the report for the image
-            const titleElement = document.createElement('div');
-            titleElement.className = 'text-center mb-6 p-4 bg-gradient-to-r from-pink-100 to-orange-100 rounded-lg border-2 border-pink-200';
-            titleElement.innerHTML = `
-                <h1 class="text-3xl font-bold text-gray-800 mb-2">🧁 รายงานธุรกิจขนม</h1>
-                <h2 class="text-xl text-gray-700">รายงานประจำเดือน ${monthName}</h2>
-                <p class="text-sm text-gray-600 mt-2">วันที่สร้างรายงาน: ${new Date().toLocaleDateString('th-TH')}</p>
+            // Create a temporary container for the full report
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = '1200px'; // Fixed width for consistent layout
+            tempContainer.style.backgroundColor = '#ffffff';
+            tempContainer.style.padding = '40px';
+            tempContainer.style.fontFamily = 'Sarabun, sans-serif';
+            tempContainer.style.fontSize = '16px';
+            tempContainer.style.lineHeight = '1.5';
+            tempContainer.style.color = '#374151';
+            
+            // Get current report data
+            const [currentYear, currentMonthNum] = month.split('-');
+            const startDate = new Date(currentYear, currentMonthNum - 1, 1);
+            const endDate = new Date(currentYear, currentMonthNum, 0);
+            
+            const monthlySales = sales.filter(sale => {
+                const saleDate = new Date(sale.date);
+                return saleDate >= startDate && saleDate <= endDate;
+            });
+            
+            const monthlyProductions = productions.filter(production => {
+                const prodDate = new Date(production.date);
+                return prodDate >= startDate && prodDate <= endDate;
+            });
+            
+            const monthlyRevenue = monthlySales.reduce((sum, sale) => sum + sale.totalRevenue, 0);
+            const monthlyCost = monthlySales.reduce((sum, sale) => sum + sale.totalCost, 0);
+            const monthlyProfit = monthlyRevenue - monthlyCost;
+            
+            // Calculate best selling products
+            const salesByRecipe = {};
+            monthlySales.forEach(sale => {
+                if (!salesByRecipe[sale.recipeName]) {
+                    salesByRecipe[sale.recipeName] = { 
+                        quantity: 0, 
+                        revenue: 0, 
+                        profit: 0 
+                    };
+                }
+                salesByRecipe[sale.recipeName].quantity += sale.quantity;
+                salesByRecipe[sale.recipeName].revenue += sale.totalRevenue;
+                salesByRecipe[sale.recipeName].profit += sale.totalProfit;
+            });
+            
+            const bestSelling = Object.entries(salesByRecipe)
+                .sort((a, b) => b[1].quantity - a[1].quantity)
+                .slice(0, 5);
+            
+            // Calculate ingredient usage
+            const ingredientUsage = {};
+            monthlyProductions.forEach(production => {
+                const recipe = recipes.find(r => r.id === production.recipeId);
+                if (recipe) {
+                    recipe.ingredients.forEach(recipeIng => {
+                        const ingredient = ingredients.find(ing => ing.id === recipeIng.ingredientId);
+                        if (ingredient) {
+                            if (!ingredientUsage[ingredient.name]) {
+                                ingredientUsage[ingredient.name] = { 
+                                    amount: 0, 
+                                    cost: 0, 
+                                    unit: ingredient.unit 
+                                };
+                            }
+                            const usedAmount = (recipeIng.amount / recipe.yield) * production.quantity;
+                            ingredientUsage[ingredient.name].amount += usedAmount;
+                            ingredientUsage[ingredient.name].cost += usedAmount * ingredient.pricePerUnit;
+                        }
+                    });
+                }
+            });
+            
+            const sortedUsage = Object.entries(ingredientUsage)
+                .sort((a, b) => b[1].cost - a[1].cost)
+                .slice(0, 10);
+            
+            const totalIngredientCost = Object.values(ingredientUsage).reduce((sum, item) => sum + item.cost, 0);
+            
+            // Create complete HTML content
+            tempContainer.innerHTML = `
+                <div style="text-align: center; margin-bottom: 40px; padding: 30px; background: linear-gradient(135deg, #fce7f3 0%, #fed7aa 100%); border-radius: 15px; border: 3px solid #f472b6;">
+                    <h1 style="font-size: 36px; font-weight: bold; color: #1f2937; margin-bottom: 15px;">🧁 รายงานธุรกิจขนม</h1>
+                    <h2 style="font-size: 24px; color: #374151; margin-bottom: 10px;">รายงานประจำเดือน ${monthName}</h2>
+                    <p style="font-size: 16px; color: #6b7280;">วันที่สร้างรายงาน: ${new Date().toLocaleDateString('th-TH')}</p>
+                </div>
+                
+                <!-- Summary Cards -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px;">
+                    <div style="background: #f0fdf4; padding: 25px; border-radius: 12px; border: 2px solid #bbf7d0; text-align: center;">
+                        <div style="font-size: 14px; color: #16a34a; margin-bottom: 8px;">รายได้เดือน ${monthName}</div>
+                        <div style="font-size: 28px; font-weight: bold; color: #15803d;">${monthlyRevenue.toLocaleString()} บาท</div>
+                    </div>
+                    <div style="background: #fef2f2; padding: 25px; border-radius: 12px; border: 2px solid #fecaca; text-align: center;">
+                        <div style="font-size: 14px; color: #dc2626; margin-bottom: 8px;">ต้นทุนเดือนนี้</div>
+                        <div style="font-size: 28px; font-weight: bold; color: #b91c1c;">${monthlyCost.toFixed(2).toLocaleString()} บาท</div>
+                    </div>
+                    <div style="background: #eff6ff; padding: 25px; border-radius: 12px; border: 2px solid #bfdbfe; text-align: center;">
+                        <div style="font-size: 14px; color: #2563eb; margin-bottom: 8px;">กำไรเดือนนี้</div>
+                        <div style="font-size: 28px; font-weight: bold; color: #1d4ed8;">${monthlyProfit.toFixed(2).toLocaleString()} บาท</div>
+                    </div>
+                    <div style="background: #faf5ff; padding: 25px; border-radius: 12px; border: 2px solid #d8b4fe; text-align: center;">
+                        <div style="font-size: 14px; color: #9333ea; margin-bottom: 8px;">รายการขาย</div>
+                        <div style="font-size: 28px; font-weight: bold; color: #7c3aed;">${monthlySales.length} รายการ</div>
+                    </div>
+                </div>
+                
+                <!-- Best Selling Table -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="font-size: 22px; font-weight: 600; color: #1f2937; margin-bottom: 20px;">🏆 สินค้าขายดี TOP 5</h3>
+                    <table style="width: 100%; border-collapse: collapse; border: 2px solid #d1d5db; border-radius: 8px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: #fef3c7;">
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: left; font-weight: 600; color: #374151;">อันดับ</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: left; font-weight: 600; color: #374151;">ชื่อสินค้า</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">จำนวนขาย</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">รายได้</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">กำไร</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${bestSelling.length > 0 ? bestSelling.map((item, index) => `
+                                <tr style="background: ${index % 2 === 0 ? '#ffffff' : '#fffbeb'};">
+                                    <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600;">${index + 1}</td>
+                                    <td style="border: 1px solid #d1d5db; padding: 15px;">${item[0]}</td>
+                                    <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center;">${item[1].quantity} ชิ้น</td>
+                                    <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center; color: #16a34a; font-weight: 600;">${item[1].revenue.toLocaleString()} บาท</td>
+                                    <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center; color: #2563eb; font-weight: 600;">${item[1].profit.toFixed(2).toLocaleString()} บาท</td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="5" style="border: 1px solid #d1d5db; padding: 30px; text-align: center; color: #6b7280;">ไม่มีข้อมูลการขายในเดือนนี้</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Ingredient Usage Table -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="font-size: 22px; font-weight: 600; color: #1f2937; margin-bottom: 20px;">📦 การใช้วัตถุดิบ TOP 10</h3>
+                    <table style="width: 100%; border-collapse: collapse; border: 2px solid #d1d5db; border-radius: 8px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: #dbeafe;">
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: left; font-weight: 600; color: #374151;">ชื่อวัตถุดิบ</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">จำนวนที่ใช้</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">หน่วย</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">ต้นทุน</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">% ของต้นทุนรวม</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedUsage.length > 0 ? sortedUsage.map((item, index) => {
+                                const percentage = totalIngredientCost > 0 ? (item[1].cost / totalIngredientCost * 100) : 0;
+                                return `
+                                    <tr style="background: ${index % 2 === 0 ? '#ffffff' : '#f0f9ff'};">
+                                        <td style="border: 1px solid #d1d5db; padding: 15px;">${item[0]}</td>
+                                        <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center;">${item[1].amount.toFixed(1)}</td>
+                                        <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center;">${item[1].unit}</td>
+                                        <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center; color: #dc2626; font-weight: 600;">${item[1].cost.toFixed(2).toLocaleString()} บาท</td>
+                                        <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center;">${percentage.toFixed(1)}%</td>
+                                    </tr>
+                                `;
+                            }).join('') : `
+                                <tr>
+                                    <td colspan="5" style="border: 1px solid #d1d5db; padding: 30px; text-align: center; color: #6b7280;">ไม่มีข้อมูลการใช้วัตถุดิบในเดือนนี้</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Monthly Sales Table -->
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 22px; font-weight: 600; color: #1f2937; margin-bottom: 20px;">💰 ประวัติการขายในเดือนนี้</h3>
+                    <table style="width: 100%; border-collapse: collapse; border: 2px solid #d1d5db; border-radius: 8px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: #dcfce7;">
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: left; font-weight: 600; color: #374151;">วันที่</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: left; font-weight: 600; color: #374151;">สินค้า</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">จำนวน</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">ราคา/ชิ้น</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">รายได้</th>
+                                <th style="border: 1px solid #d1d5db; padding: 15px; text-align: center; font-weight: 600; color: #374151;">กำไร</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${monthlySales.length > 0 ? [...monthlySales].sort((a, b) => new Date(b.date) - new Date(a.date)).map((sale, index) => `
+                                <tr style="background: ${index % 2 === 0 ? '#ffffff' : '#f0fdf4'};">
+                                    <td style="border: 1px solid #d1d5db; padding: 15px;">${new Date(sale.date).toLocaleDateString('th-TH')}</td>
+                                    <td style="border: 1px solid #d1d5db; padding: 15px;">${sale.recipeName}</td>
+                                    <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center;">${sale.quantity} ชิ้น</td>
+                                    <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center;">${sale.pricePerPiece} บาท</td>
+                                    <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center; color: #16a34a; font-weight: 600;">${sale.totalRevenue.toLocaleString()} บาท</td>
+                                    <td style="border: 1px solid #d1d5db; padding: 15px; text-align: center; color: #2563eb; font-weight: 600;">${sale.totalProfit.toFixed(2).toLocaleString()} บาท</td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="6" style="border: 1px solid #d1d5db; padding: 30px; text-align: center; color: #6b7280;">ไม่มีข้อมูลการขายในเดือนนี้</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
             `;
             
-            // Insert title at the beginning of report content
-            reportContent.insertBefore(titleElement, reportContent.firstChild);
+            // Add to document temporarily
+            document.body.appendChild(tempContainer);
             
-            // Configure html2canvas options
+            // Configure html2canvas options for the temporary container
             const options = {
                 backgroundColor: '#ffffff',
-                scale: 2, // Higher quality
+                scale: 1.5, // Good quality without being too large
                 useCORS: true,
                 allowTaint: true,
-                width: reportContent.scrollWidth,
-                height: reportContent.scrollHeight,
+                width: 1200,
+                height: tempContainer.scrollHeight,
                 scrollX: 0,
                 scrollY: 0,
-                windowWidth: window.innerWidth,
-                windowHeight: window.innerHeight
+                logging: false,
+                removeContainer: true
             };
             
-            // Capture the report content
-            html2canvas(reportContent, options).then(canvas => {
+            // Capture the temporary container
+            html2canvas(tempContainer, options).then(canvas => {
                 // Create download link
                 const link = document.createElement('a');
                 link.download = `รายงานขนม_${year}_${monthNum.padStart(2, '0')}.png`;
-                link.href = canvas.toDataURL('image/png', 1.0);
+                link.href = canvas.toDataURL('image/png', 0.95);
                 
                 // Trigger download
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 
-                // Remove the title element
-                titleElement.remove();
+                // Remove temporary container
+                document.body.removeChild(tempContainer);
                 
                 // Reset button
                 button.textContent = originalText;
@@ -1457,14 +1655,16 @@
                 
                 // Show success message
                 setTimeout(() => {
-                    alert(`✅ บันทึกรายงานเป็นรูปภาพสำเร็จ!\n\n📸 ไฟล์: รายงานขนม_${year}_${monthNum.padStart(2, '0')}.png\n📅 ข้อมูล: ${monthName}\n\n🖼️ รูปภาพประกอบด้วย:\n• สรุปผลประกอบการ\n• สินค้าขายดี TOP 5\n• การใช้วัตถุดิบ TOP 10\n• ประวัติการขายทั้งหมด\n• วันที่สร้างรายงาน`);
+                    alert(`✅ บันทึกรายงานเป็นรูปภาพสำเร็จ!\n\n📸 ไฟล์: รายงานขนม_${year}_${monthNum.padStart(2, '0')}.png\n📅 ข้อมูล: ${monthName}\n\n🖼️ รูปภาพครบถ้วนทุกข้อมูล:\n• สรุปผลประกอบการ (การ์ด 4 ใบ)\n• สินค้าขายดี TOP 5 (ตารางเต็ม)\n• การใช้วัตถุดิบ TOP 10 (ตารางเต็ม)\n• ประวัติการขายทั้งหมด (ตารางเต็ม)\n• หัวเรื่องและวันที่สร้าง\n\n📱 เหมาะสำหรับทุกอุปกรณ์ - ข้อมูลชัดเจนครบถ้วน!`);
                 }, 500);
                 
             }).catch(error => {
                 console.error('Image export error:', error);
                 
-                // Remove the title element
-                titleElement.remove();
+                // Remove temporary container
+                if (document.body.contains(tempContainer)) {
+                    document.body.removeChild(tempContainer);
+                }
                 
                 // Reset button
                 button.textContent = originalText;
@@ -1477,5 +1677,5 @@
         // Initialize selects
         updateRecipeSelects();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9676648d966e45b3',t:'MTc1Mzg5NDYyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96767fa7d4074ba1',t:'MTc1Mzg5NTczMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
