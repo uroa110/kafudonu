@@ -1212,63 +1212,60 @@
             const monthlyCost = monthlySales.reduce((sum, sale) => sum + sale.totalCost, 0);
             const monthlyProfit = monthlyRevenue - monthlyCost;
             
-            // Create workbook
+            // Create workbook with proper encoding
             const wb = XLSX.utils.book_new();
+            wb.Props = {
+                Title: "รายงานธุรกิจขนม",
+                Subject: `รายงานประจำเดือน ${monthName}`,
+                Author: "ระบบจัดการวัตถุดิบขนม",
+                CreatedDate: new Date()
+            };
             
-            // Summary Sheet
+            // Summary Sheet - Simple format
             const summaryData = [
-                ['รายงานธุรกิจขนม', ''],
-                [`เดือน: ${monthName}`, ''],
-                ['', ''],
-                ['สรุปรายเดือน', ''],
-                ['รายการ', 'จำนวน'],
-                ['ยอดขายรวม', `${monthlyRevenue.toLocaleString()} บาท`],
-                ['ต้นทุนรวม', `${monthlyCost.toFixed(2).toLocaleString()} บาท`],
-                ['กำไรสุทธิ', `${monthlyProfit.toFixed(2).toLocaleString()} บาท`],
-                ['จำนวนการขาย', `${monthlySales.length} รายการ`],
-                ['จำนวนการผลิต', `${monthlyProductions.length} ครั้ง`],
-                ['', ''],
+                ['รายงานธุรกิจขนม'],
+                [`เดือน ${monthName}`],
+                [''],
+                ['สรุปรายเดือน'],
+                ['ยอดขายรวม', monthlyRevenue],
+                ['ต้นทุนรวม', monthlyCost],
+                ['กำไรสุทธิ', monthlyProfit],
+                ['จำนวนการขาย', monthlySales.length],
+                ['จำนวนการผลิต', monthlyProductions.length],
+                [''],
                 ['วันที่สร้างรายงาน', new Date().toLocaleDateString('th-TH')]
             ];
             
             const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-            
-            // Set column widths for summary
-            summaryWs['!cols'] = [
-                { width: 20 },
-                { width: 25 }
-            ];
-            
+            summaryWs['!cols'] = [{ width: 20 }, { width: 15 }];
             XLSX.utils.book_append_sheet(wb, summaryWs, 'สรุป');
             
             // Sales Details Sheet
             if (monthlySales.length > 0) {
-                const salesHeaders = ['วันที่', 'ชื่อสินค้า', 'จำนวน (ชิ้น)', 'ราคา/ชิ้น (บาท)', 'รายได้ (บาท)', 'กำไร (บาท)'];
-                const salesData = monthlySales.map(sale => [
-                    new Date(sale.date).toLocaleDateString('th-TH'),
-                    sale.recipeName,
-                    sale.quantity,
-                    sale.pricePerPiece,
-                    sale.totalRevenue,
-                    sale.totalProfit.toFixed(2)
-                ]);
-                
-                const salesWs = XLSX.utils.aoa_to_sheet([salesHeaders, ...salesData]);
-                
-                // Set column widths for sales
-                salesWs['!cols'] = [
-                    { width: 12 },
-                    { width: 20 },
-                    { width: 12 },
-                    { width: 15 },
-                    { width: 15 },
-                    { width: 15 }
+                const salesData = [
+                    ['วันที่', 'ชื่อสินค้า', 'จำนวน', 'ราคาต่อชิ้น', 'รายได้', 'กำไร']
                 ];
                 
+                monthlySales.forEach(sale => {
+                    salesData.push([
+                        new Date(sale.date).toLocaleDateString('th-TH'),
+                        sale.recipeName,
+                        sale.quantity,
+                        sale.pricePerPiece,
+                        sale.totalRevenue,
+                        parseFloat(sale.totalProfit.toFixed(2))
+                    ]);
+                });
+                
+                const salesWs = XLSX.utils.aoa_to_sheet(salesData);
+                salesWs['!cols'] = [
+                    { width: 12 }, { width: 20 }, { width: 10 }, 
+                    { width: 12 }, { width: 12 }, { width: 12 }
+                ];
                 XLSX.utils.book_append_sheet(wb, salesWs, 'รายละเอียดการขาย');
             }
             
-            // Best Selling Products Sheet
+            // Best Selling Products
             const salesByRecipe = {};
             monthlySales.forEach(sale => {
                 if (!salesByRecipe[sale.recipeName]) {
@@ -1282,51 +1279,49 @@
                 .sort((a, b) => b[1].quantity - a[1].quantity);
             
             if (bestSelling.length > 0) {
-                const bestSellingHeaders = ['อันดับ', 'ชื่อสินค้า', 'จำนวนที่ขาย (ชิ้น)', 'รายได้รวม (บาท)'];
-                const bestSellingData = bestSelling.map((item, index) => [
-                    index + 1,
-                    item[0],
-                    item[1].quantity,
-                    item[1].revenue
-                ]);
-                
-                const bestSellingWs = XLSX.utils.aoa_to_sheet([bestSellingHeaders, ...bestSellingData]);
-                
-                // Set column widths for best selling
-                bestSellingWs['!cols'] = [
-                    { width: 8 },
-                    { width: 25 },
-                    { width: 18 },
-                    { width: 18 }
+                const bestSellingData = [
+                    ['อันดับ', 'ชื่อสินค้า', 'จำนวนที่ขาย', 'รายได้รวม']
                 ];
                 
+                bestSelling.forEach((item, index) => {
+                    bestSellingData.push([
+                        index + 1,
+                        item[0],
+                        item[1].quantity,
+                        item[1].revenue
+                    ]);
+                });
+                
+                const bestSellingWs = XLSX.utils.aoa_to_sheet(bestSellingData);
+                bestSellingWs['!cols'] = [
+                    { width: 8 }, { width: 25 }, { width: 15 }, { width: 15 }
+                ];
                 XLSX.utils.book_append_sheet(wb, bestSellingWs, 'สินค้าขายดี');
             }
             
-            // Production Details Sheet
+            // Production Details
             if (monthlyProductions.length > 0) {
-                const productionHeaders = ['วันที่', 'ชื่อสินค้า', 'จำนวนที่ผลิต (ชิ้น)', 'ต้นทุน (บาท)'];
-                const productionData = monthlyProductions.map(production => [
-                    new Date(production.date).toLocaleDateString('th-TH'),
-                    production.recipeName,
-                    production.quantity,
-                    production.totalCost.toFixed(2)
-                ]);
-                
-                const productionWs = XLSX.utils.aoa_to_sheet([productionHeaders, ...productionData]);
-                
-                // Set column widths for production
-                productionWs['!cols'] = [
-                    { width: 12 },
-                    { width: 25 },
-                    { width: 20 },
-                    { width: 15 }
+                const productionData = [
+                    ['วันที่', 'ชื่อสินค้า', 'จำนวนที่ผลิต', 'ต้นทุน']
                 ];
                 
+                monthlyProductions.forEach(production => {
+                    productionData.push([
+                        new Date(production.date).toLocaleDateString('th-TH'),
+                        production.recipeName,
+                        production.quantity,
+                        parseFloat(production.totalCost.toFixed(2))
+                    ]);
+                });
+                
+                const productionWs = XLSX.utils.aoa_to_sheet(productionData);
+                productionWs['!cols'] = [
+                    { width: 12 }, { width: 25 }, { width: 15 }, { width: 12 }
+                ];
                 XLSX.utils.book_append_sheet(wb, productionWs, 'รายละเอียดการผลิต');
             }
             
-            // Ingredient Usage Sheet
+            // Ingredient Usage
             const ingredientUsage = {};
             monthlyProductions.forEach(production => {
                 const recipe = recipes.find(r => r.id === production.recipeId);
@@ -1353,31 +1348,33 @@
                 .sort((a, b) => b[1].cost - a[1].cost);
             
             if (sortedUsage.length > 0) {
-                const usageHeaders = ['ชื่อวัตถุดิบ', 'จำนวนที่ใช้', 'หน่วย', 'ต้นทุนรวม (บาท)'];
-                const usageData = sortedUsage.map(item => [
-                    item[0],
-                    item[1].amount.toFixed(1),
-                    item[1].unit,
-                    item[1].cost.toFixed(2)
-                ]);
-                
-                const usageWs = XLSX.utils.aoa_to_sheet([usageHeaders, ...usageData]);
-                
-                // Set column widths for ingredient usage
-                usageWs['!cols'] = [
-                    { width: 20 },
-                    { width: 15 },
-                    { width: 10 },
-                    { width: 18 }
+                const usageData = [
+                    ['ชื่อวัตถุดิบ', 'จำนวนที่ใช้', 'หน่วย', 'ต้นทุนรวม']
                 ];
                 
+                sortedUsage.forEach(item => {
+                    usageData.push([
+                        item[0],
+                        parseFloat(item[1].amount.toFixed(1)),
+                        item[1].unit,
+                        parseFloat(item[1].cost.toFixed(2))
+                    ]);
+                });
+                
+                const usageWs = XLSX.utils.aoa_to_sheet(usageData);
+                usageWs['!cols'] = [
+                    { width: 20 }, { width: 12 }, { width: 8 }, { width: 15 }
+                ];
                 XLSX.utils.book_append_sheet(wb, usageWs, 'การใช้วัตถุดิบ');
             }
             
-            // Current Inventory Sheet
+            // Current Inventory
             if (ingredients.length > 0) {
-                const inventoryHeaders = ['ชื่อวัตถุดิบ', 'คงเหลือ', 'หน่วย', 'ขั้นต่ำ', 'ราคา/หน่วย (บาท)', 'มูลค่าคงเหลือ (บาท)', 'วันหมดอายุ', 'สถานะ'];
-                const inventoryData = ingredients.map(ingredient => {
+                const inventoryData = [
+                    ['ชื่อวัตถุดิบ', 'คงเหลือ', 'หน่วย', 'ขั้นต่ำ', 'ราคาต่อหน่วย', 'มูลค่าคงเหลือ', 'วันหมดอายุ', 'สถานะ']
+                ];
+                
+                ingredients.forEach(ingredient => {
                     const isLowStock = ingredient.remaining <= ingredient.minStock;
                     const isExpired = ingredient.expiry && new Date(ingredient.expiry) < new Date();
                     const isExpiringSoon = ingredient.expiry && new Date(ingredient.expiry) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && !isExpired;
@@ -1388,42 +1385,50 @@
                     else if (isExpiringSoon) status = 'ใกล้หมดอายุ';
                     else if (isLowStock) status = 'ใกล้หมด';
                     
-                    return [
+                    inventoryData.push([
                         ingredient.name,
                         ingredient.remaining,
                         ingredient.unit,
                         ingredient.minStock,
-                        ingredient.pricePerUnit.toFixed(2),
-                        stockValue.toFixed(2),
+                        parseFloat(ingredient.pricePerUnit.toFixed(2)),
+                        parseFloat(stockValue.toFixed(2)),
                         ingredient.expiry ? new Date(ingredient.expiry).toLocaleDateString('th-TH') : '-',
                         status
-                    ];
+                    ]);
                 });
                 
-                const inventoryWs = XLSX.utils.aoa_to_sheet([inventoryHeaders, ...inventoryData]);
-                
-                // Set column widths for inventory
+                const inventoryWs = XLSX.utils.aoa_to_sheet(inventoryData);
                 inventoryWs['!cols'] = [
-                    { width: 20 },
-                    { width: 10 },
-                    { width: 8 },
-                    { width: 10 },
-                    { width: 15 },
-                    { width: 18 },
-                    { width: 15 },
-                    { width: 15 }
+                    { width: 20 }, { width: 10 }, { width: 8 }, { width: 10 },
+                    { width: 12 }, { width: 15 }, { width: 12 }, { width: 12 }
                 ];
-                
                 XLSX.utils.book_append_sheet(wb, inventoryWs, 'สต็อกปัจจุบัน');
             }
             
-            // Save the Excel file
+            // Generate filename and save
             const fileName = `รายงานขนม_${year}_${monthNum.padStart(2, '0')}.xlsx`;
-            XLSX.writeFile(wb, fileName);
+            
+            try {
+                XLSX.writeFile(wb, fileName, {
+                    bookType: 'xlsx',
+                    type: 'binary',
+                    cellStyles: true,
+                    sheetStubs: false
+                });
+                
+                // Show success message
+                setTimeout(() => {
+                    alert(`✅ ส่งออกรายงาน Excel สำเร็จ!\n\nไฟล์: ${fileName}\nข้อมูล: ${monthName}\n\n📊 รายงานประกอบด้วย:\n• สรุปรายเดือน\n• รายละเอียดการขาย\n• สินค้าขายดี\n• การผลิต\n• การใช้วัตถุดิบ\n• สต็อกปัจจุบัน`);
+                }, 500);
+                
+            } catch (error) {
+                console.error('Excel export error:', error);
+                alert('❌ เกิดข้อผิดพลาดในการส่งออกไฟล์ Excel\nกรุณาลองใหม่อีกครั้ง');
+            }
         }
 
         // Initialize selects
         updateRecipeSelects();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96760b9253c64b9a',t:'MTc1Mzg5MDk3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96762cc3e0e7c8e3',t:'MTc1Mzg5MjMzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
