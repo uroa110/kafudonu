@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบจัดการวัตถุดิบขนม</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Sarabun', sans-serif; }
@@ -356,8 +355,8 @@
                     <div id="monthly-report" class="mt-4 space-y-3">
                         <!-- Monthly report will be displayed here -->
                     </div>
-                    <button onclick="exportToPDF()" class="w-full mt-4 bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-medium">
-                        📄 ส่งออกรายงาน PDF
+                    <button onclick="exportToExcel()" class="w-full mt-4 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-medium">
+                        📊 ส่งออกรายงาน Excel
                     </button>
                 </div>
             </div>
@@ -1177,11 +1176,8 @@
             `;
         }
 
-        // PDF Export Function
-        function exportToPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
+        // Excel Export Function
+        function exportToExcel() {
             // Get selected month
             const month = document.getElementById('report-month').value;
             if (!month) {
@@ -1216,79 +1212,63 @@
             const monthlyCost = monthlySales.reduce((sum, sale) => sum + sale.totalCost, 0);
             const monthlyProfit = monthlyRevenue - monthlyCost;
             
-            // Helper function to convert Thai text to safe format for PDF
-            function safeThaiText(text) {
-                // Convert Thai text to a format that can be displayed in PDF
-                // This is a workaround for Thai font issues
-                return text.toString();
-            }
+            // Create workbook
+            const wb = XLSX.utils.book_new();
             
-            // Set font
-            doc.setFont('helvetica');
-            
-            // Title (using English for better compatibility)
-            doc.setFontSize(20);
-            doc.text('Bakery Business Report', 105, 20, { align: 'center' });
-            doc.setFontSize(16);
-            doc.text(`Month: ${monthName}`, 105, 30, { align: 'center' });
-            
-            let yPosition = 50;
-            
-            // Summary Section
-            doc.setFontSize(14);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Monthly Summary', 20, yPosition);
-            yPosition += 10;
-            
+            // Summary Sheet
             const summaryData = [
-                ['Total Revenue', `${monthlyRevenue.toLocaleString()} Baht`],
-                ['Total Cost', `${monthlyCost.toFixed(2).toLocaleString()} Baht`],
-                ['Net Profit', `${monthlyProfit.toFixed(2).toLocaleString()} Baht`],
-                ['Sales Count', `${monthlySales.length} transactions`],
-                ['Production Count', `${monthlyProductions.length} batches`]
+                ['รายงานธุรกิจขนม', ''],
+                [`เดือน: ${monthName}`, ''],
+                ['', ''],
+                ['สรุปรายเดือน', ''],
+                ['รายการ', 'จำนวน'],
+                ['ยอดขายรวม', `${monthlyRevenue.toLocaleString()} บาท`],
+                ['ต้นทุนรวม', `${monthlyCost.toFixed(2).toLocaleString()} บาท`],
+                ['กำไรสุทธิ', `${monthlyProfit.toFixed(2).toLocaleString()} บาท`],
+                ['จำนวนการขาย', `${monthlySales.length} รายการ`],
+                ['จำนวนการผลิต', `${monthlyProductions.length} ครั้ง`],
+                ['', ''],
+                ['วันที่สร้างรายงาน', new Date().toLocaleDateString('th-TH')]
             ];
             
-            doc.autoTable({
-                startY: yPosition,
-                head: [['Category', 'Amount']],
-                body: summaryData,
-                theme: 'grid',
-                headStyles: { fillColor: [255, 182, 193] },
-                margin: { left: 20, right: 20 }
-            });
+            const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
             
-            yPosition = doc.lastAutoTable.finalY + 20;
+            // Set column widths for summary
+            summaryWs['!cols'] = [
+                { width: 20 },
+                { width: 25 }
+            ];
             
-            // Sales Details
+            XLSX.utils.book_append_sheet(wb, summaryWs, 'สรุป');
+            
+            // Sales Details Sheet
             if (monthlySales.length > 0) {
-                doc.setFontSize(14);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Sales Details', 20, yPosition);
-                yPosition += 10;
-                
+                const salesHeaders = ['วันที่', 'ชื่อสินค้า', 'จำนวน (ชิ้น)', 'ราคา/ชิ้น (บาท)', 'รายได้ (บาท)', 'กำไร (บาท)'];
                 const salesData = monthlySales.map(sale => [
-                    new Date(sale.date).toLocaleDateString('en-GB'),
+                    new Date(sale.date).toLocaleDateString('th-TH'),
                     sale.recipeName,
-                    `${sale.quantity} pcs`,
-                    `${sale.pricePerPiece} Baht`,
-                    `${sale.totalRevenue} Baht`,
-                    `${sale.totalProfit.toFixed(2)} Baht`
+                    sale.quantity,
+                    sale.pricePerPiece,
+                    sale.totalRevenue,
+                    sale.totalProfit.toFixed(2)
                 ]);
                 
-                doc.autoTable({
-                    startY: yPosition,
-                    head: [['Date', 'Product', 'Quantity', 'Price/pc', 'Revenue', 'Profit']],
-                    body: salesData,
-                    theme: 'grid',
-                    headStyles: { fillColor: [144, 238, 144] },
-                    margin: { left: 20, right: 20 },
-                    styles: { fontSize: 8 }
-                });
+                const salesWs = XLSX.utils.aoa_to_sheet([salesHeaders, ...salesData]);
                 
-                yPosition = doc.lastAutoTable.finalY + 20;
+                // Set column widths for sales
+                salesWs['!cols'] = [
+                    { width: 12 },
+                    { width: 20 },
+                    { width: 12 },
+                    { width: 15 },
+                    { width: 15 },
+                    { width: 15 }
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, salesWs, 'รายละเอียดการขาย');
             }
             
-            // Best Selling Products
+            // Best Selling Products Sheet
             const salesByRecipe = {};
             monthlySales.forEach(sale => {
                 if (!salesByRecipe[sale.recipeName]) {
@@ -1299,71 +1279,54 @@
             });
             
             const bestSelling = Object.entries(salesByRecipe)
-                .sort((a, b) => b[1].quantity - a[1].quantity)
-                .slice(0, 10);
+                .sort((a, b) => b[1].quantity - a[1].quantity);
             
             if (bestSelling.length > 0) {
-                // Check if we need a new page
-                if (yPosition > 250) {
-                    doc.addPage();
-                    yPosition = 20;
-                }
-                
-                doc.setFontSize(14);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Best Selling Products', 20, yPosition);
-                yPosition += 10;
-                
+                const bestSellingHeaders = ['อันดับ', 'ชื่อสินค้า', 'จำนวนที่ขาย (ชิ้น)', 'รายได้รวม (บาท)'];
                 const bestSellingData = bestSelling.map((item, index) => [
-                    `#${index + 1}`,
+                    index + 1,
                     item[0],
-                    `${item[1].quantity} pcs`,
-                    `${item[1].revenue.toLocaleString()} Baht`
+                    item[1].quantity,
+                    item[1].revenue
                 ]);
                 
-                doc.autoTable({
-                    startY: yPosition,
-                    head: [['Rank', 'Product Name', 'Qty Sold', 'Total Revenue']],
-                    body: bestSellingData,
-                    theme: 'grid',
-                    headStyles: { fillColor: [255, 215, 0] },
-                    margin: { left: 20, right: 20 }
-                });
+                const bestSellingWs = XLSX.utils.aoa_to_sheet([bestSellingHeaders, ...bestSellingData]);
                 
-                yPosition = doc.lastAutoTable.finalY + 20;
+                // Set column widths for best selling
+                bestSellingWs['!cols'] = [
+                    { width: 8 },
+                    { width: 25 },
+                    { width: 18 },
+                    { width: 18 }
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, bestSellingWs, 'สินค้าขายดี');
             }
             
-            // Production Details
+            // Production Details Sheet
             if (monthlyProductions.length > 0) {
-                // Check if we need a new page
-                if (yPosition > 200) {
-                    doc.addPage();
-                    yPosition = 20;
-                }
-                
-                doc.setFontSize(14);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Production Details', 20, yPosition);
-                yPosition += 10;
-                
+                const productionHeaders = ['วันที่', 'ชื่อสินค้า', 'จำนวนที่ผลิต (ชิ้น)', 'ต้นทุน (บาท)'];
                 const productionData = monthlyProductions.map(production => [
-                    new Date(production.date).toLocaleDateString('en-GB'),
+                    new Date(production.date).toLocaleDateString('th-TH'),
                     production.recipeName,
-                    `${production.quantity} pcs`,
-                    `${production.totalCost.toFixed(2)} Baht`
+                    production.quantity,
+                    production.totalCost.toFixed(2)
                 ]);
                 
-                doc.autoTable({
-                    startY: yPosition,
-                    head: [['Date', 'Product', 'Quantity', 'Cost']],
-                    body: productionData,
-                    theme: 'grid',
-                    headStyles: { fillColor: [255, 165, 0] },
-                    margin: { left: 20, right: 20 }
-                });
+                const productionWs = XLSX.utils.aoa_to_sheet([productionHeaders, ...productionData]);
+                
+                // Set column widths for production
+                productionWs['!cols'] = [
+                    { width: 12 },
+                    { width: 25 },
+                    { width: 20 },
+                    { width: 15 }
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, productionWs, 'รายละเอียดการผลิต');
             }
             
-            // Ingredient Usage Summary
+            // Ingredient Usage Sheet
             const ingredientUsage = {};
             monthlyProductions.forEach(production => {
                 const recipe = recipes.find(r => r.id === production.recipeId);
@@ -1372,7 +1335,11 @@
                         const ingredient = ingredients.find(ing => ing.id === recipeIng.ingredientId);
                         if (ingredient) {
                             if (!ingredientUsage[ingredient.name]) {
-                                ingredientUsage[ingredient.name] = { amount: 0, cost: 0 };
+                                ingredientUsage[ingredient.name] = { 
+                                    amount: 0, 
+                                    cost: 0, 
+                                    unit: ingredient.unit 
+                                };
                             }
                             const usedAmount = (recipeIng.amount / recipe.yield) * production.quantity;
                             ingredientUsage[ingredient.name].amount += usedAmount;
@@ -1383,56 +1350,80 @@
             });
             
             const sortedUsage = Object.entries(ingredientUsage)
-                .sort((a, b) => b[1].cost - a[1].cost)
-                .slice(0, 10);
+                .sort((a, b) => b[1].cost - a[1].cost);
             
             if (sortedUsage.length > 0) {
-                // Check if we need a new page
-                if (doc.lastAutoTable && doc.lastAutoTable.finalY > 200) {
-                    doc.addPage();
-                    yPosition = 20;
-                } else {
-                    yPosition = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : yPosition + 20;
-                }
-                
-                doc.setFontSize(14);
-                doc.setFont('helvetica', 'bold');
-                doc.text('Ingredient Usage', 20, yPosition);
-                yPosition += 10;
-                
+                const usageHeaders = ['ชื่อวัตถุดิบ', 'จำนวนที่ใช้', 'หน่วย', 'ต้นทุนรวม (บาท)'];
                 const usageData = sortedUsage.map(item => [
                     item[0],
-                    `${item[1].amount.toFixed(1)} units`,
-                    `${item[1].cost.toFixed(2)} Baht`
+                    item[1].amount.toFixed(1),
+                    item[1].unit,
+                    item[1].cost.toFixed(2)
                 ]);
                 
-                doc.autoTable({
-                    startY: yPosition,
-                    head: [['Ingredient', 'Quantity Used', 'Total Cost']],
-                    body: usageData,
-                    theme: 'grid',
-                    headStyles: { fillColor: [173, 216, 230] },
-                    margin: { left: 20, right: 20 }
+                const usageWs = XLSX.utils.aoa_to_sheet([usageHeaders, ...usageData]);
+                
+                // Set column widths for ingredient usage
+                usageWs['!cols'] = [
+                    { width: 20 },
+                    { width: 15 },
+                    { width: 10 },
+                    { width: 18 }
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, usageWs, 'การใช้วัตถุดิบ');
+            }
+            
+            // Current Inventory Sheet
+            if (ingredients.length > 0) {
+                const inventoryHeaders = ['ชื่อวัตถุดิบ', 'คงเหลือ', 'หน่วย', 'ขั้นต่ำ', 'ราคา/หน่วย (บาท)', 'มูลค่าคงเหลือ (บาท)', 'วันหมดอายุ', 'สถานะ'];
+                const inventoryData = ingredients.map(ingredient => {
+                    const isLowStock = ingredient.remaining <= ingredient.minStock;
+                    const isExpired = ingredient.expiry && new Date(ingredient.expiry) < new Date();
+                    const isExpiringSoon = ingredient.expiry && new Date(ingredient.expiry) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && !isExpired;
+                    const stockValue = ingredient.remaining * ingredient.pricePerUnit;
+                    
+                    let status = 'ปกติ';
+                    if (isExpired) status = 'หมดอายุ';
+                    else if (isExpiringSoon) status = 'ใกล้หมดอายุ';
+                    else if (isLowStock) status = 'ใกล้หมด';
+                    
+                    return [
+                        ingredient.name,
+                        ingredient.remaining,
+                        ingredient.unit,
+                        ingredient.minStock,
+                        ingredient.pricePerUnit.toFixed(2),
+                        stockValue.toFixed(2),
+                        ingredient.expiry ? new Date(ingredient.expiry).toLocaleDateString('th-TH') : '-',
+                        status
+                    ];
                 });
+                
+                const inventoryWs = XLSX.utils.aoa_to_sheet([inventoryHeaders, ...inventoryData]);
+                
+                // Set column widths for inventory
+                inventoryWs['!cols'] = [
+                    { width: 20 },
+                    { width: 10 },
+                    { width: 8 },
+                    { width: 10 },
+                    { width: 15 },
+                    { width: 18 },
+                    { width: 15 },
+                    { width: 15 }
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, inventoryWs, 'สต็อกปัจจุบัน');
             }
             
-            // Add footer with generation date
-            const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-                doc.setFontSize(8);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Generated on: ${new Date().toLocaleDateString('en-GB')}`, 20, 285);
-                doc.text(`Page ${i} of ${pageCount}`, 190, 285, { align: 'right' });
-            }
-            
-            // Save the PDF
-            const fileName = `Bakery_Report_${year}_${monthNum.padStart(2, '0')}.pdf`;
-            doc.save(fileName);
+            // Save the Excel file
+            const fileName = `รายงานขนม_${year}_${monthNum.padStart(2, '0')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
         }
 
         // Initialize selects
         updateRecipeSelects();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9675f49ec0204ba6',t:'MTc1Mzg5MDAzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96760b9253c64b9a',t:'MTc1Mzg5MDk3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
