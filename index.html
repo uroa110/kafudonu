@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบจัดการวัตถุดิบขนม</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Sarabun', sans-serif; }
@@ -355,8 +356,8 @@
                     <div id="monthly-report" class="mt-4 space-y-3">
                         <!-- Monthly report will be displayed here -->
                     </div>
-                    <button onclick="exportToExcel()" class="w-full mt-4 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-medium">
-                        📊 ส่งออกรายงาน Excel
+                    <button onclick="exportToWord()" class="w-full mt-4 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-medium">
+                        📄 ส่งออกรายงาน Word
                     </button>
                 </div>
             </div>
@@ -1176,8 +1177,8 @@
             `;
         }
 
-        // Excel Export Function
-        function exportToExcel() {
+        // Word Export Function
+        function exportToWord() {
             // Get selected month
             const month = document.getElementById('report-month').value;
             if (!month) {
@@ -1212,60 +1213,7 @@
             const monthlyCost = monthlySales.reduce((sum, sale) => sum + sale.totalCost, 0);
             const monthlyProfit = monthlyRevenue - monthlyCost;
             
-            // Create workbook with proper encoding
-            const wb = XLSX.utils.book_new();
-            wb.Props = {
-                Title: "รายงานธุรกิจขนม",
-                Subject: `รายงานประจำเดือน ${monthName}`,
-                Author: "ระบบจัดการวัตถุดิบขนม",
-                CreatedDate: new Date()
-            };
-            
-            // Summary Sheet - Simple format
-            const summaryData = [
-                ['รายงานธุรกิจขนม'],
-                [`เดือน ${monthName}`],
-                [''],
-                ['สรุปรายเดือน'],
-                ['ยอดขายรวม', monthlyRevenue],
-                ['ต้นทุนรวม', monthlyCost],
-                ['กำไรสุทธิ', monthlyProfit],
-                ['จำนวนการขาย', monthlySales.length],
-                ['จำนวนการผลิต', monthlyProductions.length],
-                [''],
-                ['วันที่สร้างรายงาน', new Date().toLocaleDateString('th-TH')]
-            ];
-            
-            const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-            summaryWs['!cols'] = [{ width: 20 }, { width: 15 }];
-            XLSX.utils.book_append_sheet(wb, summaryWs, 'สรุป');
-            
-            // Sales Details Sheet
-            if (monthlySales.length > 0) {
-                const salesData = [
-                    ['วันที่', 'ชื่อสินค้า', 'จำนวน', 'ราคาต่อชิ้น', 'รายได้', 'กำไร']
-                ];
-                
-                monthlySales.forEach(sale => {
-                    salesData.push([
-                        new Date(sale.date).toLocaleDateString('th-TH'),
-                        sale.recipeName,
-                        sale.quantity,
-                        sale.pricePerPiece,
-                        sale.totalRevenue,
-                        parseFloat(sale.totalProfit.toFixed(2))
-                    ]);
-                });
-                
-                const salesWs = XLSX.utils.aoa_to_sheet(salesData);
-                salesWs['!cols'] = [
-                    { width: 12 }, { width: 20 }, { width: 10 }, 
-                    { width: 12 }, { width: 12 }, { width: 12 }
-                ];
-                XLSX.utils.book_append_sheet(wb, salesWs, 'รายละเอียดการขาย');
-            }
-            
-            // Best Selling Products
+            // Calculate best selling products
             const salesByRecipe = {};
             monthlySales.forEach(sale => {
                 if (!salesByRecipe[sale.recipeName]) {
@@ -1276,52 +1224,10 @@
             });
             
             const bestSelling = Object.entries(salesByRecipe)
-                .sort((a, b) => b[1].quantity - a[1].quantity);
+                .sort((a, b) => b[1].quantity - a[1].quantity)
+                .slice(0, 5);
             
-            if (bestSelling.length > 0) {
-                const bestSellingData = [
-                    ['อันดับ', 'ชื่อสินค้า', 'จำนวนที่ขาย', 'รายได้รวม']
-                ];
-                
-                bestSelling.forEach((item, index) => {
-                    bestSellingData.push([
-                        index + 1,
-                        item[0],
-                        item[1].quantity,
-                        item[1].revenue
-                    ]);
-                });
-                
-                const bestSellingWs = XLSX.utils.aoa_to_sheet(bestSellingData);
-                bestSellingWs['!cols'] = [
-                    { width: 8 }, { width: 25 }, { width: 15 }, { width: 15 }
-                ];
-                XLSX.utils.book_append_sheet(wb, bestSellingWs, 'สินค้าขายดี');
-            }
-            
-            // Production Details
-            if (monthlyProductions.length > 0) {
-                const productionData = [
-                    ['วันที่', 'ชื่อสินค้า', 'จำนวนที่ผลิต', 'ต้นทุน']
-                ];
-                
-                monthlyProductions.forEach(production => {
-                    productionData.push([
-                        new Date(production.date).toLocaleDateString('th-TH'),
-                        production.recipeName,
-                        production.quantity,
-                        parseFloat(production.totalCost.toFixed(2))
-                    ]);
-                });
-                
-                const productionWs = XLSX.utils.aoa_to_sheet(productionData);
-                productionWs['!cols'] = [
-                    { width: 12 }, { width: 25 }, { width: 15 }, { width: 12 }
-                ];
-                XLSX.utils.book_append_sheet(wb, productionWs, 'รายละเอียดการผลิต');
-            }
-            
-            // Ingredient Usage
+            // Calculate ingredient usage
             const ingredientUsage = {};
             monthlyProductions.forEach(production => {
                 const recipe = recipes.find(r => r.id === production.recipeId);
@@ -1345,90 +1251,314 @@
             });
             
             const sortedUsage = Object.entries(ingredientUsage)
-                .sort((a, b) => b[1].cost - a[1].cost);
-            
-            if (sortedUsage.length > 0) {
-                const usageData = [
-                    ['ชื่อวัตถุดิบ', 'จำนวนที่ใช้', 'หน่วย', 'ต้นทุนรวม']
-                ];
-                
-                sortedUsage.forEach(item => {
-                    usageData.push([
-                        item[0],
-                        parseFloat(item[1].amount.toFixed(1)),
-                        item[1].unit,
-                        parseFloat(item[1].cost.toFixed(2))
-                    ]);
-                });
-                
-                const usageWs = XLSX.utils.aoa_to_sheet(usageData);
-                usageWs['!cols'] = [
-                    { width: 20 }, { width: 12 }, { width: 8 }, { width: 15 }
-                ];
-                XLSX.utils.book_append_sheet(wb, usageWs, 'การใช้วัตถุดิบ');
-            }
-            
-            // Current Inventory
-            if (ingredients.length > 0) {
-                const inventoryData = [
-                    ['ชื่อวัตถุดิบ', 'คงเหลือ', 'หน่วย', 'ขั้นต่ำ', 'ราคาต่อหน่วย', 'มูลค่าคงเหลือ', 'วันหมดอายุ', 'สถานะ']
-                ];
-                
-                ingredients.forEach(ingredient => {
-                    const isLowStock = ingredient.remaining <= ingredient.minStock;
-                    const isExpired = ingredient.expiry && new Date(ingredient.expiry) < new Date();
-                    const isExpiringSoon = ingredient.expiry && new Date(ingredient.expiry) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && !isExpired;
-                    const stockValue = ingredient.remaining * ingredient.pricePerUnit;
-                    
-                    let status = 'ปกติ';
-                    if (isExpired) status = 'หมดอายุ';
-                    else if (isExpiringSoon) status = 'ใกล้หมดอายุ';
-                    else if (isLowStock) status = 'ใกล้หมด';
-                    
-                    inventoryData.push([
-                        ingredient.name,
-                        ingredient.remaining,
-                        ingredient.unit,
-                        ingredient.minStock,
-                        parseFloat(ingredient.pricePerUnit.toFixed(2)),
-                        parseFloat(stockValue.toFixed(2)),
-                        ingredient.expiry ? new Date(ingredient.expiry).toLocaleDateString('th-TH') : '-',
-                        status
-                    ]);
-                });
-                
-                const inventoryWs = XLSX.utils.aoa_to_sheet(inventoryData);
-                inventoryWs['!cols'] = [
-                    { width: 20 }, { width: 10 }, { width: 8 }, { width: 10 },
-                    { width: 12 }, { width: 15 }, { width: 12 }, { width: 12 }
-                ];
-                XLSX.utils.book_append_sheet(wb, inventoryWs, 'สต็อกปัจจุบัน');
-            }
-            
-            // Generate filename and save
-            const fileName = `รายงานขนม_${year}_${monthNum.padStart(2, '0')}.xlsx`;
+                .sort((a, b) => b[1].cost - a[1].cost)
+                .slice(0, 10);
             
             try {
-                XLSX.writeFile(wb, fileName, {
-                    bookType: 'xlsx',
-                    type: 'binary',
-                    cellStyles: true,
-                    sheetStubs: false
+                // Create document sections
+                const children = [];
+                
+                // Title
+                children.push(
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: "รายงานธุรกิจขนม",
+                                bold: true,
+                                size: 32,
+                                font: "Sarabun"
+                            })
+                        ],
+                        alignment: docx.AlignmentType.CENTER,
+                        spacing: { after: 400 }
+                    })
+                );
+                
+                // Month subtitle
+                children.push(
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: `รายงานประจำเดือน ${monthName}`,
+                                size: 24,
+                                font: "Sarabun"
+                            })
+                        ],
+                        alignment: docx.AlignmentType.CENTER,
+                        spacing: { after: 600 }
+                    })
+                );
+                
+                // Summary section
+                children.push(
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: "📊 สรุปผลประกอบการ",
+                                bold: true,
+                                size: 20,
+                                font: "Sarabun"
+                            })
+                        ],
+                        spacing: { before: 400, after: 200 }
+                    })
+                );
+                
+                // Summary table
+                const summaryRows = [
+                    new docx.TableRow({
+                        children: [
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "ยอดขายรวม", font: "Sarabun" })] })],
+                                width: { size: 50, type: docx.WidthType.PERCENTAGE }
+                            }),
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: `${monthlyRevenue.toLocaleString()} บาท`, font: "Sarabun" })] })],
+                                width: { size: 50, type: docx.WidthType.PERCENTAGE }
+                            })
+                        ]
+                    }),
+                    new docx.TableRow({
+                        children: [
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "ต้นทุนรวม", font: "Sarabun" })] })]
+                            }),
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: `${monthlyCost.toFixed(2).toLocaleString()} บาท`, font: "Sarabun" })] })]
+                            })
+                        ]
+                    }),
+                    new docx.TableRow({
+                        children: [
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "กำไรสุทธิ", font: "Sarabun", bold: true })] })]
+                            }),
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: `${monthlyProfit.toFixed(2).toLocaleString()} บาท`, font: "Sarabun", bold: true })] })]
+                            })
+                        ]
+                    }),
+                    new docx.TableRow({
+                        children: [
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "จำนวนการขาย", font: "Sarabun" })] })]
+                            }),
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: `${monthlySales.length} รายการ`, font: "Sarabun" })] })]
+                            })
+                        ]
+                    }),
+                    new docx.TableRow({
+                        children: [
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "จำนวนการผลิต", font: "Sarabun" })] })]
+                            }),
+                            new docx.TableCell({
+                                children: [new docx.Paragraph({ children: [new docx.TextRun({ text: `${monthlyProductions.length} ครั้ง`, font: "Sarabun" })] })]
+                            })
+                        ]
+                    })
+                ];
+                
+                children.push(
+                    new docx.Table({
+                        rows: summaryRows,
+                        width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                        margins: { top: 100, bottom: 100, left: 100, right: 100 }
+                    })
+                );
+                
+                // Best selling products section
+                if (bestSelling.length > 0) {
+                    children.push(
+                        new docx.Paragraph({
+                            children: [
+                                new docx.TextRun({
+                                    text: "🏆 สินค้าขายดี",
+                                    bold: true,
+                                    size: 20,
+                                    font: "Sarabun"
+                                })
+                            ],
+                            spacing: { before: 600, after: 200 }
+                        })
+                    );
+                    
+                    const bestSellingRows = [
+                        new docx.TableRow({
+                            children: [
+                                new docx.TableCell({
+                                    children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "อันดับ", font: "Sarabun", bold: true })] })],
+                                    width: { size: 15, type: docx.WidthType.PERCENTAGE }
+                                }),
+                                new docx.TableCell({
+                                    children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "ชื่อสินค้า", font: "Sarabun", bold: true })] })],
+                                    width: { size: 45, type: docx.WidthType.PERCENTAGE }
+                                }),
+                                new docx.TableCell({
+                                    children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "จำนวนที่ขาย", font: "Sarabun", bold: true })] })],
+                                    width: { size: 20, type: docx.WidthType.PERCENTAGE }
+                                }),
+                                new docx.TableCell({
+                                    children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "รายได้", font: "Sarabun", bold: true })] })],
+                                    width: { size: 20, type: docx.WidthType.PERCENTAGE }
+                                })
+                            ]
+                        })
+                    ];
+                    
+                    bestSelling.forEach((item, index) => {
+                        bestSellingRows.push(
+                            new docx.TableRow({
+                                children: [
+                                    new docx.TableCell({
+                                        children: [new docx.Paragraph({ children: [new docx.TextRun({ text: `${index + 1}`, font: "Sarabun" })] })]
+                                    }),
+                                    new docx.TableCell({
+                                        children: [new docx.Paragraph({ children: [new docx.TextRun({ text: item[0], font: "Sarabun" })] })]
+                                    }),
+                                    new docx.TableCell({
+                                        children: [new docx.Paragraph({ children: [new docx.TextRun({ text: `${item[1].quantity} ชิ้น`, font: "Sarabun" })] })]
+                                    }),
+                                    new docx.TableCell({
+                                        children: [new docx.Paragraph({ children: [new docx.TextRun({ text: `${item[1].revenue.toLocaleString()} บาท`, font: "Sarabun" })] })]
+                                    })
+                                ]
+                            })
+                        );
+                    });
+                    
+                    children.push(
+                        new docx.Table({
+                            rows: bestSellingRows,
+                            width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                            margins: { top: 100, bottom: 100, left: 100, right: 100 }
+                        })
+                    );
+                }
+                
+                // Ingredient usage section
+                if (sortedUsage.length > 0) {
+                    children.push(
+                        new docx.Paragraph({
+                            children: [
+                                new docx.TextRun({
+                                    text: "📦 การใช้วัตถุดิบ",
+                                    bold: true,
+                                    size: 20,
+                                    font: "Sarabun"
+                                })
+                            ],
+                            spacing: { before: 600, after: 200 }
+                        })
+                    );
+                    
+                    const usageRows = [
+                        new docx.TableRow({
+                            children: [
+                                new docx.TableCell({
+                                    children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "ชื่อวัตถุดิบ", font: "Sarabun", bold: true })] })],
+                                    width: { size: 40, type: docx.WidthType.PERCENTAGE }
+                                }),
+                                new docx.TableCell({
+                                    children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "จำนวนที่ใช้", font: "Sarabun", bold: true })] })],
+                                    width: { size: 20, type: docx.WidthType.PERCENTAGE }
+                                }),
+                                new docx.TableCell({
+                                    children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "หน่วย", font: "Sarabun", bold: true })] })],
+                                    width: { size: 20, type: docx.WidthType.PERCENTAGE }
+                                }),
+                                new docx.TableCell({
+                                    children: [new docx.Paragraph({ children: [new docx.TextRun({ text: "ต้นทุน", font: "Sarabun", bold: true })] })],
+                                    width: { size: 20, type: docx.WidthType.PERCENTAGE }
+                                })
+                            ]
+                        })
+                    ];
+                    
+                    sortedUsage.forEach(item => {
+                        usageRows.push(
+                            new docx.TableRow({
+                                children: [
+                                    new docx.TableCell({
+                                        children: [new docx.Paragraph({ children: [new docx.TextRun({ text: item[0], font: "Sarabun" })] })]
+                                    }),
+                                    new docx.TableCell({
+                                        children: [new docx.Paragraph({ children: [new docx.TextRun({ text: item[1].amount.toFixed(1), font: "Sarabun" })] })]
+                                    }),
+                                    new docx.TableCell({
+                                        children: [new docx.Paragraph({ children: [new docx.TextRun({ text: item[1].unit, font: "Sarabun" })] })]
+                                    }),
+                                    new docx.TableCell({
+                                        children: [new docx.Paragraph({ children: [new docx.TextRun({ text: `${item[1].cost.toFixed(2)} บาท`, font: "Sarabun" })] })]
+                                    })
+                                ]
+                            })
+                        );
+                    });
+                    
+                    children.push(
+                        new docx.Table({
+                            rows: usageRows,
+                            width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                            margins: { top: 100, bottom: 100, left: 100, right: 100 }
+                        })
+                    );
+                }
+                
+                // Footer
+                children.push(
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: `วันที่สร้างรายงาน: ${new Date().toLocaleDateString('th-TH')}`,
+                                size: 16,
+                                font: "Sarabun",
+                                italics: true
+                            })
+                        ],
+                        alignment: docx.AlignmentType.RIGHT,
+                        spacing: { before: 800 }
+                    })
+                );
+                
+                // Create document
+                const doc = new docx.Document({
+                    sections: [{
+                        properties: {
+                            page: {
+                                margin: {
+                                    top: 1440,
+                                    right: 1440,
+                                    bottom: 1440,
+                                    left: 1440
+                                }
+                            }
+                        },
+                        children: children
+                    }]
                 });
                 
-                // Show success message
-                setTimeout(() => {
-                    alert(`✅ ส่งออกรายงาน Excel สำเร็จ!\n\nไฟล์: ${fileName}\nข้อมูล: ${monthName}\n\n📊 รายงานประกอบด้วย:\n• สรุปรายเดือน\n• รายละเอียดการขาย\n• สินค้าขายดี\n• การผลิต\n• การใช้วัตถุดิบ\n• สต็อกปัจจุบัน`);
-                }, 500);
+                // Generate and save file
+                const fileName = `รายงานขนม_${year}_${monthNum.padStart(2, '0')}.docx`;
+                
+                docx.Packer.toBlob(doc).then(blob => {
+                    saveAs(blob, fileName);
+                    
+                    // Show success message
+                    setTimeout(() => {
+                        alert(`✅ ส่งออกรายงาน Word สำเร็จ!\n\nไฟล์: ${fileName}\nข้อมูล: ${monthName}\n\n📄 รายงานประกอบด้วย:\n• สรุปผลประกอบการ\n• สินค้าขายดี\n• การใช้วัตถุดิบ\n• วันที่สร้างรายงาน`);
+                    }, 500);
+                });
                 
             } catch (error) {
-                console.error('Excel export error:', error);
-                alert('❌ เกิดข้อผิดพลาดในการส่งออกไฟล์ Excel\nกรุณาลองใหม่อีกครั้ง');
+                console.error('Word export error:', error);
+                alert('❌ เกิดข้อผิดพลาดในการส่งออกไฟล์ Word\nกรุณาลองใหม่อีกครั้ง');
             }
         }
 
         // Initialize selects
         updateRecipeSelects();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96762cc3e0e7c8e3',t:'MTc1Mzg5MjMzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96764b3430e245b8',t:'MTc1Mzg5MzU4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
