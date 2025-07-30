@@ -299,7 +299,12 @@
 
                 <!-- Sales History -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">📋 ประวัติการขาย</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">📋 ประวัติการขาย</h2>
+                        <button onclick="toggleSalesSort()" id="sales-sort-btn" class="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
+                            📅 ใหม่ → เก่า
+                        </button>
+                    </div>
                     <div id="sales-history" class="space-y-3 max-h-96 overflow-y-auto">
                         <!-- Sales history will be displayed here -->
                     </div>
@@ -449,6 +454,7 @@
         let productions = JSON.parse(localStorage.getItem('productions')) || [];
         let sales = JSON.parse(localStorage.getItem('sales')) || [];
         let ingredientHistory = JSON.parse(localStorage.getItem('ingredientHistory')) || [];
+        let salesSortNewestFirst = true; // Default to newest first
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
@@ -1110,7 +1116,16 @@
             const list = document.getElementById('sales-history');
             list.innerHTML = '';
             
-            sales.slice(-10).reverse().forEach(sale => {
+            // Sort sales based on current sort preference
+            let sortedSales = [...sales];
+            if (salesSortNewestFirst) {
+                sortedSales.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else {
+                sortedSales.sort((a, b) => new Date(a.date) - new Date(b.date));
+            }
+            
+            // Show last 10 items
+            sortedSales.slice(0, 10).forEach(sale => {
                 const div = document.createElement('div');
                 div.className = 'p-3 bg-green-50 border border-green-200 rounded-lg';
                 div.innerHTML = `
@@ -1127,6 +1142,19 @@
                 `;
                 list.appendChild(div);
             });
+        }
+        
+        function toggleSalesSort() {
+            salesSortNewestFirst = !salesSortNewestFirst;
+            const btn = document.getElementById('sales-sort-btn');
+            
+            if (salesSortNewestFirst) {
+                btn.textContent = '📅 ใหม่ → เก่า';
+            } else {
+                btn.textContent = '📅 เก่า → ใหม่';
+            }
+            
+            displaySales();
         }
 
         function deleteSale(id) {
@@ -1677,5 +1705,5 @@
         // Initialize selects
         updateRecipeSelects();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96767fa7d4074ba1',t:'MTc1Mzg5NTczMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96769c04e4d145ba',t:'MTc1Mzg5Njg5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
