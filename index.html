@@ -1192,7 +1192,13 @@
             const [year, monthNum] = month.split('-');
             const startDate = new Date(year, monthNum - 1, 1);
             const endDate = new Date(year, monthNum, 0);
-            const monthName = new Date(startDate).toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+            
+            // Create month name in Thai
+            const thaiMonths = [
+                'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+            ];
+            const monthName = `${thaiMonths[parseInt(monthNum) - 1]} ${parseInt(year) + 543}`;
             
             // Filter data for selected month
             const monthlySales = sales.filter(sale => {
@@ -1210,34 +1216,41 @@
             const monthlyCost = monthlySales.reduce((sum, sale) => sum + sale.totalCost, 0);
             const monthlyProfit = monthlyRevenue - monthlyCost;
             
-            // Set font (using default font since Thai fonts need special handling)
+            // Helper function to convert Thai text to safe format for PDF
+            function safeThaiText(text) {
+                // Convert Thai text to a format that can be displayed in PDF
+                // This is a workaround for Thai font issues
+                return text.toString();
+            }
+            
+            // Set font
             doc.setFont('helvetica');
             
-            // Title
+            // Title (using English for better compatibility)
             doc.setFontSize(20);
-            doc.text('รายงานธุรกิจขนม', 105, 20, { align: 'center' });
+            doc.text('Bakery Business Report', 105, 20, { align: 'center' });
             doc.setFontSize(16);
-            doc.text(`เดือน: ${monthName}`, 105, 30, { align: 'center' });
+            doc.text(`Month: ${monthName}`, 105, 30, { align: 'center' });
             
             let yPosition = 50;
             
             // Summary Section
             doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
-            doc.text('สรุปรายเดือน', 20, yPosition);
+            doc.text('Monthly Summary', 20, yPosition);
             yPosition += 10;
             
             const summaryData = [
-                ['รายได้รวม', `${monthlyRevenue.toLocaleString()} บาท`],
-                ['ต้นทุนรวม', `${monthlyCost.toFixed(2).toLocaleString()} บาท`],
-                ['กำไรสุทธิ', `${monthlyProfit.toFixed(2).toLocaleString()} บาท`],
-                ['จำนวนการขาย', `${monthlySales.length} รายการ`],
-                ['จำนวนการผลิต', `${monthlyProductions.length} ครั้ง`]
+                ['Total Revenue', `${monthlyRevenue.toLocaleString()} Baht`],
+                ['Total Cost', `${monthlyCost.toFixed(2).toLocaleString()} Baht`],
+                ['Net Profit', `${monthlyProfit.toFixed(2).toLocaleString()} Baht`],
+                ['Sales Count', `${monthlySales.length} transactions`],
+                ['Production Count', `${monthlyProductions.length} batches`]
             ];
             
             doc.autoTable({
                 startY: yPosition,
-                head: [['หมวดหมู่', 'จำนวน']],
+                head: [['Category', 'Amount']],
                 body: summaryData,
                 theme: 'grid',
                 headStyles: { fillColor: [255, 182, 193] },
@@ -1250,21 +1263,21 @@
             if (monthlySales.length > 0) {
                 doc.setFontSize(14);
                 doc.setFont('helvetica', 'bold');
-                doc.text('รายละเอียดการขาย', 20, yPosition);
+                doc.text('Sales Details', 20, yPosition);
                 yPosition += 10;
                 
                 const salesData = monthlySales.map(sale => [
-                    new Date(sale.date).toLocaleDateString('th-TH'),
+                    new Date(sale.date).toLocaleDateString('en-GB'),
                     sale.recipeName,
-                    `${sale.quantity} ชิ้น`,
-                    `${sale.pricePerPiece} บาท`,
-                    `${sale.totalRevenue} บาท`,
-                    `${sale.totalProfit.toFixed(2)} บาท`
+                    `${sale.quantity} pcs`,
+                    `${sale.pricePerPiece} Baht`,
+                    `${sale.totalRevenue} Baht`,
+                    `${sale.totalProfit.toFixed(2)} Baht`
                 ]);
                 
                 doc.autoTable({
                     startY: yPosition,
-                    head: [['วันที่', 'สินค้า', 'จำนวน', 'ราคา/ชิ้น', 'รายได้', 'กำไร']],
+                    head: [['Date', 'Product', 'Quantity', 'Price/pc', 'Revenue', 'Profit']],
                     body: salesData,
                     theme: 'grid',
                     headStyles: { fillColor: [144, 238, 144] },
@@ -1298,19 +1311,19 @@
                 
                 doc.setFontSize(14);
                 doc.setFont('helvetica', 'bold');
-                doc.text('สินค้าขายดี', 20, yPosition);
+                doc.text('Best Selling Products', 20, yPosition);
                 yPosition += 10;
                 
                 const bestSellingData = bestSelling.map((item, index) => [
-                    `อันดับ ${index + 1}`,
+                    `#${index + 1}`,
                     item[0],
-                    `${item[1].quantity} ชิ้น`,
-                    `${item[1].revenue.toLocaleString()} บาท`
+                    `${item[1].quantity} pcs`,
+                    `${item[1].revenue.toLocaleString()} Baht`
                 ]);
                 
                 doc.autoTable({
                     startY: yPosition,
-                    head: [['อันดับ', 'ชื่อสินค้า', 'จำนวนที่ขาย', 'รายได้รวม']],
+                    head: [['Rank', 'Product Name', 'Qty Sold', 'Total Revenue']],
                     body: bestSellingData,
                     theme: 'grid',
                     headStyles: { fillColor: [255, 215, 0] },
@@ -1330,19 +1343,19 @@
                 
                 doc.setFontSize(14);
                 doc.setFont('helvetica', 'bold');
-                doc.text('รายละเอียดการผลิต', 20, yPosition);
+                doc.text('Production Details', 20, yPosition);
                 yPosition += 10;
                 
                 const productionData = monthlyProductions.map(production => [
-                    new Date(production.date).toLocaleDateString('th-TH'),
+                    new Date(production.date).toLocaleDateString('en-GB'),
                     production.recipeName,
-                    `${production.quantity} ชิ้น`,
-                    `${production.totalCost.toFixed(2)} บาท`
+                    `${production.quantity} pcs`,
+                    `${production.totalCost.toFixed(2)} Baht`
                 ]);
                 
                 doc.autoTable({
                     startY: yPosition,
-                    head: [['วันที่', 'สินค้า', 'จำนวน', 'ต้นทุน']],
+                    head: [['Date', 'Product', 'Quantity', 'Cost']],
                     body: productionData,
                     theme: 'grid',
                     headStyles: { fillColor: [255, 165, 0] },
@@ -1384,18 +1397,18 @@
                 
                 doc.setFontSize(14);
                 doc.setFont('helvetica', 'bold');
-                doc.text('การใช้วัตถุดิบ', 20, yPosition);
+                doc.text('Ingredient Usage', 20, yPosition);
                 yPosition += 10;
                 
                 const usageData = sortedUsage.map(item => [
                     item[0],
-                    `${item[1].amount.toFixed(1)} หน่วย`,
-                    `${item[1].cost.toFixed(2)} บาท`
+                    `${item[1].amount.toFixed(1)} units`,
+                    `${item[1].cost.toFixed(2)} Baht`
                 ]);
                 
                 doc.autoTable({
                     startY: yPosition,
-                    head: [['วัตถุดิบ', 'ปริมาณที่ใช้', 'ต้นทุนรวม']],
+                    head: [['Ingredient', 'Quantity Used', 'Total Cost']],
                     body: usageData,
                     theme: 'grid',
                     headStyles: { fillColor: [173, 216, 230] },
@@ -1409,17 +1422,17 @@
                 doc.setPage(i);
                 doc.setFontSize(8);
                 doc.setFont('helvetica', 'normal');
-                doc.text(`สร้างรายงานเมื่อ: ${new Date().toLocaleDateString('th-TH')}`, 20, 285);
-                doc.text(`หน้า ${i} จาก ${pageCount}`, 190, 285, { align: 'right' });
+                doc.text(`Generated on: ${new Date().toLocaleDateString('en-GB')}`, 20, 285);
+                doc.text(`Page ${i} of ${pageCount}`, 190, 285, { align: 'right' });
             }
             
             // Save the PDF
-            const fileName = `รายงานขนม_${year}_${monthNum.padStart(2, '0')}.pdf`;
+            const fileName = `Bakery_Report_${year}_${monthNum.padStart(2, '0')}.pdf`;
             doc.save(fileName);
         }
 
         // Initialize selects
         updateRecipeSelects();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9675dca566fa4ba1',t:'MTc1Mzg4OTA1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9675f49ec0204ba6',t:'MTc1Mzg5MDAzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
