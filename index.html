@@ -129,42 +129,87 @@
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">➕ เพิ่มวัตถุดิบใหม่</h2>
                     <form id="ingredient-form" class="space-y-4">
                         <div class="relative">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อวัตถุดิบ</label>
-                            <input type="text" id="ingredient-name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" placeholder="เช่น แป้งสาลี" autocomplete="off" oninput="showIngredientSuggestions()" onfocus="showIngredientSuggestions()" onblur="hideIngredientSuggestions()">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อวัตถุดิบ <span class="text-red-500">*</span></label>
+                            <input type="text" id="ingredient-name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" placeholder="เช่น แป้งสาลี" autocomplete="off" oninput="showIngredientSuggestions()" onfocus="showIngredientSuggestions()" onblur="hideIngredientSuggestions()" required>
                             <div id="ingredient-suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto hidden">
                                 <!-- Suggestions will appear here -->
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">ราคาซื้อ (บาท)</label>
-                                <input type="number" id="ingredient-price" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" placeholder="60">
+                        
+                        <!-- Simple Input Mode Toggle -->
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <label class="text-sm font-medium text-blue-800">โหมดกรอกข้อมูลง่าย</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="simple-mode" class="sr-only peer" onchange="toggleInputMode()">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">ปริมาณ</label>
-                                <input type="number" id="ingredient-quantity" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" placeholder="1000">
+                            <p class="text-xs text-blue-600">เปิดใช้งาน: ใส่แค่จำนวนถุง ระบบคำนวณกรัมให้อัตโนมัติ</p>
+                        </div>
+                        
+                        <!-- Simple Mode Input -->
+                        <div id="simple-input" class="hidden">
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                                <h3 class="font-medium text-green-800 mb-3">📦 กรอกข้อมูลแบบง่าย</h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-green-700 mb-1">จำนวนถุง <span class="text-red-500">*</span></label>
+                                        <input type="number" id="simple-bags" class="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" placeholder="1" min="0.01" step="0.01" oninput="calculateFromBags()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-green-700 mb-1">กรัม/ถุง <span class="text-red-500">*</span></label>
+                                        <input type="number" id="simple-grams-per-bag" class="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" placeholder="1000" min="0.01" step="0.01" oninput="calculateFromBags()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-green-700 mb-1">ราคา/ถุง <span class="text-red-500">*</span></label>
+                                        <input type="number" id="simple-price-per-bag" class="w-full p-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" placeholder="60" min="0.01" step="0.01" oninput="calculateFromBags()">
+                                    </div>
+                                </div>
+                                <div class="mt-3 p-3 bg-white rounded-lg border border-green-200">
+                                    <div class="text-sm text-green-700">
+                                        <div>📊 <strong>รวม:</strong> <span id="total-grams">0</span> กรัม</div>
+                                        <div>💰 <strong>ราคารวม:</strong> <span id="total-price">0</span> บาท</div>
+                                        <div>🏷️ <strong>ราคาต่อกรัม:</strong> <span id="price-per-gram">0.00</span> บาท/กรัม</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">หน่วย</label>
-                                <select id="ingredient-unit" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base">
-                                    <option value="กรัม">กรัม</option>
-                                    <option value="กิโลกรัม">กิโลกรัม</option>
-                                    <option value="ลิตร">ลิตร</option>
-                                    <option value="มิลลิลิตร">มิลลิลิตร</option>
-                                    <option value="ฟอง">ฟอง</option>
-                                    <option value="ช้อนโต๊ะ">ช้อนโต๊ะ</option>
-                                    <option value="ชิ้น">ชิ้น</option>
-                                </select>
+                        
+                        <!-- Advanced Mode Input -->
+                        <div id="advanced-input">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">ราคาซื้อ (บาท) <span class="text-red-500">*</span></label>
+                                    <input type="number" id="ingredient-price" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" placeholder="60" min="0.01" step="0.01" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">ปริมาณ <span class="text-red-500">*</span></label>
+                                    <input type="number" id="ingredient-quantity" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" placeholder="1000" min="0.01" step="0.01" required>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนขั้นต่ำ (แจ้งเตือน)</label>
-                                <input type="number" id="ingredient-min" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" placeholder="100">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">หน่วย <span class="text-red-500">*</span></label>
+                                    <select id="ingredient-unit" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" required>
+                                        <option value="กรัม">กรัม</option>
+                                        <option value="กิโลกรัม">กิโลกรัม</option>
+                                        <option value="ลิตร">ลิตร</option>
+                                        <option value="มิลลิลิตร">มิลลิลิตร</option>
+                                        <option value="ฟอง">ฟอง</option>
+                                        <option value="ช้อนโต๊ะ">ช้อนโต๊ะ</option>
+                                        <option value="ชิ้น">ชิ้น</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนขั้นต่ำ (แจ้งเตือน) <span class="text-red-500">*</span></label>
+                                    <input type="number" id="ingredient-min" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" placeholder="100" min="0" step="0.01" required>
+                                </div>
                             </div>
                         </div>
+                        
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">วันหมดอายุ</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">วันหมดอายุ (ไม่บังคับ)</label>
                             <input type="date" id="ingredient-expiry" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base">
                         </div>
                         <button type="submit" class="w-full bg-pink-500 text-white py-3 rounded-lg hover:bg-pink-600 transition-colors font-medium">เพิ่มวัตถุดิบ</button>
@@ -350,6 +395,78 @@
                     </div>
                 </div>
 
+                <!-- Weekly Report -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">📊 รายงานรายสัปดาห์</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">เลือกสัปดาห์</label>
+                        <input type="week" id="report-week" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base" onchange="generateWeeklyReport()">
+                    </div>
+                    
+                    <!-- Weekly Report Content -->
+                    <div id="weekly-report-content" class="hidden">
+                        <!-- Weekly Summary Cards -->
+                        <div id="weekly-summary" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                            <!-- Summary cards will be populated here -->
+                        </div>
+                        
+                        <!-- Daily Sales Chart -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">📈 ยอดขายรายวัน</h3>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div id="daily-sales-chart" class="space-y-3">
+                                    <!-- Daily sales bars will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Daily Analysis Table -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">📋 วิเคราะห์รายวัน</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full border-collapse border border-gray-300">
+                                    <thead>
+                                        <tr class="bg-blue-50">
+                                            <th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">วัน</th>
+                                            <th class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">วันที่</th>
+                                            <th class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">รายการขาย</th>
+                                            <th class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">ชิ้นรวม</th>
+                                            <th class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">รายได้</th>
+                                            <th class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">กำไร</th>
+                                            <th class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">เมนูขายดี</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="daily-analysis-table">
+                                        <!-- Daily analysis data will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Weekly Insights -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">💡 ข้อมูลเชิงลึก</h3>
+                            <div id="weekly-insights" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Insights will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Popular Items by Day -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">🍰 เมนูยอดนิยมแต่ละวัน</h3>
+                            <div id="daily-popular-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- Daily popular items will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="weekly-report-empty" class="text-center py-8">
+                        <div class="text-4xl mb-3">📊</div>
+                        <p class="text-gray-500">เลือกสัปดาห์เพื่อดูรายงาน</p>
+                    </div>
+                </div>
+
                 <!-- Monthly Report -->
                 <div class="bg-white rounded-xl shadow-lg p-6 col-span-1 lg:col-span-2">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">📅 รายงานรายเดือน</h2>
@@ -463,6 +580,12 @@
             document.getElementById('sales-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('report-month').value = new Date().toISOString().slice(0, 7);
             
+            // Set current week as default
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentWeek = getWeekNumber(today);
+            document.getElementById('report-week').value = `${currentYear}-W${currentWeek.toString().padStart(2, '0')}`;
+            
             displayIngredients();
             displayRecipes();
             displayProductions();
@@ -498,13 +621,18 @@
                 return;
             }
             
-            suggestionsDiv.innerHTML = filteredHistory.map(item => `
-                <div class="p-3 hover:bg-pink-50 cursor-pointer border-b border-gray-100 last:border-b-0" onclick="selectIngredientSuggestion('${item.name}', ${item.price}, ${item.quantity}, '${item.unit}', ${item.minStock}, '${item.expiry}')">
-                    <div class="font-medium text-gray-800">${item.name}</div>
-                    <div class="text-sm text-gray-600">ราคา: ${item.price} บาท / ${item.quantity} ${item.unit}</div>
-                    <div class="text-xs text-gray-500">ใช้ครั้งล่าสุด: ${new Date(item.lastUsed).toLocaleDateString('th-TH')}</div>
-                </div>
-            `).join('');
+            suggestionsDiv.innerHTML = filteredHistory.map(item => {
+                const pricePerUnit = item.quantity > 0 ? (item.price / item.quantity).toFixed(4) : '0.0000';
+                const bagInfo = item.bags && item.gramsPerBag ? ` (${item.bags} ถุง × ${item.gramsPerBag} กรัม)` : '';
+                return `
+                    <div class="p-3 hover:bg-pink-50 cursor-pointer border-b border-gray-100 last:border-b-0" onclick="selectIngredientSuggestion('${item.name}', ${item.price}, ${item.quantity}, '${item.unit}', ${item.minStock}, '${item.expiry}', ${item.bags || 0}, ${item.gramsPerBag || 0}, ${item.pricePerBag || 0})">
+                        <div class="font-medium text-gray-800">${item.name}</div>
+                        <div class="text-sm text-gray-600">ราคา: ${item.price} บาท / ${item.quantity} ${item.unit}${bagInfo}</div>
+                        <div class="text-sm text-blue-600">ราคาต่อ${item.unit}: ${pricePerUnit} บาท</div>
+                        <div class="text-xs text-gray-500">ใช้ครั้งล่าสุด: ${new Date(item.lastUsed).toLocaleDateString('th-TH')}</div>
+                    </div>
+                `;
+            }).join('');
             
             suggestionsDiv.classList.remove('hidden');
         }
@@ -520,26 +648,39 @@
             // Sort by most recently used
             const sortedHistory = [...ingredientHistory].sort((a, b) => new Date(b.lastUsed) - new Date(a.lastUsed));
             
-            suggestionsDiv.innerHTML = sortedHistory.slice(0, 10).map(item => `
-                <div class="p-3 hover:bg-pink-50 cursor-pointer border-b border-gray-100 last:border-b-0" onclick="selectIngredientSuggestion('${item.name}', ${item.price}, ${item.quantity}, '${item.unit}', ${item.minStock}, '${item.expiry}')">
-                    <div class="font-medium text-gray-800">${item.name}</div>
-                    <div class="text-sm text-gray-600">ราคา: ${item.price} บาท / ${item.quantity} ${item.unit}</div>
-                    <div class="text-xs text-gray-500">ใช้ครั้งล่าสุด: ${new Date(item.lastUsed).toLocaleDateString('th-TH')}</div>
-                </div>
-            `).join('');
+            suggestionsDiv.innerHTML = sortedHistory.slice(0, 10).map(item => {
+                const pricePerUnit = item.quantity > 0 ? (item.price / item.quantity).toFixed(4) : '0.0000';
+                const bagInfo = item.bags && item.gramsPerBag ? ` (${item.bags} ถุง × ${item.gramsPerBag} กรัม)` : '';
+                return `
+                    <div class="p-3 hover:bg-pink-50 cursor-pointer border-b border-gray-100 last:border-b-0" onclick="selectIngredientSuggestion('${item.name}', ${item.price}, ${item.quantity}, '${item.unit}', ${item.minStock}, '${item.expiry}', ${item.bags || 0}, ${item.gramsPerBag || 0}, ${item.pricePerBag || 0})">
+                        <div class="font-medium text-gray-800">${item.name}</div>
+                        <div class="text-sm text-gray-600">ราคา: ${item.price} บาท / ${item.quantity} ${item.unit}${bagInfo}</div>
+                        <div class="text-sm text-blue-600">ราคาต่อ${item.unit}: ${pricePerUnit} บาท</div>
+                        <div class="text-xs text-gray-500">ใช้ครั้งล่าสุด: ${new Date(item.lastUsed).toLocaleDateString('th-TH')}</div>
+                    </div>
+                `;
+            }).join('');
             
             if (sortedHistory.length > 0) {
                 suggestionsDiv.classList.remove('hidden');
             }
         }
         
-        function selectIngredientSuggestion(name, price, quantity, unit, minStock, expiry) {
+        function selectIngredientSuggestion(name, price, quantity, unit, minStock, expiry, bags = 0, gramsPerBag = 0, pricePerBag = 0) {
             document.getElementById('ingredient-name').value = name;
             document.getElementById('ingredient-price').value = price;
             document.getElementById('ingredient-quantity').value = quantity;
             document.getElementById('ingredient-unit').value = unit;
             document.getElementById('ingredient-min').value = minStock;
             document.getElementById('ingredient-expiry').value = expiry || '';
+            
+            // Fill simple mode fields if available
+            if (bags > 0 && gramsPerBag > 0 && pricePerBag > 0) {
+                document.getElementById('simple-bags').value = bags;
+                document.getElementById('simple-grams-per-bag').value = gramsPerBag;
+                document.getElementById('simple-price-per-bag').value = pricePerBag;
+                calculateFromBags();
+            }
             
             hideIngredientSuggestions();
         }
@@ -561,6 +702,9 @@
                 unit: ingredientData.unit,
                 minStock: ingredientData.minStock,
                 expiry: ingredientData.expiry,
+                bags: ingredientData.bags || 0,
+                gramsPerBag: ingredientData.gramsPerBag || 0,
+                pricePerBag: ingredientData.pricePerBag || 0,
                 lastUsed: new Date().toISOString()
             };
             
@@ -599,32 +743,201 @@
             document.getElementById('tab-' + tabName).classList.add('bg-pink-500', 'text-white');
         }
 
+        // Simple mode functions
+        function toggleInputMode() {
+            const simpleMode = document.getElementById('simple-mode').checked;
+            const simpleInput = document.getElementById('simple-input');
+            const advancedInput = document.getElementById('advanced-input');
+            
+            if (simpleMode) {
+                simpleInput.classList.remove('hidden');
+                advancedInput.classList.add('hidden');
+                // Auto-set unit to กรัม in simple mode
+                document.getElementById('ingredient-unit').value = 'กรัม';
+            } else {
+                simpleInput.classList.add('hidden');
+                advancedInput.classList.remove('hidden');
+            }
+        }
+        
+        function calculateFromBags() {
+            const bags = parseFloat(document.getElementById('simple-bags').value) || 0;
+            const gramsPerBag = parseFloat(document.getElementById('simple-grams-per-bag').value) || 0;
+            const pricePerBag = parseFloat(document.getElementById('simple-price-per-bag').value) || 0;
+            
+            const totalGrams = bags * gramsPerBag;
+            const totalPrice = bags * pricePerBag;
+            const pricePerGram = totalGrams > 0 ? totalPrice / totalGrams : 0;
+            
+            document.getElementById('total-grams').textContent = totalGrams.toLocaleString();
+            document.getElementById('total-price').textContent = totalPrice.toLocaleString();
+            document.getElementById('price-per-gram').textContent = pricePerGram.toFixed(4);
+            
+            // Auto-fill advanced mode fields
+            document.getElementById('ingredient-quantity').value = totalGrams;
+            document.getElementById('ingredient-price').value = totalPrice;
+            document.getElementById('ingredient-unit').value = 'กรัม';
+        }
+
         // Ingredient management
         document.getElementById('ingredient-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const ingredient = {
-                id: Date.now(),
-                name: document.getElementById('ingredient-name').value,
-                price: parseFloat(document.getElementById('ingredient-price').value),
-                quantity: parseFloat(document.getElementById('ingredient-quantity').value),
-                unit: document.getElementById('ingredient-unit').value,
-                remaining: parseFloat(document.getElementById('ingredient-quantity').value),
-                minStock: parseFloat(document.getElementById('ingredient-min').value),
-                expiry: document.getElementById('ingredient-expiry').value,
-                pricePerUnit: parseFloat(document.getElementById('ingredient-price').value) / parseFloat(document.getElementById('ingredient-quantity').value)
-            };
+            const name = document.getElementById('ingredient-name').value.trim();
+            const minStock = parseFloat(document.getElementById('ingredient-min').value);
+            const expiry = document.getElementById('ingredient-expiry').value;
+            
+            // Check if simple mode is enabled
+            const isSimpleMode = document.getElementById('simple-mode').checked;
+            
+            // Basic validation
+            if (!name) {
+                alert('❌ กรุณากรอกชื่อวัตถุดิบ');
+                document.getElementById('ingredient-name').focus();
+                return;
+            }
+            
+            if (isNaN(minStock) || minStock < 0) {
+                alert('❌ กรุณากรอกจำนวนขั้นต่ำที่ถูกต้อง (0 หรือมากกว่า)');
+                document.getElementById('ingredient-min').focus();
+                return;
+            }
+            
+            let price, quantity, unit;
+            
+            if (isSimpleMode) {
+                // Simple mode validation
+                const bags = parseFloat(document.getElementById('simple-bags').value);
+                const gramsPerBag = parseFloat(document.getElementById('simple-grams-per-bag').value);
+                const pricePerBag = parseFloat(document.getElementById('simple-price-per-bag').value);
+                
+                if (!bags || bags <= 0) {
+                    alert('❌ กรุณากรอกจำนวนถุงที่ถูกต้อง (มากกว่า 0)');
+                    document.getElementById('simple-bags').focus();
+                    return;
+                }
+                
+                if (!gramsPerBag || gramsPerBag <= 0) {
+                    alert('❌ กรุณากรอกจำนวนกรัมต่อถุงที่ถูกต้อง (มากกว่า 0)');
+                    document.getElementById('simple-grams-per-bag').focus();
+                    return;
+                }
+                
+                if (!pricePerBag || pricePerBag <= 0) {
+                    alert('❌ กรุณากรอกราคาต่อถุงที่ถูกต้อง (มากกว่า 0)');
+                    document.getElementById('simple-price-per-bag').focus();
+                    return;
+                }
+                
+                // Calculate values from simple mode
+                quantity = bags * gramsPerBag;
+                price = bags * pricePerBag;
+                unit = 'กรัม';
+            } else {
+                // Advanced mode validation
+                price = parseFloat(document.getElementById('ingredient-price').value);
+                quantity = parseFloat(document.getElementById('ingredient-quantity').value);
+                unit = document.getElementById('ingredient-unit').value;
+                
+                if (!price || price <= 0) {
+                    alert('❌ กรุณากรอกราคาซื้อที่ถูกต้อง (มากกว่า 0)');
+                    document.getElementById('ingredient-price').focus();
+                    return;
+                }
+                
+                if (!quantity || quantity <= 0) {
+                    alert('❌ กรุณากรอกปริมาณที่ถูกต้อง (มากกว่า 0)');
+                    document.getElementById('ingredient-quantity').focus();
+                    return;
+                }
+                
+                if (!unit) {
+                    alert('❌ กรุณาเลือกหน่วย');
+                    document.getElementById('ingredient-unit').focus();
+                    return;
+                }
+            }
+            
+            const pricePerUnit = price / quantity;
+            
+            // Check if ingredient already exists (same name and unit)
+            const existingIngredient = ingredients.find(ing => 
+                ing.name.toLowerCase() === name.toLowerCase() && ing.unit === unit
+            );
+            
+            if (existingIngredient) {
+                // Update existing ingredient - add to stock
+                const totalOldValue = existingIngredient.remaining * existingIngredient.pricePerUnit;
+                const totalNewValue = quantity * pricePerUnit;
+                const totalQuantity = existingIngredient.remaining + quantity;
+                
+                // Calculate weighted average price per unit
+                const newPricePerUnit = (totalOldValue + totalNewValue) / totalQuantity;
+                
+                existingIngredient.remaining = totalQuantity;
+                existingIngredient.pricePerUnit = newPricePerUnit;
+                existingIngredient.minStock = minStock; // Update minimum stock
+                
+                // Update expiry date if new one is provided and is earlier
+                if (expiry) {
+                    if (!existingIngredient.expiry || new Date(expiry) < new Date(existingIngredient.expiry)) {
+                        existingIngredient.expiry = expiry;
+                    }
+                }
+                
+                alert(`✅ เพิ่มสต็อก "${name}" สำเร็จ!\n\n📦 สต็อกเดิม: ${(totalQuantity - quantity).toFixed(1)} ${unit}\n➕ เพิ่ม: ${quantity} ${unit}\n📊 สต็อกรวม: ${totalQuantity.toFixed(1)} ${unit}\n\n💰 ราคาเฉลี่ยใหม่: ${newPricePerUnit.toFixed(2)} บาท/${unit}`);
+            } else {
+                // Create new ingredient
+                const ingredient = {
+                    id: Date.now(),
+                    name: name,
+                    price: price,
+                    quantity: quantity,
+                    unit: unit,
+                    remaining: quantity,
+                    minStock: minStock,
+                    expiry: expiry,
+                    pricePerUnit: pricePerUnit
+                };
+                
+                ingredients.push(ingredient);
+                alert(`✅ เพิ่มวัตถุดิบใหม่ "${name}" สำเร็จ!\n\n📦 จำนวน: ${quantity} ${unit}\n💰 ราคา: ${pricePerUnit.toFixed(2)} บาท/${unit}`);
+            }
             
             // Save to history for future suggestions
-            saveToIngredientHistory(ingredient);
+            const isSimpleMode = document.getElementById('simple-mode').checked;
+            const historyData = {
+                name: name,
+                price: price,
+                quantity: quantity,
+                unit: unit,
+                minStock: minStock,
+                expiry: expiry
+            };
             
-            ingredients.push(ingredient);
+            // Add simple mode data if used
+            if (isSimpleMode) {
+                historyData.bags = parseFloat(document.getElementById('simple-bags').value) || 0;
+                historyData.gramsPerBag = parseFloat(document.getElementById('simple-grams-per-bag').value) || 0;
+                historyData.pricePerBag = parseFloat(document.getElementById('simple-price-per-bag').value) || 0;
+            }
+            
+            saveToIngredientHistory(historyData);
+            
             localStorage.setItem('ingredients', JSON.stringify(ingredients));
             displayIngredients();
             updateRecipeSelects();
             checkLowStock();
             displayInventory();
             this.reset();
+            
+            // Reset simple mode fields
+            document.getElementById('simple-bags').value = '';
+            document.getElementById('simple-grams-per-bag').value = '';
+            document.getElementById('simple-price-per-bag').value = '';
+            document.getElementById('total-grams').textContent = '0';
+            document.getElementById('total-price').textContent = '0';
+            document.getElementById('price-per-gram').textContent = '0.00';
             
             // Hide suggestions after form reset
             document.getElementById('ingredient-suggestions').classList.add('hidden');
@@ -1410,6 +1723,244 @@
             }
         }
 
+        // Helper function to get week number
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // Weekly Report Generation
+        function generateWeeklyReport() {
+            const weekInput = document.getElementById('report-week').value;
+            if (!weekInput) {
+                document.getElementById('weekly-report-content').classList.add('hidden');
+                document.getElementById('weekly-report-empty').classList.remove('hidden');
+                return;
+            }
+            
+            const [year, week] = weekInput.split('-W');
+            const weekNum = parseInt(week);
+            
+            // Calculate start and end dates of the week
+            const jan1 = new Date(year, 0, 1);
+            const daysToAdd = (weekNum - 1) * 7;
+            const startOfWeek = new Date(jan1.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+            
+            // Adjust to Monday (start of week)
+            const dayOfWeek = startOfWeek.getDay();
+            const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            startOfWeek.setDate(startOfWeek.getDate() + mondayOffset);
+            
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            
+            // Filter sales for the selected week
+            const weeklySales = sales.filter(sale => {
+                const saleDate = new Date(sale.date);
+                return saleDate >= startOfWeek && saleDate <= endOfWeek;
+            });
+            
+            // Show content, hide empty state
+            document.getElementById('weekly-report-empty').classList.add('hidden');
+            document.getElementById('weekly-report-content').classList.remove('hidden');
+            
+            // Calculate weekly totals
+            const weeklyRevenue = weeklySales.reduce((sum, sale) => sum + sale.totalRevenue, 0);
+            const weeklyCost = weeklySales.reduce((sum, sale) => sum + sale.totalCost, 0);
+            const weeklyProfit = weeklyRevenue - weeklyCost;
+            const totalItems = weeklySales.reduce((sum, sale) => sum + sale.quantity, 0);
+            
+            // Create Thai week display
+            const thaiMonths = [
+                'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+                'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
+            ];
+            const weekDisplay = `สัปดาห์ที่ ${weekNum} (${startOfWeek.getDate()} ${thaiMonths[startOfWeek.getMonth()]} - ${endOfWeek.getDate()} ${thaiMonths[endOfWeek.getMonth()]} ${parseInt(year) + 543})`;
+            
+            // Update summary cards
+            const summaryDiv = document.getElementById('weekly-summary');
+            summaryDiv.innerHTML = `
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <div class="text-sm text-green-600 mb-1">รายได้สัปดาห์นี้</div>
+                    <div class="text-2xl font-bold text-green-800">${weeklyRevenue.toLocaleString()} บาท</div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <div class="text-sm text-blue-600 mb-1">กำไรสัปดาห์นี้</div>
+                    <div class="text-2xl font-bold text-blue-800">${weeklyProfit.toFixed(2).toLocaleString()} บาท</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <div class="text-sm text-purple-600 mb-1">ขายได้ทั้งหมด</div>
+                    <div class="text-2xl font-bold text-purple-800">${totalItems} ชิ้น</div>
+                </div>
+                <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                    <div class="text-sm text-orange-600 mb-1">รายการขาย</div>
+                    <div class="text-2xl font-bold text-orange-800">${weeklySales.length} รายการ</div>
+                </div>
+            `;
+            
+            // Generate daily analysis
+            const dailyData = [];
+            const thaiDays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+            
+            for (let i = 0; i < 7; i++) {
+                const currentDay = new Date(startOfWeek);
+                currentDay.setDate(startOfWeek.getDate() + i);
+                
+                const dayString = currentDay.toISOString().split('T')[0];
+                const daySales = weeklySales.filter(sale => sale.date === dayString);
+                
+                const dayRevenue = daySales.reduce((sum, sale) => sum + sale.totalRevenue, 0);
+                const dayProfit = daySales.reduce((sum, sale) => sum + sale.totalProfit, 0);
+                const dayItems = daySales.reduce((sum, sale) => sum + sale.quantity, 0);
+                
+                // Find most popular item for the day
+                const itemCounts = {};
+                daySales.forEach(sale => {
+                    itemCounts[sale.recipeName] = (itemCounts[sale.recipeName] || 0) + sale.quantity;
+                });
+                
+                const mostPopular = Object.entries(itemCounts)
+                    .sort((a, b) => b[1] - a[1])[0];
+                
+                dailyData.push({
+                    dayName: thaiDays[currentDay.getDay()],
+                    date: currentDay.getDate(),
+                    fullDate: dayString,
+                    sales: daySales.length,
+                    items: dayItems,
+                    revenue: dayRevenue,
+                    profit: dayProfit,
+                    mostPopular: mostPopular ? `${mostPopular[0]} (${mostPopular[1]} ชิ้น)` : '-'
+                });
+            }
+            
+            // Create daily sales chart
+            const maxRevenue = Math.max(...dailyData.map(d => d.revenue));
+            const chartDiv = document.getElementById('daily-sales-chart');
+            chartDiv.innerHTML = dailyData.map(day => {
+                const percentage = maxRevenue > 0 ? (day.revenue / maxRevenue) * 100 : 0;
+                const barColor = day.revenue > 0 ? 'bg-blue-500' : 'bg-gray-200';
+                
+                return `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-16 text-sm font-medium text-gray-700">${day.dayName}</div>
+                        <div class="flex-1 bg-gray-200 rounded-full h-6 relative">
+                            <div class="${barColor} h-6 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                            <div class="absolute inset-0 flex items-center justify-center text-xs font-semibold text-white">
+                                ${day.revenue > 0 ? day.revenue.toLocaleString() + ' บาท' : ''}
+                            </div>
+                        </div>
+                        <div class="w-20 text-sm text-gray-600 text-right">${day.items} ชิ้น</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Update daily analysis table
+            const dailyTable = document.getElementById('daily-analysis-table');
+            dailyTable.innerHTML = dailyData.map((day, index) => {
+                const rowClass = day.revenue > 0 ? (index % 2 === 0 ? 'bg-white' : 'bg-blue-25') : 'bg-gray-50';
+                return `
+                    <tr class="${rowClass}">
+                        <td class="border border-gray-300 px-4 py-3 font-medium">${day.dayName}</td>
+                        <td class="border border-gray-300 px-4 py-3 text-center">${day.date}</td>
+                        <td class="border border-gray-300 px-4 py-3 text-center">${day.sales}</td>
+                        <td class="border border-gray-300 px-4 py-3 text-center">${day.items}</td>
+                        <td class="border border-gray-300 px-4 py-3 text-center text-green-600 font-semibold">${day.revenue.toLocaleString()} บาท</td>
+                        <td class="border border-gray-300 px-4 py-3 text-center text-blue-600 font-semibold">${day.profit.toFixed(2).toLocaleString()} บาท</td>
+                        <td class="border border-gray-300 px-4 py-3 text-center text-sm">${day.mostPopular}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Generate insights
+            const bestDay = dailyData.reduce((best, day) => day.revenue > best.revenue ? day : best, dailyData[0]);
+            const worstDay = dailyData.reduce((worst, day) => day.revenue < worst.revenue ? day : worst, dailyData[0]);
+            const avgDaily = weeklyRevenue / 7;
+            const daysWithSales = dailyData.filter(day => day.revenue > 0).length;
+            
+            // Calculate weekly vs previous week comparison (if data exists)
+            const prevWeekStart = new Date(startOfWeek);
+            prevWeekStart.setDate(startOfWeek.getDate() - 7);
+            const prevWeekEnd = new Date(endOfWeek);
+            prevWeekEnd.setDate(endOfWeek.getDate() - 7);
+            
+            const prevWeekSales = sales.filter(sale => {
+                const saleDate = new Date(sale.date);
+                return saleDate >= prevWeekStart && saleDate <= prevWeekEnd;
+            });
+            
+            const prevWeekRevenue = prevWeekSales.reduce((sum, sale) => sum + sale.totalRevenue, 0);
+            const revenueChange = prevWeekRevenue > 0 ? ((weeklyRevenue - prevWeekRevenue) / prevWeekRevenue * 100) : 0;
+            
+            const insightsDiv = document.getElementById('weekly-insights');
+            insightsDiv.innerHTML = `
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <h4 class="font-semibold text-yellow-800 mb-2">🏆 วันที่ขายดีที่สุด</h4>
+                    <p class="text-yellow-700">${bestDay.dayName} (${bestDay.revenue.toLocaleString()} บาท)</p>
+                    <p class="text-sm text-yellow-600">ขายได้ ${bestDay.items} ชิ้น จาก ${bestDay.sales} รายการ</p>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                    <h4 class="font-semibold text-red-800 mb-2">📉 วันที่ขายน้อยที่สุด</h4>
+                    <p class="text-red-700">${worstDay.dayName} (${worstDay.revenue.toLocaleString()} บาท)</p>
+                    <p class="text-sm text-red-600">${worstDay.revenue === 0 ? 'ไม่มีการขาย' : `ขายได้ ${worstDay.items} ชิ้น`}</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h4 class="font-semibold text-blue-800 mb-2">📊 ค่าเฉลี่ยรายวัน</h4>
+                    <p class="text-blue-700">${avgDaily.toFixed(2).toLocaleString()} บาท/วัน</p>
+                    <p class="text-sm text-blue-600">มีการขาย ${daysWithSales}/7 วัน</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <h4 class="font-semibold text-purple-800 mb-2">📈 เปรียบเทียบสัปดาห์ก่อน</h4>
+                    <p class="text-purple-700 ${revenueChange >= 0 ? 'text-green-700' : 'text-red-700'}">
+                        ${revenueChange >= 0 ? '↗️' : '↘️'} ${Math.abs(revenueChange).toFixed(1)}%
+                    </p>
+                    <p class="text-sm text-purple-600">
+                        ${revenueChange >= 0 ? 'เพิ่มขึ้น' : 'ลดลง'} ${Math.abs(weeklyRevenue - prevWeekRevenue).toFixed(2).toLocaleString()} บาท
+                    </p>
+                </div>
+            `;
+            
+            // Generate popular items by day
+            const popularItemsDiv = document.getElementById('daily-popular-items');
+            popularItemsDiv.innerHTML = dailyData.filter(day => day.revenue > 0).map(day => {
+                const daySales = weeklySales.filter(sale => sale.date === day.fullDate);
+                const itemStats = {};
+                
+                daySales.forEach(sale => {
+                    if (!itemStats[sale.recipeName]) {
+                        itemStats[sale.recipeName] = { quantity: 0, revenue: 0 };
+                    }
+                    itemStats[sale.recipeName].quantity += sale.quantity;
+                    itemStats[sale.recipeName].revenue += sale.totalRevenue;
+                });
+                
+                const sortedItems = Object.entries(itemStats)
+                    .sort((a, b) => b[1].quantity - a[1].quantity)
+                    .slice(0, 3);
+                
+                return `
+                    <div class="bg-gradient-to-br from-pink-50 to-orange-50 p-4 rounded-lg border border-pink-200">
+                        <h4 class="font-semibold text-gray-800 mb-3">${day.dayName} (${day.date})</h4>
+                        <div class="space-y-2">
+                            ${sortedItems.map((item, index) => `
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="font-medium">${index + 1}. ${item[0]}</span>
+                                    <div class="text-right">
+                                        <div class="text-blue-600 font-semibold">${item[1].quantity} ชิ้น</div>
+                                        <div class="text-green-600 text-xs">${item[1].revenue.toLocaleString()} บาท</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${sortedItems.length === 0 ? '<p class="text-gray-500 text-sm">ไม่มีการขาย</p>' : ''}
+                    </div>
+                `;
+            }).join('') || '<div class="col-span-full text-center text-gray-500 py-8">ไม่มีข้อมูลการขายในสัปดาห์นี้</div>';
+        }
+
         // Image Export Function
         function exportReportAsImage() {
             const month = document.getElementById('report-month').value;
@@ -1705,5 +2256,5 @@
         // Initialize selects
         updateRecipeSelects();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96769c04e4d145ba',t:'MTc1Mzg5Njg5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'967db6a20190a192',t:'MTc1Mzk3MTM4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
