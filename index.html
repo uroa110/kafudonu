@@ -373,7 +373,7 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">วันที่</label>
-                            <input type="date" id="sale-date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <input type="date" id="sale-date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" onchange="updateSaleInfo()">
                         </div>
                         
                         <div>
@@ -383,9 +383,22 @@
                             </select>
                         </div>
                         
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่ขาย</label>
-                            <input type="number" id="sale-quantity" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="1" oninput="updateSaleInfo()">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ขนมที่ผลิตได้</label>
+                                <input type="number" id="produced-quantity" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="0" oninput="this.dataset.autoFilled = 'false'; updateSaleInfo()">
+                                <p class="text-xs text-blue-500 mt-1">🔄 ซิงค์อัตโนมัติจากข้อมูลการผลิต</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ขนมที่เหลือ</label>
+                                <input type="number" id="remaining-quantity" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="0" oninput="updateSaleInfo()">
+                                <p class="text-xs text-gray-500 mt-1">จำนวนขนมที่เหลือหลังขาย</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">จำนวนที่ขายได้: <span id="sold-quantity" class="font-bold text-blue-600">0</span> ชิ้น</p>
+                            <p class="text-sm text-gray-500 text-xs mt-1">คำนวณจาก: ที่ผลิตได้ - ที่เหลือ</p>
                         </div>
                         
                         <div class="bg-green-50 p-4 rounded-lg">
@@ -1395,7 +1408,12 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <h4 class="font-medium text-gray-800">${sale.recipeName}</h4>
-                            <p class="text-sm text-gray-600">${new Date(sale.date).toLocaleDateString('th-TH')} | จำนวน: ${sale.quantity} ชิ้น</p>
+                            <p class="text-sm text-gray-600">${new Date(sale.date).toLocaleDateString('th-TH')}</p>
+                            ${sale.producedQuantity ? `
+                                <p class="text-sm text-gray-600">ผลิต: ${sale.producedQuantity} | เหลือ: ${sale.remainingQuantity || 0} | ขาย: ${sale.quantity} ชิ้น</p>
+                            ` : `
+                                <p class="text-sm text-gray-600">จำนวน: ${sale.quantity} ชิ้น</p>
+                            `}
                             <p class="text-sm text-gray-600">ยอดขาย: ${sale.revenue.toFixed(2)} บาท</p>
                             <p class="text-sm text-green-600 font-medium">กำไร: ${sale.profit.toFixed(2)} บาท</p>
                         </div>
@@ -1764,9 +1782,40 @@
         // Sales management
         function updateSaleInfo() {
             const recipeId = document.getElementById('sale-recipe').value;
-            const quantity = parseFloat(document.getElementById('sale-quantity').value) || 0;
+            const saleDate = document.getElementById('sale-date').value;
             
-            if (!recipeId || quantity <= 0) {
+            if (!recipeId || !saleDate) {
+                document.getElementById('produced-quantity').value = '';
+                document.getElementById('remaining-quantity').value = '';
+                document.getElementById('sold-quantity').textContent = '0';
+                document.getElementById('sale-revenue').textContent = '0.00';
+                document.getElementById('sale-cost').textContent = '0.00';
+                document.getElementById('sale-profit').textContent = '0.00';
+                return;
+            }
+            
+            // Auto-fill produced quantity from production data
+            const todayProduction = production.filter(prod => 
+                prod.recipeId == recipeId && prod.date === saleDate
+            );
+            
+            const totalProduced = todayProduction.reduce((sum, prod) => sum + prod.totalPieces, 0);
+            
+            // Auto-fill produced quantity if not manually changed
+            const producedInput = document.getElementById('produced-quantity');
+            if (producedInput.value === '' || producedInput.dataset.autoFilled === 'true') {
+                producedInput.value = totalProduced;
+                producedInput.dataset.autoFilled = 'true';
+            }
+            
+            const producedQty = parseFloat(producedInput.value) || 0;
+            const remainingQty = parseFloat(document.getElementById('remaining-quantity').value) || 0;
+            
+            // Calculate sold quantity
+            const soldQty = Math.max(0, producedQty - remainingQty);
+            document.getElementById('sold-quantity').textContent = soldQty;
+            
+            if (!recipeId || soldQty <= 0) {
                 document.getElementById('sale-revenue').textContent = '0.00';
                 document.getElementById('sale-cost').textContent = '0.00';
                 document.getElementById('sale-profit').textContent = '0.00';
@@ -1776,8 +1825,8 @@
             const recipe = recipes.find(r => r.id == recipeId);
             if (!recipe) return;
             
-            const revenue = recipe.sellingPrice * quantity;
-            const cost = recipe.costPerPiece * quantity;
+            const revenue = recipe.sellingPrice * soldQty;
+            const cost = recipe.costPerPiece * soldQty;
             const profit = revenue - cost;
             
             document.getElementById('sale-revenue').textContent = revenue.toFixed(2);
@@ -1788,10 +1837,23 @@
         function addSale() {
             const date = document.getElementById('sale-date').value;
             const recipeId = document.getElementById('sale-recipe').value;
-            const quantity = parseFloat(document.getElementById('sale-quantity').value) || 0;
+            const producedQty = parseFloat(document.getElementById('produced-quantity').value) || 0;
+            const remainingQty = parseFloat(document.getElementById('remaining-quantity').value) || 0;
             
-            if (!date || !recipeId || quantity <= 0) {
+            const soldQty = Math.max(0, producedQty - remainingQty);
+            
+            if (!date || !recipeId || producedQty <= 0) {
                 alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+            
+            if (remainingQty > producedQty) {
+                alert('จำนวนที่เหลือไม่สามารถมากกว่าที่ผลิตได้');
+                return;
+            }
+            
+            if (soldQty <= 0) {
+                alert('จำนวนที่ขายได้ต้องมากกว่า 0');
                 return;
             }
             
@@ -1801,8 +1863,8 @@
                 return;
             }
             
-            const revenue = recipe.sellingPrice * quantity;
-            const cost = recipe.costPerPiece * quantity;
+            const revenue = recipe.sellingPrice * soldQty;
+            const cost = recipe.costPerPiece * soldQty;
             const profit = revenue - cost;
             
             sales.push({
@@ -1810,7 +1872,9 @@
                 date,
                 recipeId: recipe.id,
                 recipeName: recipe.name,
-                quantity,
+                quantity: soldQty,
+                producedQuantity: producedQty,
+                remainingQuantity: remainingQty,
                 revenue,
                 cost,
                 profit
@@ -1820,8 +1884,11 @@
             updateDisplays();
             
             // Clear form
-            document.getElementById('sale-quantity').value = '';
+            document.getElementById('produced-quantity').value = '';
+            document.getElementById('remaining-quantity').value = '';
             updateSaleInfo();
+            
+            alert(`บันทึกการขาย ${recipe.name} เรียบร้อยแล้ว!\nผลิต: ${producedQty} ชิ้น | เหลือ: ${remainingQty} ชิ้น | ขายได้: ${soldQty} ชิ้น`);
         }
 
         // Production functions
@@ -2063,5 +2130,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9684ce0b230445ac',t:'MTc1NDA0NTc0NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9686187b454a10e2',t:'MTc1NDA1OTI3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
