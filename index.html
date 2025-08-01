@@ -102,25 +102,44 @@
                             <div id="suggestions" class="mt-2 bg-white border rounded-lg shadow-lg hidden"></div>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">หน่วยนับ</label>
+                            <select id="ingredient-unit" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" onchange="toggleUnitType()">
+                                <option value="weight">นับเป็นน้ำหนัก (กรัม)</option>
+                                <option value="piece">นับเป็นชิ้น/ฟอง</option>
+                            </select>
+                        </div>
+                        
+                        <div id="weight-inputs" class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนถุง/แพ็ค</label>
-                                <input type="number" id="ingredient-bags" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="1" oninput="calculateGrams()">
+                                <input type="number" id="ingredient-bags" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="1" oninput="calculateTotal()">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">กรัมต่อถุง</label>
-                                <input type="number" id="grams-per-bag" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="1000">
+                                <input type="number" id="grams-per-bag" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="1000" oninput="calculateTotal()">
+                            </div>
+                        </div>
+                        
+                        <div id="piece-inputs" class="grid grid-cols-2 gap-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนชิ้น/ฟอง</label>
+                                <input type="number" id="ingredient-pieces" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="12" oninput="calculateTotal()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ราคาต่อชิ้น/ฟอง</label>
+                                <input type="number" id="price-per-piece" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="5" step="0.01" oninput="calculateTotal()">
                             </div>
                         </div>
                         
                         <div class="bg-blue-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-600">รวมปริมาณ: <span id="total-grams" class="font-bold text-blue-600">0</span> กรัม</p>
+                            <p class="text-sm text-gray-600">รวมปริมาณ: <span id="total-amount" class="font-bold text-blue-600">0</span> <span id="unit-display">กรัม</span></p>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-4">
+                        <div id="weight-price-input" class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">ราคาซื้อ (บาท)</label>
-                                <input type="number" id="ingredient-price" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="60" oninput="calculatePricePerGram()">
+                                <input type="number" id="ingredient-price" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="60" oninput="calculateTotal()">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุ (ถ้ามี)</label>
@@ -128,8 +147,14 @@
                             </div>
                         </div>
                         
+                        <div id="piece-expiry-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุ (ถ้ามี)</label>
+                            <input type="date" id="expiry-date-piece" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
                         <div class="bg-green-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-600">ราคาต่อกรัม: <span id="price-per-gram" class="font-bold text-green-600">0.00</span> บาท/กรัม</p>
+                            <p class="text-sm text-gray-600">ราคาต่อหน่วย: <span id="price-per-unit" class="font-bold text-green-600">0.00</span> บาท/<span id="unit-price-display">กรัม</span></p>
+                            <p id="total-cost-display" class="text-sm text-gray-600">ราคารวม: <span id="total-cost-amount" class="font-bold text-blue-600">0.00</span> บาท</p>
                         </div>
                         
                         <button onclick="addIngredient()" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
@@ -291,7 +316,7 @@
                                     <select class="flex-1 px-3 py-2 border border-gray-300 rounded-lg ingredient-select">
                                         <option value="">เลือกวัตถุดิบ</option>
                                     </select>
-                                    <input type="number" placeholder="กรัม" class="w-24 px-3 py-2 border border-gray-300 rounded-lg ingredient-amount">
+                                    <input type="number" placeholder="จำนวน" class="w-24 px-3 py-2 border border-gray-300 rounded-lg ingredient-amount">
                                     <button onclick="addIngredientToRecipe()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">+</button>
                                 </div>
                             </div>
@@ -628,7 +653,7 @@
             
             container.innerHTML = alerts.map(([ingredientId, alert]) => {
                 const ingredient = inventory.find(item => item.id == ingredientId);
-                const currentStock = ingredient ? ingredient.grams : 0;
+                const currentStock = ingredient ? (ingredient.amount || ingredient.grams || 0) : 0;
                 const isLow = currentStock <= alert.minStock;
                 
                 return `
@@ -660,10 +685,11 @@
             }
             
             container.innerHTML = inventory.map(item => {
+                const amount = item.amount || item.grams || 0;
                 const alert = stockAlerts[item.id];
                 const minStock = alert ? alert.minStock : 50; // Default minimum
-                const isLow = item.grams <= minStock;
-                const percentage = Math.min((item.grams / (minStock * 2)) * 100, 100);
+                const isLow = amount <= minStock;
+                const percentage = Math.min((amount / (minStock * 2)) * 100, 100);
                 
                 return `
                     <div class="border rounded-lg p-4 ${isLow ? 'border-red-300 bg-red-50' : 'border-gray-200'}">
@@ -671,7 +697,7 @@
                         <div class="space-y-2">
                             <div class="flex justify-between text-sm">
                                 <span>คงเหลือ:</span>
-                                <span class="font-medium">${item.grams.toLocaleString()} กรัม</span>
+                                <span class="font-medium">${amount.toLocaleString()} ${item.unit || 'กรัม'}</span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2">
                                 <div class="h-2 rounded-full transition-all duration-300 ${isLow ? 'bg-red-500' : 'bg-green-500'}" 
@@ -712,68 +738,156 @@
         function selectSuggestion(name) {
             const history = ingredientHistory[name];
             document.getElementById('ingredient-name').value = name;
-            document.getElementById('ingredient-bags').value = 1;
-            document.getElementById('grams-per-bag').value = history.gramsPerBag;
-            document.getElementById('ingredient-price').value = history.price;
+            
+            if (history.unitType === 'piece') {
+                document.getElementById('ingredient-unit').value = 'piece';
+                document.getElementById('ingredient-pieces').value = 1;
+                document.getElementById('price-per-piece').value = history.pricePerPiece;
+            } else {
+                document.getElementById('ingredient-unit').value = 'weight';
+                document.getElementById('ingredient-bags').value = 1;
+                document.getElementById('grams-per-bag').value = history.gramsPerBag;
+                document.getElementById('ingredient-price').value = history.price;
+            }
+            
             document.getElementById('suggestions').classList.add('hidden');
-            calculateGrams();
-            calculatePricePerGram();
+            toggleUnitType();
+            calculateTotal();
+        }
+
+        // Unit type toggle
+        function toggleUnitType() {
+            const unitType = document.getElementById('ingredient-unit').value;
+            const weightInputs = document.getElementById('weight-inputs');
+            const pieceInputs = document.getElementById('piece-inputs');
+            const weightPriceInput = document.getElementById('weight-price-input');
+            const pieceExpiryInput = document.getElementById('piece-expiry-input');
+            const unitDisplay = document.getElementById('unit-display');
+            const unitPriceDisplay = document.getElementById('unit-price-display');
+            
+            if (unitType === 'weight') {
+                weightInputs.classList.remove('hidden');
+                pieceInputs.classList.add('hidden');
+                weightPriceInput.classList.remove('hidden');
+                pieceExpiryInput.classList.add('hidden');
+                unitDisplay.textContent = 'กรัม';
+                unitPriceDisplay.textContent = 'กรัม';
+            } else {
+                weightInputs.classList.add('hidden');
+                pieceInputs.classList.remove('hidden');
+                weightPriceInput.classList.add('hidden');
+                pieceExpiryInput.classList.remove('hidden');
+                unitDisplay.textContent = 'ชิ้น';
+                unitPriceDisplay.textContent = 'ชิ้น';
+            }
+            
+            calculateTotal();
         }
 
         // Calculations
-        function calculateGrams() {
-            const bags = parseFloat(document.getElementById('ingredient-bags').value) || 0;
-            const gramsPerBag = parseFloat(document.getElementById('grams-per-bag').value) || 0;
-            const total = bags * gramsPerBag;
-            document.getElementById('total-grams').textContent = total.toLocaleString();
-        }
-
-        function calculatePricePerGram() {
-            const price = parseFloat(document.getElementById('ingredient-price').value) || 0;
-            const totalGrams = parseFloat(document.getElementById('total-grams').textContent.replace(/,/g, '')) || 0;
-            const pricePerGram = totalGrams > 0 ? price / totalGrams : 0;
-            document.getElementById('price-per-gram').textContent = pricePerGram.toFixed(4);
+        function calculateTotal() {
+            const unitType = document.getElementById('ingredient-unit').value;
+            
+            if (unitType === 'weight') {
+                const bags = parseFloat(document.getElementById('ingredient-bags').value) || 0;
+                const gramsPerBag = parseFloat(document.getElementById('grams-per-bag').value) || 0;
+                const totalGrams = bags * gramsPerBag;
+                const price = parseFloat(document.getElementById('ingredient-price').value) || 0;
+                const pricePerGram = totalGrams > 0 ? price / totalGrams : 0;
+                
+                document.getElementById('total-amount').textContent = totalGrams.toLocaleString();
+                document.getElementById('price-per-unit').textContent = pricePerGram.toFixed(4);
+                document.getElementById('total-cost-amount').textContent = price.toFixed(2);
+            } else {
+                const pieces = parseFloat(document.getElementById('ingredient-pieces').value) || 0;
+                const pricePerPiece = parseFloat(document.getElementById('price-per-piece').value) || 0;
+                const totalCost = pieces * pricePerPiece;
+                
+                document.getElementById('total-amount').textContent = pieces.toLocaleString();
+                document.getElementById('price-per-unit').textContent = pricePerPiece.toFixed(2);
+                document.getElementById('total-cost-amount').textContent = totalCost.toFixed(2);
+            }
         }
 
         // Add ingredient
         function addIngredient() {
             const name = document.getElementById('ingredient-name').value.trim();
-            const bags = parseFloat(document.getElementById('ingredient-bags').value) || 0;
-            const gramsPerBag = parseFloat(document.getElementById('grams-per-bag').value) || 0;
-            const price = parseFloat(document.getElementById('ingredient-price').value) || 0;
-            const expiryDate = document.getElementById('expiry-date').value;
+            const unitType = document.getElementById('ingredient-unit').value;
             
-            if (!name || bags <= 0 || gramsPerBag <= 0 || price <= 0) {
-                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+            if (!name) {
+                alert('กรุณากรอกชื่อวัตถุดิบ');
                 return;
             }
             
-            const totalGrams = bags * gramsPerBag;
-            const pricePerGram = price / totalGrams;
+            let totalAmount, pricePerUnit, totalCost, expiryDate;
             
-            // Update ingredient history
-            ingredientHistory[name] = { gramsPerBag, price };
+            if (unitType === 'weight') {
+                const bags = parseFloat(document.getElementById('ingredient-bags').value) || 0;
+                const gramsPerBag = parseFloat(document.getElementById('grams-per-bag').value) || 0;
+                const price = parseFloat(document.getElementById('ingredient-price').value) || 0;
+                expiryDate = document.getElementById('expiry-date').value;
+                
+                if (bags <= 0 || gramsPerBag <= 0 || price <= 0) {
+                    alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                    return;
+                }
+                
+                totalAmount = bags * gramsPerBag;
+                totalCost = price;
+                pricePerUnit = price / totalAmount;
+                
+                // Update ingredient history
+                ingredientHistory[name] = { gramsPerBag, price, unitType: 'weight' };
+            } else {
+                const pieces = parseFloat(document.getElementById('ingredient-pieces').value) || 0;
+                const pricePerPiece = parseFloat(document.getElementById('price-per-piece').value) || 0;
+                expiryDate = document.getElementById('expiry-date-piece').value;
+                
+                if (pieces <= 0 || pricePerPiece <= 0) {
+                    alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                    return;
+                }
+                
+                totalAmount = pieces;
+                totalCost = pieces * pricePerPiece;
+                pricePerUnit = pricePerPiece;
+                
+                // Update ingredient history
+                ingredientHistory[name] = { pricePerPiece, unitType: 'piece' };
+            }
             
             // Check if ingredient exists
             const existingIndex = inventory.findIndex(item => item.name === name);
             if (existingIndex >= 0) {
                 // Merge with existing stock
                 const existing = inventory[existingIndex];
-                const newTotalGrams = existing.grams + totalGrams;
-                const newTotalCost = (existing.grams * existing.pricePerGram) + (totalGrams * pricePerGram);
-                inventory[existingIndex] = {
-                    ...existing,
-                    grams: newTotalGrams,
-                    pricePerGram: newTotalCost / newTotalGrams,
-                    expiryDate: expiryDate || existing.expiryDate
-                };
+                
+                // Only merge if same unit type
+                if (existing.unitType === unitType) {
+                    const newTotalAmount = existing.amount + totalAmount;
+                    const newTotalCost = (existing.amount * existing.pricePerUnit) + (totalAmount * pricePerUnit);
+                    inventory[existingIndex] = {
+                        ...existing,
+                        amount: newTotalAmount,
+                        pricePerUnit: newTotalCost / newTotalAmount,
+                        grams: unitType === 'weight' ? newTotalAmount : existing.grams,
+                        expiryDate: expiryDate || existing.expiryDate
+                    };
+                } else {
+                    alert('วัตถุดิบนี้มีอยู่แล้วแต่ใช้หน่วยต่างกัน กรุณาใช้ชื่ออื่น');
+                    return;
+                }
             } else {
                 // Add new ingredient
                 inventory.push({
                     id: Date.now(),
                     name,
-                    grams: totalGrams,
-                    pricePerGram,
+                    amount: totalAmount,
+                    unitType,
+                    unit: unitType === 'weight' ? 'กรัม' : 'ชิ้น',
+                    pricePerUnit,
+                    grams: unitType === 'weight' ? totalAmount : 0, // For backward compatibility
+                    pricePerGram: unitType === 'weight' ? pricePerUnit : 0, // For backward compatibility
                     expiryDate,
                     addedDate: new Date().toISOString()
                 });
@@ -786,12 +900,18 @@
 
         function clearIngredientForm() {
             document.getElementById('ingredient-name').value = '';
+            document.getElementById('ingredient-unit').value = 'weight';
             document.getElementById('ingredient-bags').value = '';
             document.getElementById('grams-per-bag').value = '';
             document.getElementById('ingredient-price').value = '';
+            document.getElementById('ingredient-pieces').value = '';
+            document.getElementById('price-per-piece').value = '';
             document.getElementById('expiry-date').value = '';
-            document.getElementById('total-grams').textContent = '0';
-            document.getElementById('price-per-gram').textContent = '0.00';
+            document.getElementById('expiry-date-piece').value = '';
+            document.getElementById('total-amount').textContent = '0';
+            document.getElementById('price-per-unit').textContent = '0.00';
+            document.getElementById('total-cost-amount').textContent = '0.00';
+            toggleUnitType();
         }
 
         function clearRecipeForm() {
@@ -806,7 +926,7 @@
                         <option value="">เลือกวัตถุดิบ</option>
                         ${inventory.map(item => `<option value="${item.id}">${item.name}</option>`).join('')}
                     </select>
-                    <input type="number" placeholder="กรัม" class="w-24 px-3 py-2 border border-gray-300 rounded-lg ingredient-amount">
+                    <input type="number" placeholder="จำนวน" class="w-24 px-3 py-2 border border-gray-300 rounded-lg ingredient-amount">
                     <button onclick="addIngredientToRecipe()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">+</button>
                 </div>
             `;
@@ -832,7 +952,7 @@
                     <option value="">เลือกวัตถุดิบ</option>
                     ${inventory.map(item => `<option value="${item.id}">${item.name}</option>`).join('')}
                 </select>
-                <input type="number" placeholder="กรัม" class="w-24 px-3 py-2 border border-gray-300 rounded-lg ingredient-amount">
+                <input type="number" placeholder="จำนวน" class="w-24 px-3 py-2 border border-gray-300 rounded-lg ingredient-amount">
                 <button onclick="this.parentElement.remove(); calculateRecipeCost()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">-</button>
             `;
             container.appendChild(newRow);
@@ -854,7 +974,17 @@
                     const ingredient = inventory.find(item => item.id == select.value);
                     const amount = parseFloat(amountInput.value);
                     if (ingredient && amount > 0) {
-                        totalCost += ingredient.pricePerGram * amount;
+                        // Handle both old and new data structure
+                        const pricePerUnit = ingredient.pricePerUnit || ingredient.pricePerGram || 0;
+                        const unitType = ingredient.unitType || 'weight';
+                        
+                        if (unitType === 'piece') {
+                            // For piece-based ingredients, amount is in pieces
+                            totalCost += pricePerUnit * amount;
+                        } else {
+                            // For weight-based ingredients, amount is in grams
+                            totalCost += pricePerUnit * amount;
+                        }
                     }
                 }
             });
@@ -892,11 +1022,12 @@
                     const ingredient = inventory.find(item => item.id == select.value);
                     const amount = parseFloat(amountInput.value);
                     if (ingredient && amount > 0) {
+                        const pricePerUnit = ingredient.pricePerUnit || ingredient.pricePerGram || 0;
                         ingredients.push({
                             id: ingredient.id,
                             name: ingredient.name,
                             amount: amount,
-                            cost: ingredient.pricePerGram * amount
+                            cost: pricePerUnit * amount
                         });
                     }
                 }
@@ -1000,7 +1131,7 @@
                         <option value="">เลือกวัตถุดิบ</option>
                         ${inventory.map(item => `<option value="${item.id}">${item.name}</option>`).join('')}
                     </select>
-                    <input type="number" placeholder="กรัม" class="w-24 px-3 py-2 border border-gray-300 rounded-lg ingredient-amount">
+                    <input type="number" placeholder="จำนวน" class="w-24 px-3 py-2 border border-gray-300 rounded-lg ingredient-amount">
                     <button onclick="addIngredientToRecipe()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">+</button>
                 </div>
             `;
@@ -1150,7 +1281,15 @@
             }
             
             container.innerHTML = inventory.map(item => {
-                const isLowStock = item.grams < 100;
+                // Handle both old and new data structure
+                const amount = item.amount || item.grams || 0;
+                const unit = item.unit || 'กรัม';
+                const pricePerUnit = item.pricePerUnit || item.pricePerGram || 0;
+                const unitType = item.unitType || 'weight';
+                
+                // For low stock check, use appropriate threshold
+                const lowStockThreshold = unitType === 'piece' ? 5 : 100;
+                const isLowStock = amount < lowStockThreshold;
                 const isExpiringSoon = item.expiryDate && new Date(item.expiryDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
                 
                 return `
@@ -1158,8 +1297,8 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-medium text-gray-800">${item.name}</h4>
-                                <p class="text-sm text-gray-600">คงเหลือ: ${item.grams.toLocaleString()} กรัม</p>
-                                <p class="text-sm text-gray-600">ราคา: ${item.pricePerGram.toFixed(4)} บาท/กรัม</p>
+                                <p class="text-sm text-gray-600">คงเหลือ: ${amount.toLocaleString()} ${unit}</p>
+                                <p class="text-sm text-gray-600">ราคา: ${pricePerUnit.toFixed(unitType === 'piece' ? 2 : 4)} บาท/${unit}</p>
                                 ${item.expiryDate ? `<p class="text-sm text-gray-600">หมดอายุ: ${new Date(item.expiryDate).toLocaleDateString('th-TH')}</p>` : ''}
                             </div>
                             <div class="flex gap-2">
@@ -1226,7 +1365,7 @@
                                             <p class="text-sm text-gray-600">ต้นทุน: ${recipe.costPerPiece.toFixed(2)} บาท/ชิ้น</p>
                                             <p class="text-sm text-green-600 font-medium">กำไร: ${recipe.profitPerPiece.toFixed(2)} บาท/ชิ้น</p>
                                             <div class="mt-2 text-xs text-gray-500">
-                                                วัตถุดิบ: ${recipe.ingredients.map(ing => `${ing.name} ${ing.amount}g`).join(', ')}
+                                                วัตถุดิบ: ${recipe.ingredients.map(ing => `${ing.name} ${ing.amount}`).join(', ')}
                                             </div>
                                         </div>
                                         <div class="flex gap-2 ml-4">
@@ -1411,18 +1550,21 @@
             
             // Low stock (always show current stock regardless of period)
             const lowStockItems = inventory.filter(item => {
+                const amount = item.amount || item.grams || 0;
                 const alert = stockAlerts[item.id];
                 const minStock = alert ? alert.minStock : 50;
-                return item.grams <= minStock;
+                return amount <= minStock;
             });
             
             document.getElementById('low-stock').innerHTML = lowStockItems.length > 0
-                ? lowStockItems.map(item => 
-                    `<div class="flex justify-between text-red-600">
+                ? lowStockItems.map(item => {
+                    const amount = item.amount || item.grams || 0;
+                    const unit = item.unit || 'กรัม';
+                    return `<div class="flex justify-between text-red-600">
                         <span>${item.name}</span>
-                        <span class="font-medium">${item.grams.toLocaleString()} กรัม</span>
-                    </div>`
-                ).join('')
+                        <span class="font-medium">${amount.toLocaleString()} ${unit}</span>
+                    </div>`;
+                }).join('')
                 : '<p class="text-gray-500">ไม่มีวัตถุดิบใกล้หมด</p>';
             
             // Poor sellers
@@ -1775,14 +1917,14 @@
             const checks = recipe.ingredients.map(ingredient => {
                 const needed = ingredient.amount * batchesNeeded;
                 const available = inventory.find(item => item.id == ingredient.id);
-                const availableAmount = available ? available.grams : 0;
+                const availableAmount = available ? (available.amount || available.grams || 0) : 0;
                 const isEnough = availableAmount >= needed;
                 
                 return `
                     <div class="flex justify-between items-center p-2 rounded ${isEnough ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}">
                         <span>${ingredient.name}</span>
                         <span class="text-sm">
-                            ต้องการ: ${needed.toFixed(1)}g | มี: ${availableAmount.toFixed(1)}g
+                            ต้องการ: ${needed.toFixed(1)} | มี: ${availableAmount.toFixed(1)}
                             ${isEnough ? '✅' : '❌'}
                         </span>
                     </div>
@@ -1795,7 +1937,6 @@
         function recordProduction() {
             const date = document.getElementById('production-date').value;
             const recipeId = document.getElementById('production-recipe').value;
-            const selectedType = document.querySelector('input[name="production-type"]:checked').value;
             
             if (!date || !recipeId) {
                 alert('กรุณากรอกข้อมูลให้ครบถ้วน');
@@ -1808,52 +1949,68 @@
                 return;
             }
             
+            const selectedType = document.querySelector('input[name="production-type"]:checked').value;
             let totalPieces = 0;
+            
             if (selectedType === 'batch') {
                 const batches = parseFloat(document.getElementById('production-batches').value) || 0;
+                if (batches <= 0) {
+                    alert('กรุณาระบุจำนวนชุดที่ผลิต');
+                    return;
+                }
                 totalPieces = batches * recipe.yield;
             } else {
                 totalPieces = parseFloat(document.getElementById('production-pieces').value) || 0;
-            }
-            
-            if (totalPieces <= 0) {
-                alert('กรุณาระบุจำนวนที่ผลิต');
-                return;
-            }
-            
-            const batchesNeeded = totalPieces / recipe.yield;
-            
-            // Check if we have enough ingredients
-            for (const ingredient of recipe.ingredients) {
-                const needed = ingredient.amount * batchesNeeded;
-                const available = inventory.find(item => item.id == ingredient.id);
-                const availableAmount = available ? available.grams : 0;
-                
-                if (availableAmount < needed) {
-                    alert(`วัตถุดิบ ${ingredient.name} ไม่เพียงพอ (ต้องการ ${needed.toFixed(1)}g มี ${availableAmount.toFixed(1)}g)`);
+                if (totalPieces <= 0) {
+                    alert('กรุณาระบุจำนวนชิ้นที่ผลิต');
                     return;
                 }
             }
             
-            // Deduct ingredients from inventory
+            const batchesNeeded = totalPieces / recipe.yield;
+            const totalCost = recipe.totalCost * batchesNeeded;
+            
+            // Check and deduct ingredients
+            let canProduce = true;
+            const ingredientUpdates = [];
+            
             recipe.ingredients.forEach(ingredient => {
                 const needed = ingredient.amount * batchesNeeded;
-                const inventoryItem = inventory.find(item => item.id == ingredient.id);
-                if (inventoryItem) {
-                    inventoryItem.grams -= needed;
+                const available = inventory.find(item => item.id == ingredient.id);
+                const availableAmount = available ? (available.amount || available.grams || 0) : 0;
+                
+                if (availableAmount < needed) {
+                    canProduce = false;
+                    alert(`วัตถุดิบ ${ingredient.name} ไม่เพียงพอ (ต้องการ ${needed.toFixed(1)} มี ${availableAmount.toFixed(1)})`);
+                    return;
+                }
+                
+                ingredientUpdates.push({
+                    id: ingredient.id,
+                    newAmount: availableAmount - needed
+                });
+            });
+            
+            if (!canProduce) return;
+            
+            // Update inventory
+            ingredientUpdates.forEach(update => {
+                const item = inventory.find(item => item.id == update.id);
+                if (item) {
+                    item.amount = update.newAmount;
+                    if (item.grams !== undefined) item.grams = update.newAmount; // For backward compatibility
                 }
             });
             
-            const totalCost = recipe.totalCost * batchesNeeded;
-            
+            // Record production
             production.push({
                 id: Date.now(),
                 date,
                 recipeId: recipe.id,
                 recipeName: recipe.name,
                 totalPieces,
-                batches: batchesNeeded,
-                cost: totalCost
+                cost: totalCost,
+                batchesProduced: batchesNeeded
             });
             
             saveData();
@@ -1864,7 +2021,7 @@
             document.getElementById('production-pieces').value = '';
             updateProductionInfo();
             
-            alert(`บันทึกการผลิตเรียบร้อย! ผลิต ${recipe.name} จำนวน ${totalPieces} ชิ้น`);
+            alert(`บันทึกการผลิต ${recipe.name} จำนวน ${totalPieces} ชิ้น เรียบร้อยแล้ว!`);
         }
 
         function removeProduction(id) {
@@ -1875,27 +2032,36 @@
             }
         }
 
-        // Event listeners
-        document.getElementById('recipe-yield').addEventListener('input', calculateRecipeCost);
-        document.getElementById('selling-price').addEventListener('input', calculateRecipeCost);
-        
         // Category icon selection
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('category-icon-btn')) {
-                // Remove selection from all icons
-                document.querySelectorAll('.category-icon-btn').forEach(btn => {
-                    btn.classList.remove('bg-yellow-100', 'border-yellow-500');
-                    btn.classList.add('border-gray-300');
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.category-icon-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove selection from all buttons
+                    document.querySelectorAll('.category-icon-btn').forEach(b => {
+                        b.classList.remove('bg-yellow-100', 'border-yellow-500');
+                        b.classList.add('border-gray-300');
+                    });
+                    
+                    // Add selection to clicked button
+                    this.classList.add('bg-yellow-100', 'border-yellow-500');
+                    this.classList.remove('border-gray-300');
+                    
+                    // Update hidden input
+                    document.getElementById('selected-category-icon').value = this.dataset.icon;
                 });
-                
-                // Add selection to clicked icon
-                e.target.classList.add('bg-yellow-100', 'border-yellow-500');
-                e.target.classList.remove('border-gray-300');
-                
-                // Update hidden input
-                document.getElementById('selected-category-icon').value = e.target.dataset.icon;
+            });
+            
+            // Add event listeners for recipe form
+            document.getElementById('recipe-yield').addEventListener('input', calculateRecipeCost);
+            document.getElementById('selling-price').addEventListener('input', calculateRecipeCost);
+            
+            // Initialize first ingredient row event listeners
+            const firstRow = document.querySelector('#recipe-ingredients .flex');
+            if (firstRow) {
+                firstRow.querySelector('.ingredient-select').addEventListener('change', calculateRecipeCost);
+                firstRow.querySelector('.ingredient-amount').addEventListener('input', calculateRecipeCost);
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'968207aaa312c8d7',t:'MTc1NDAxNjY0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9684ce0b230445ac',t:'MTc1NDA0NTc0NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
