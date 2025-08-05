@@ -1782,18 +1782,56 @@
             const baseRecipe = recipes.find(r => r.id == baseRecipeId);
             if (!baseRecipe) return;
             
+            // Don't auto-clear ingredients - let user decide
+            // Just show the base recipe information
+            
+            // Load base recipe data only if yield is empty
+            if (!document.getElementById('recipeYield').value) {
+                document.getElementById('recipeYield').value = baseRecipe.yield;
+            }
+            
+            // Show base recipe cost information
+            showBaseCostInfo(baseRecipe);
+            
+            // Show suggestion to load ingredients
+            const suggestion = document.createElement('div');
+            suggestion.id = 'loadIngredientsSuggestion';
+            suggestion.className = 'bg-yellow-50 p-3 rounded-lg mb-3 border border-yellow-200';
+            suggestion.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="text-sm font-medium text-yellow-800">💡 ต้องการโหลดส่วนผสมจากสูตรพื้นฐานหรือไม่?</div>
+                        <div class="text-xs text-yellow-600 mt-1">จะเขียนทับส่วนผสมที่มีอยู่</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="loadBaseIngredients()" class="bg-yellow-500 text-white px-3 py-1 rounded text-xs hover:bg-yellow-600">โหลด</button>
+                        <button onclick="removeSuggestion()" class="bg-gray-400 text-white px-3 py-1 rounded text-xs hover:bg-gray-500">ไม่</button>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing suggestion
+            const existingSuggestion = document.getElementById('loadIngredientsSuggestion');
+            if (existingSuggestion) existingSuggestion.remove();
+            
+            // Insert suggestion after base cost display
+            const baseCostDisplay = document.getElementById('baseCostDisplay');
+            if (baseCostDisplay) {
+                baseCostDisplay.parentNode.insertBefore(suggestion, baseCostDisplay.nextSibling);
+            }
+        }
+
+        function loadBaseIngredients() {
+            const baseRecipeId = document.getElementById('baseRecipe').value;
+            const baseRecipe = recipes.find(r => r.id == baseRecipeId);
+            if (!baseRecipe) return;
+            
             // Clear existing ingredients except the first row
             const container = document.getElementById('recipeIngredients');
             const ingredientRows = container.querySelectorAll('.ingredient-row');
             ingredientRows.forEach((row, index) => {
                 if (index > 0) row.remove();
             });
-            
-            // Load base recipe data
-            document.getElementById('recipeYield').value = baseRecipe.yield;
-            
-            // Show base recipe cost information
-            showBaseCostInfo(baseRecipe);
             
             // Load ingredients
             baseRecipe.ingredients.forEach((ingredient, index) => {
@@ -1813,6 +1851,14 @@
                 select.value = ingredient.name;
                 amountInput.value = ingredient.amount;
             });
+            
+            // Remove suggestion
+            removeSuggestion();
+        }
+
+        function removeSuggestion() {
+            const suggestion = document.getElementById('loadIngredientsSuggestion');
+            if (suggestion) suggestion.remove();
         }
 
         function showBaseCostInfo(baseRecipe) {
@@ -2005,6 +2051,9 @@
             // Remove base cost display
             const baseCostDisplay = document.getElementById('baseCostDisplay');
             if (baseCostDisplay) baseCostDisplay.remove();
+            
+            // Remove suggestion
+            removeSuggestion();
             
             // Clear ingredients
             document.querySelectorAll('.ingredient-row').forEach((row, index) => {
@@ -2232,6 +2281,13 @@
             document.getElementById('recipeCategory').value = recipe.category || '';
             document.getElementById('recipeYield').value = recipe.yield;
             
+            // Set base recipe if exists
+            if (recipe.baseRecipeId) {
+                document.getElementById('baseRecipe').value = recipe.baseRecipeId;
+                // Trigger base recipe loading to show cost info
+                loadBaseRecipe();
+            }
+            
             // Clear existing ingredients except first row
             clearAllIngredients();
             
@@ -2272,7 +2328,15 @@
             document.getElementById('recipeName').value = recipe.name;
             document.getElementById('recipeCategory').value = recipe.category || '';
             document.getElementById('recipeYield').value = recipe.yield;
-            document.getElementById('baseRecipe').value = '';
+            
+            // Set base recipe if exists
+            if (recipe.baseRecipeId) {
+                document.getElementById('baseRecipe').value = recipe.baseRecipeId;
+                // Trigger base recipe loading to show cost info
+                loadBaseRecipe();
+            } else {
+                document.getElementById('baseRecipe').value = '';
+            }
             
             // Clear existing ingredients except first row
             clearAllIngredients();
@@ -2305,6 +2369,7 @@
             const name = document.getElementById('recipeName').value;
             const category = document.getElementById('recipeCategory').value;
             const yield = parseFloat(document.getElementById('recipeYield').value);
+            const baseRecipeId = document.getElementById('baseRecipe').value;
             
             if (!name || !yield) {
                 alert('กรุณากรอกชื่อสูตรและจำนวนที่ได้');
@@ -2313,9 +2378,22 @@
 
             const ingredientRows = document.querySelectorAll('.ingredient-row');
             const ingredients = [];
-            let totalCost = 0;
+            let additionalCost = 0;
+            let baseCost = 0;
+            let baseRecipe = null;
             let costBreakdown = [];
 
+            // Calculate base recipe cost if selected
+            if (baseRecipeId) {
+                baseRecipe = recipes.find(r => r.id == baseRecipeId);
+                if (baseRecipe) {
+                    // Calculate base cost proportionally based on yield
+                    const yieldRatio = yield / baseRecipe.yield;
+                    baseCost = baseRecipe.totalCost * yieldRatio;
+                }
+            }
+
+            // Calculate additional ingredients cost using inventory unit prices
             ingredientRows.forEach(row => {
                 const select = row.querySelector('.ingredient-select');
                 const amountInput = row.querySelector('.ingredient-amount');
@@ -2338,7 +2416,7 @@
                         unitPrice: item.unitPrice,
                         cost
                     });
-                    totalCost += cost;
+                    additionalCost += cost;
                     
                     // Add to cost breakdown for detailed display
                     costBreakdown.push({
@@ -2351,10 +2429,14 @@
                 }
             });
 
-            if (ingredients.length === 0) {
-                alert('กรุณาเพิ่มวัตถุดิบอย่างน้อย 1 รายการ');
+            // For base recipe usage, we need at least the base recipe OR additional ingredients
+            if (!baseRecipe && ingredients.length === 0) {
+                alert('กรุณาเลือกสูตรพื้นฐาน หรือเพิ่มวัตถุดิบอย่างน้อย 1 รายการ');
                 return;
             }
+
+            const totalCost = baseCost + additionalCost;
+            const costPerUnit = totalCost / yield;
 
             // Update the recipe
             const recipeIndex = recipes.findIndex(r => r.id === editingRecipeId);
@@ -2365,9 +2447,12 @@
                     category: category || 'อื่นๆ',
                     yield,
                     ingredients,
-                    additionalCost: totalCost,
+                    additionalCost,
+                    baseCost,
+                    baseRecipeId: baseRecipeId || null,
+                    baseRecipeName: baseRecipe ? baseRecipe.name : null,
                     totalCost,
-                    costPerUnit: totalCost / yield,
+                    costPerUnit,
                     updated: new Date().toLocaleDateString('th-TH')
                 };
 
@@ -2377,12 +2462,22 @@
                 
                 // Show detailed success message with cost breakdown
                 let message = `อัพเดทสูตร "${name}" สำเร็จ!\n\n`;
-                message += `🧂 รายละเอียดวัตถุดิบ:\n`;
-                costBreakdown.forEach(item => {
-                    message += `• ${item.name}: ${item.amount} ${item.unit} × ${item.unitPrice.toFixed(4)} บาท = ${item.cost.toFixed(2)} บาท\n`;
-                });
-                message += `\n📊 ต้นทุนรวม: ${totalCost.toFixed(2)} บาท\n`;
-                message += `🎯 ต้นทุนต่อชิ้น: ${(totalCost / yield).toFixed(2)} บาท\n`;
+                
+                if (baseRecipe) {
+                    message += `📋 สูตรพื้นฐาน: ${baseRecipe.name}\n`;
+                    message += `💰 ต้นทุนพื้นฐาน: ${baseCost.toFixed(2)} บาท\n\n`;
+                }
+                
+                if (costBreakdown.length > 0) {
+                    message += `🧂 รายละเอียดวัตถุดิบ:\n`;
+                    costBreakdown.forEach(item => {
+                        message += `• ${item.name}: ${item.amount} ${item.unit} × ${item.unitPrice.toFixed(4)} บาท = ${item.cost.toFixed(2)} บาท\n`;
+                    });
+                    message += `\n💰 ต้นทุนวัตถุดิบรวม: ${additionalCost.toFixed(2)} บาท\n\n`;
+                }
+                
+                message += `📊 ต้นทุนรวมทั้งหมด: ${totalCost.toFixed(2)} บาท\n`;
+                message += `🎯 ต้นทุนต่อชิ้น: ${costPerUnit.toFixed(2)} บาท\n`;
                 message += `📈 ได้: ${yield} ชิ้น`;
                 
                 alert(message);
@@ -2402,11 +2497,7 @@
             document.getElementById('cancelEditBtn').classList.add('hidden');
             
             // Clear form
-            document.getElementById('recipeName').value = '';
-            document.getElementById('recipeCategory').value = '';
-            document.getElementById('recipeYield').value = '';
-            document.getElementById('baseRecipe').value = '';
-            clearAllIngredients();
+            clearRecipeForm();
         }
 
         function viewRecipeDetails(id) {
@@ -3440,5 +3531,5 @@
             updateCostAnalysis();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a520ec53b745ba',t:'MTc1NDM4NDY4My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a5a2aaa14dc8d7',t:'MTc1NDM4OTk5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
