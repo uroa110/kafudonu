@@ -143,9 +143,80 @@
                 
                 <!-- คลังสินค้าปัจจุบัน -->
                 <div class="bg-gray-50 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">
-                        📋 คลังสินค้าปัจจุบัน
-                    </h3>
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">
+                            📋 คลังสินค้าปัจจุบัน
+                        </h3>
+                        <div class="text-sm text-gray-600">
+                            <span id="inventoryCount">0</span> รายการ
+                        </div>
+                    </div>
+                    
+                    <!-- Search and Filter Section -->
+                    <div class="mb-4 space-y-3">
+                        <!-- Search Box -->
+                        <div class="relative">
+                            <input type="text" id="inventorySearch" placeholder="🔍 ค้นหาวัตถุดิบ... (เช่น แป้ง, น้ำตาล, ไข่)" 
+                                   class="w-full p-3 pl-10 border rounded-lg text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                   oninput="searchInventory()">
+                            <div class="absolute left-3 top-3 text-gray-400">
+                                🔍
+                            </div>
+                            <button onclick="clearInventorySearch()" id="clearSearchBtn" 
+                                    class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 hidden">
+                                ✕
+                            </button>
+                        </div>
+                        
+                        <!-- Quick Filters -->
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterInventory('all')" class="filter-btn active px-3 py-1 rounded-full text-xs bg-blue-500 text-white hover:bg-blue-600">
+                                ทั้งหมด
+                            </button>
+                            <button onclick="filterInventory('low-stock')" class="filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                ⚠️ ใกล้หมด
+                            </button>
+                            <button onclick="filterInventory('powder')" class="filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🌾 แป้ง/ผง
+                            </button>
+                            <button onclick="filterInventory('liquid')" class="filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🥛 ของเหลว
+                            </button>
+                            <button onclick="filterInventory('dairy')" class="filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🧈 นม/เนย
+                            </button>
+                            <button onclick="filterInventory('sweet')" class="filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🍯 หวาน
+                            </button>
+                        </div>
+                        
+                        <!-- Sort Options -->
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="text-gray-600">เรียงตาม:</span>
+                            <select id="inventorySort" onchange="sortInventory()" class="px-2 py-1 border rounded text-xs bg-white">
+                                <option value="name-asc">ชื่อ (ก-ฮ)</option>
+                                <option value="name-desc">ชื่อ (ฮ-ก)</option>
+                                <option value="stock-low">สต็อกน้อย-มาก</option>
+                                <option value="stock-high">สต็อกมาก-น้อย</option>
+                                <option value="updated-new">อัพเดทล่าสุด</option>
+                                <option value="updated-old">อัพเดทเก่าสุด</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Search Suggestions -->
+                        <div id="searchSuggestions" class="hidden">
+                            <div class="text-xs text-gray-600 mb-2">💡 คำแนะนำการค้นหา:</div>
+                            <div id="suggestionsList" class="flex flex-wrap gap-1">
+                                <!-- Suggestions will be shown here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Search Results Info -->
+                        <div id="searchResults" class="hidden text-sm text-blue-600 bg-blue-50 p-2 rounded">
+                            <!-- Search results info will be shown here -->
+                        </div>
+                    </div>
+                    
                     <div id="inventoryList" class="space-y-3 max-h-80 overflow-y-auto">
                         <!-- Inventory items will be displayed here -->
                     </div>
@@ -300,6 +371,21 @@
                                 <input type="text" id="recipeName" placeholder="เช่น เค้กช็อกโกแลต" class="w-full p-3 border rounded-lg text-sm">
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">หมวดหมู่</label>
+                                <select id="recipeCategory" class="w-full p-3 border rounded-lg text-sm">
+                                    <option value="">เลือกหมวดหมู่</option>
+                                    <option value="ขนมปัง">🍞 ขนมปัง</option>
+                                    <option value="โดนัท">🍩 โดนัท</option>
+                                    <option value="เค้ก">🎂 เค้ก</option>
+                                    <option value="คุกกี้">🍪 คุกกี้</option>
+                                    <option value="มัฟฟิน">🧁 มัฟฟิน</option>
+                                    <option value="ครัวซอง">🥐 ครัวซอง</option>
+                                    <option value="พาย">🥧 พาย</option>
+                                    <option value="ขนมไทย">🍮 ขนมไทย</option>
+                                    <option value="อื่นๆ">🍰 อื่นๆ</option>
+                                </select>
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่ได้</label>
                                 <input type="number" id="recipeYield" placeholder="ได้กี่ชิ้น/หน่วย" class="w-full p-3 border rounded-lg text-sm">
                             </div>
@@ -341,9 +427,51 @@
                 
                 <!-- สูตรทั้งหมด -->
                 <div class="bg-gray-50 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">
-                        📚 สูตรทั้งหมด
-                    </h3>
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">
+                            📚 สูตรทั้งหมด
+                        </h3>
+                        <div class="text-sm text-gray-600">
+                            <span id="recipesCount">0</span> สูตร
+                        </div>
+                    </div>
+                    
+                    <!-- Filter and View Options -->
+                    <div class="mb-4 space-y-3">
+                        <!-- Category Filter -->
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterRecipes('all')" class="recipe-filter-btn active px-3 py-1 rounded-full text-xs bg-purple-500 text-white hover:bg-purple-600">
+                                ทั้งหมด
+                            </button>
+                            <button onclick="filterRecipes('ขนมปัง')" class="recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🍞 ขนมปัง
+                            </button>
+                            <button onclick="filterRecipes('โดนัท')" class="recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🍩 โดนัท
+                            </button>
+                            <button onclick="filterRecipes('เค้ก')" class="recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🎂 เค้ก
+                            </button>
+                            <button onclick="filterRecipes('คุกกี้')" class="recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🍪 คุกกี้
+                            </button>
+                            <button onclick="filterRecipes('อื่นๆ')" class="recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🍰 อื่นๆ
+                            </button>
+                        </div>
+                        
+                        <!-- View Toggle -->
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="text-gray-600">มุมมอง:</span>
+                            <button onclick="toggleRecipeView('compact')" id="compactViewBtn" class="px-3 py-1 rounded text-xs bg-purple-500 text-white hover:bg-purple-600">
+                                📋 แบบย่อ
+                            </button>
+                            <button onclick="toggleRecipeView('detailed')" id="detailedViewBtn" class="px-3 py-1 rounded text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                📄 แบบละเอียด
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div id="recipesList" class="space-y-3 max-h-80 overflow-y-auto">
                         <!-- Recipes will be displayed here -->
                     </div>
@@ -640,6 +768,16 @@
         let sales = JSON.parse(localStorage.getItem('bakery_sales') || '[]');
         let productStock = JSON.parse(localStorage.getItem('bakery_product_stock') || '{}');
         let fixedCosts = JSON.parse(localStorage.getItem('bakery_fixed_costs') || '{}');
+        
+        // Search and filter state
+        let currentFilter = 'all';
+        let currentSearchTerm = '';
+        let filteredInventory = [];
+        
+        // Recipe filter and view state
+        let currentRecipeFilter = 'all';
+        let currentRecipeView = 'compact';
+        let filteredRecipes = [];
 
         // Navigation
         function showSection(sectionName) {
@@ -763,15 +901,347 @@
             alert(`เพิ่มวัตถุดิบ "${name}" สำเร็จ!\n\nรายละเอียด:\n• ${initialStock} หน่วยซื้อ × ${packageQuantity} ${packageUnit} = ${totalQuantity} ${packageUnit}\n• ราคาต่อหน่วย: ${unitPrice.toFixed(4)} บาท/${packageUnit}`);
         }
 
+        // Search and Filter Functions
+        function searchInventory() {
+            const searchTerm = document.getElementById('inventorySearch').value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            
+            currentSearchTerm = searchTerm;
+            
+            // Show/hide clear button
+            if (searchTerm) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            
+            // Show suggestions if search term is not empty but no exact matches
+            showSearchSuggestions(searchTerm);
+            
+            // Apply current filter and search
+            applyInventoryFilter();
+        }
+
+        function clearInventorySearch() {
+            document.getElementById('inventorySearch').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            document.getElementById('searchSuggestions').classList.add('hidden');
+            document.getElementById('searchResults').classList.add('hidden');
+            currentSearchTerm = '';
+            applyInventoryFilter();
+        }
+
+        function showSearchSuggestions(searchTerm) {
+            const suggestionsDiv = document.getElementById('searchSuggestions');
+            const suggestionsList = document.getElementById('suggestionsList');
+            
+            if (!searchTerm) {
+                suggestionsDiv.classList.add('hidden');
+                return;
+            }
+            
+            // Find similar items using fuzzy matching
+            const suggestions = findSimilarItems(searchTerm);
+            
+            if (suggestions.length > 0) {
+                suggestionsDiv.classList.remove('hidden');
+                suggestionsList.innerHTML = suggestions.map(suggestion => `
+                    <button onclick="applySuggestion('${suggestion}')" 
+                            class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                        ${suggestion}
+                    </button>
+                `).join('');
+            } else {
+                suggestionsDiv.classList.add('hidden');
+            }
+        }
+
+        function findSimilarItems(searchTerm) {
+            if (!searchTerm || searchTerm.length < 2) return [];
+            
+            const suggestions = new Set();
+            
+            // Common ingredient keywords and their variations
+            const ingredientKeywords = {
+                'แป้ง': ['แป้งสาลี', 'แป้งเอนกประสงค์', 'แป้งเค้ก', 'แป้งขนมปัง', 'แป้งมัน'],
+                'น้ำตาล': ['น้ำตาลทราย', 'น้ำตาลป่น', 'น้ำตาลไอซิ่ง', 'น้ำตาลแดง'],
+                'เนย': ['เนยจืด', 'เนยเค็ม', 'เนยขาว', 'มาการีน'],
+                'นม': ['นมสด', 'นมข้นหวาน', 'นมข้นจืด', 'นมผง', 'วิปปิ้งครีม'],
+                'ไข่': ['ไข่ไก่', 'ไข่แดง', 'ไข่ขาว'],
+                'ช็อกโกแลต': ['ช็อกโกแลตชิป', 'โกโก้ผง', 'ช็อกโกแลตแท่ง'],
+                'วนิลลา': ['วนิลลาเอสเซ้นส์', 'วนิลลาสกัด'],
+                'เกลือ': ['เกลือป่น', 'เกลือทะเล'],
+                'ผงฟู': ['เบกกิ้งโซดา', 'ผงฟูเค้ก'],
+                'น้ำมัน': ['น้ำมันพืช', 'น้ำมันคาโนลา', 'น้ำมันมะกอก']
+            };
+            
+            // Search in existing inventory
+            inventory.forEach(item => {
+                const itemName = item.name.toLowerCase();
+                
+                // Exact match or contains search term
+                if (itemName.includes(searchTerm)) {
+                    suggestions.add(item.name);
+                }
+                
+                // Fuzzy matching for typos
+                if (calculateSimilarity(itemName, searchTerm) > 0.6) {
+                    suggestions.add(item.name);
+                }
+            });
+            
+            // Search in keyword suggestions
+            Object.entries(ingredientKeywords).forEach(([keyword, variations]) => {
+                if (keyword.includes(searchTerm) || searchTerm.includes(keyword)) {
+                    variations.forEach(variation => {
+                        // Only suggest if not already in inventory
+                        if (!inventory.some(item => item.name.toLowerCase().includes(variation.toLowerCase()))) {
+                            suggestions.add(variation);
+                        }
+                    });
+                }
+                
+                variations.forEach(variation => {
+                    if (variation.toLowerCase().includes(searchTerm) || 
+                        calculateSimilarity(variation.toLowerCase(), searchTerm) > 0.6) {
+                        suggestions.add(variation);
+                    }
+                });
+            });
+            
+            return Array.from(suggestions).slice(0, 8); // Limit to 8 suggestions
+        }
+
+        function calculateSimilarity(str1, str2) {
+            const longer = str1.length > str2.length ? str1 : str2;
+            const shorter = str1.length > str2.length ? str2 : str1;
+            
+            if (longer.length === 0) return 1.0;
+            
+            const editDistance = levenshteinDistance(longer, shorter);
+            return (longer.length - editDistance) / longer.length;
+        }
+
+        function levenshteinDistance(str1, str2) {
+            const matrix = [];
+            
+            for (let i = 0; i <= str2.length; i++) {
+                matrix[i] = [i];
+            }
+            
+            for (let j = 0; j <= str1.length; j++) {
+                matrix[0][j] = j;
+            }
+            
+            for (let i = 1; i <= str2.length; i++) {
+                for (let j = 1; j <= str1.length; j++) {
+                    if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j] + 1
+                        );
+                    }
+                }
+            }
+            
+            return matrix[str2.length][str1.length];
+        }
+
+        function applySuggestion(suggestion) {
+            document.getElementById('inventorySearch').value = suggestion;
+            currentSearchTerm = suggestion.toLowerCase();
+            document.getElementById('searchSuggestions').classList.add('hidden');
+            document.getElementById('clearSearchBtn').classList.remove('hidden');
+            applyInventoryFilter();
+        }
+
+        function filterInventory(filterType) {
+            currentFilter = filterType;
+            
+            // Update filter button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            event.target.classList.add('active', 'bg-blue-500', 'text-white');
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            applyInventoryFilter();
+        }
+
+        function applyInventoryFilter() {
+            let filtered = [...inventory];
+            
+            // Apply search filter
+            if (currentSearchTerm) {
+                filtered = filtered.filter(item => {
+                    const itemName = item.name.toLowerCase();
+                    const unit = item.unit.toLowerCase();
+                    
+                    return itemName.includes(currentSearchTerm) || 
+                           unit.includes(currentSearchTerm) ||
+                           calculateSimilarity(itemName, currentSearchTerm) > 0.5;
+                });
+            }
+            
+            // Apply category filter
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(item => {
+                    const itemName = item.name.toLowerCase();
+                    
+                    switch (currentFilter) {
+                        case 'low-stock':
+                            const packagesLeft = Math.floor(item.quantity / item.packageQuantity);
+                            return packagesLeft < 1;
+                        case 'powder':
+                            return itemName.includes('แป้ง') || itemName.includes('ผง') || 
+                                   itemName.includes('โกโก้') || itemName.includes('ผงฟู');
+                        case 'liquid':
+                            return item.unit.includes('มล') || item.unit.includes('ลิตร') || 
+                                   itemName.includes('น้ำ') || itemName.includes('น้ำมัน') ||
+                                   itemName.includes('เอสเซ้นส์');
+                        case 'dairy':
+                            return itemName.includes('นม') || itemName.includes('เนย') || 
+                                   itemName.includes('ครีม') || itemName.includes('ชีส') ||
+                                   itemName.includes('โยเกิร์ต');
+                        case 'sweet':
+                            return itemName.includes('น้ำตาล') || itemName.includes('น้ำผึ้ง') || 
+                                   itemName.includes('ช็อกโกแลต') || itemName.includes('หวาน') ||
+                                   itemName.includes('ไซรัป');
+                        default:
+                            return true;
+                    }
+                });
+            }
+            
+            filteredInventory = filtered;
+            
+            // Apply sorting
+            sortInventory();
+            
+            // Show search results info
+            showSearchResults();
+        }
+
+        function sortInventory() {
+            const sortType = document.getElementById('inventorySort').value;
+            
+            filteredInventory.sort((a, b) => {
+                switch (sortType) {
+                    case 'name-asc':
+                        return a.name.localeCompare(b.name, 'th');
+                    case 'name-desc':
+                        return b.name.localeCompare(a.name, 'th');
+                    case 'stock-low':
+                        return a.quantity - b.quantity;
+                    case 'stock-high':
+                        return b.quantity - a.quantity;
+                    case 'updated-new':
+                        return new Date(b.lastUpdated) - new Date(a.lastUpdated);
+                    case 'updated-old':
+                        return new Date(a.lastUpdated) - new Date(b.lastUpdated);
+                    default:
+                        return 0;
+                }
+            });
+            
+            updateInventoryDisplay();
+        }
+
+        function showSearchResults() {
+            const searchResults = document.getElementById('searchResults');
+            const totalItems = inventory.length;
+            const filteredCount = filteredInventory.length;
+            
+            if (currentSearchTerm || currentFilter !== 'all') {
+                searchResults.classList.remove('hidden');
+                
+                let message = `พบ ${filteredCount} รายการ`;
+                if (currentSearchTerm) {
+                    message += ` จากการค้นหา "${currentSearchTerm}"`;
+                }
+                if (currentFilter !== 'all') {
+                    const filterNames = {
+                        'low-stock': 'ใกล้หมด',
+                        'powder': 'แป้ง/ผง',
+                        'liquid': 'ของเหลว',
+                        'dairy': 'นม/เนย',
+                        'sweet': 'หวาน'
+                    };
+                    message += ` ในหมวด "${filterNames[currentFilter]}"`;
+                }
+                message += ` จากทั้งหมด ${totalItems} รายการ`;
+                
+                searchResults.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span>🔍 ${message}</span>
+                        ${(currentSearchTerm || currentFilter !== 'all') ? 
+                            '<button onclick="resetAllFilters()" class="text-blue-800 hover:text-blue-900 underline text-xs">ล้างตัวกรอง</button>' : 
+                            ''
+                        }
+                    </div>
+                `;
+            } else {
+                searchResults.classList.add('hidden');
+            }
+        }
+
+        function resetAllFilters() {
+            // Clear search
+            document.getElementById('inventorySearch').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            currentSearchTerm = '';
+            
+            // Reset filter to 'all'
+            currentFilter = 'all';
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            document.querySelector('.filter-btn').classList.add('active', 'bg-blue-500', 'text-white');
+            document.querySelector('.filter-btn').classList.remove('bg-gray-200', 'text-gray-700');
+            
+            // Reset sort
+            document.getElementById('inventorySort').value = 'name-asc';
+            
+            // Hide suggestions and results
+            document.getElementById('searchSuggestions').classList.add('hidden');
+            document.getElementById('searchResults').classList.add('hidden');
+            
+            // Apply filters
+            applyInventoryFilter();
+        }
+
         function updateInventoryDisplay() {
             const list = document.getElementById('inventoryList');
+            const countElement = document.getElementById('inventoryCount');
+            
+            // Update count
+            countElement.textContent = filteredInventory.length;
             
             if (inventory.length === 0) {
                 list.innerHTML = '<div class="text-center text-gray-500 py-8">ยังไม่มีวัตถุดิบในคลัง<br>เพิ่มวัตถุดิบแรกของคุณเลย!</div>';
                 return;
             }
             
-            list.innerHTML = inventory.map(item => {
+            if (filteredInventory.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-lg mb-2">🔍 ไม่พบวัตถุดิบที่ค้นหา</div>
+                        <div class="text-sm">ลองเปลี่ยนคำค้นหาหรือตัวกรองดู</div>
+                        <button onclick="resetAllFilters()" class="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm">
+                            ล้างตัวกรองทั้งหมด
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = filteredInventory.map(item => {
                 // Calculate how many packages are left
                 const packagesLeft = Math.floor(item.quantity / item.packageQuantity);
                 const remainingUnits = item.quantity % item.packageQuantity;
@@ -779,11 +1249,18 @@
                 // Warning for low stock (less than 1 package or less than 10% of a package)
                 const lowStock = packagesLeft < 1 || (packagesLeft === 0 && remainingUnits < item.packageQuantity * 0.1);
                 
+                // Highlight search term in item name
+                let displayName = item.name;
+                if (currentSearchTerm) {
+                    const regex = new RegExp(`(${currentSearchTerm})`, 'gi');
+                    displayName = item.name.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+                }
+                
                 return `
                     <div class="p-4 border rounded-lg ${lowStock ? 'bg-red-50 border-red-200' : 'bg-gray-50'} hover:shadow-md transition-shadow">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
-                                <div class="font-medium text-lg">${item.name}</div>
+                                <div class="font-medium text-lg">${displayName}</div>
                                 
                                 <!-- Stock Information -->
                                 <div class="mt-2 space-y-1">
@@ -1403,6 +1880,7 @@
 
         function createRecipe() {
             const name = document.getElementById('recipeName').value;
+            const category = document.getElementById('recipeCategory').value;
             const yield = parseFloat(document.getElementById('recipeYield').value);
             const baseRecipeId = document.getElementById('baseRecipe').value;
             
@@ -1476,6 +1954,7 @@
             const newRecipe = {
                 id: Date.now(),
                 name,
+                category: category || 'อื่นๆ',
                 yield,
                 ingredients,
                 additionalCost,
@@ -1519,6 +1998,7 @@
 
         function clearRecipeForm() {
             document.getElementById('recipeName').value = '';
+            document.getElementById('recipeCategory').value = '';
             document.getElementById('recipeYield').value = '';
             document.getElementById('baseRecipe').value = '';
             
@@ -1534,68 +2014,210 @@
             document.querySelector('.ingredient-amount').value = '';
         }
 
+        // Recipe filtering and view functions
+        function filterRecipes(category) {
+            currentRecipeFilter = category;
+            
+            // Update filter button styles
+            document.querySelectorAll('.recipe-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-purple-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            event.target.classList.add('active', 'bg-purple-500', 'text-white');
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            applyRecipeFilter();
+        }
+
+        function toggleRecipeView(viewType) {
+            currentRecipeView = viewType;
+            
+            // Update view button styles
+            document.querySelectorAll('#compactViewBtn, #detailedViewBtn').forEach(btn => {
+                btn.classList.remove('bg-purple-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            if (viewType === 'compact') {
+                document.getElementById('compactViewBtn').classList.add('bg-purple-500', 'text-white');
+                document.getElementById('compactViewBtn').classList.remove('bg-gray-200', 'text-gray-700');
+            } else {
+                document.getElementById('detailedViewBtn').classList.add('bg-purple-500', 'text-white');
+                document.getElementById('detailedViewBtn').classList.remove('bg-gray-200', 'text-gray-700');
+            }
+            
+            updateRecipesList();
+        }
+
+        function applyRecipeFilter() {
+            if (currentRecipeFilter === 'all') {
+                filteredRecipes = [...recipes];
+            } else {
+                filteredRecipes = recipes.filter(recipe => 
+                    recipe.category === currentRecipeFilter
+                );
+            }
+            
+            updateRecipesList();
+        }
+
         function updateRecipesList() {
             const list = document.getElementById('recipesList');
-            list.innerHTML = recipes.map(recipe => {
-                // Create detailed cost breakdown display
-                let costBreakdown = '';
-                
-                // Show base recipe cost if exists
-                if (recipe.baseRecipeName && recipe.baseCost > 0) {
-                    costBreakdown = `
-                        <div class="text-xs text-blue-600 mt-1">
-                            📋 พื้นฐาน: ${recipe.baseRecipeName} (${recipe.baseCost.toFixed(2)} บาท)
-                        </div>
-                    `;
-                }
-                
-                // Show ingredients breakdown
-                if (recipe.ingredients && recipe.ingredients.length > 0) {
-                    costBreakdown += `
-                        <div class="text-xs text-orange-600 mt-1">
-                            🧂 วัตถุดิบ:
-                        </div>
-                        <div class="text-xs text-gray-600 ml-2">
-                    `;
-                    
-                    recipe.ingredients.forEach(ingredient => {
-                        const unitPrice = ingredient.unitPrice || 0;
-                        const cost = ingredient.cost || (ingredient.amount * unitPrice);
-                        costBreakdown += `
-                            <div class="flex justify-between">
-                                <span>• ${ingredient.name} ${ingredient.amount} ${ingredient.unit}</span>
-                                <span>${cost.toFixed(2)} บาท</span>
-                            </div>
-                        `;
-                    });
-                    
-                    costBreakdown += `</div>`;
-                    
-                    if (recipe.additionalCost > 0) {
-                        costBreakdown += `
-                            <div class="text-xs text-orange-600 mt-1">
-                                รวมวัตถุดิบ: ${recipe.additionalCost.toFixed(2)} บาท
-                            </div>
-                        `;
-                    }
-                }
-                
-                return `
-                    <div class="p-3 border rounded-lg bg-purple-50">
-                        <div class="font-medium">${recipe.name}</div>
-                        <div class="text-sm text-gray-600">ได้ ${recipe.yield} หน่วย | ต้นทุนรวม ${recipe.totalCost.toFixed(2)} บาท</div>
-                        <div class="text-sm text-green-600 font-medium">ต้นทุน/หน่วย: ${recipe.costPerUnit.toFixed(2)} บาท</div>
-                        ${costBreakdown}
-                        <div class="text-xs text-gray-500 mt-2">สร้างเมื่อ: ${recipe.created}</div>
-                        <div class="mt-2 flex gap-2">
-                            <button onclick="viewRecipeDetails(${recipe.id})" class="text-purple-500 hover:text-purple-700 text-sm">👁️ ดูรายละเอียด</button>
-                            <button onclick="copyRecipe(${recipe.id})" class="text-blue-500 hover:text-blue-700 text-sm">📋 คัดลอก</button>
-                            <button onclick="editRecipe(${recipe.id})" class="text-green-500 hover:text-green-700 text-sm">✏️ แก้ไข</button>
-                            <button onclick="removeRecipe(${recipe.id})" class="text-red-500 hover:text-red-700 text-sm">🗑️ ลบสูตร</button>
-                        </div>
+            const countElement = document.getElementById('recipesCount');
+            
+            // Update count
+            countElement.textContent = filteredRecipes.length;
+            
+            if (recipes.length === 0) {
+                list.innerHTML = '<div class="text-center text-gray-500 py-8">ยังไม่มีสูตรในระบบ<br>สร้างสูตรแรกของคุณเลย!</div>';
+                return;
+            }
+            
+            if (filteredRecipes.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-lg mb-2">🔍 ไม่พบสูตรในหมวดหมู่นี้</div>
+                        <div class="text-sm">ลองเปลี่ยนหมวดหมู่ดู</div>
                     </div>
                 `;
+                return;
+            }
+            
+            list.innerHTML = filteredRecipes.map(recipe => {
+                if (currentRecipeView === 'compact') {
+                    return renderCompactRecipe(recipe);
+                } else {
+                    return renderDetailedRecipe(recipe);
+                }
             }).join('');
+        }
+
+        function renderCompactRecipe(recipe) {
+            const categoryIcon = getCategoryIcon(recipe.category);
+            
+            return `
+                <div class="p-3 border rounded-lg bg-purple-50 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-lg">${categoryIcon}</span>
+                                <div class="font-medium text-lg">${recipe.name}</div>
+                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">${recipe.category}</span>
+                            </div>
+                            <div class="flex items-center gap-4 text-sm text-gray-600">
+                                <span>📈 ได้ ${recipe.yield} หน่วย</span>
+                                <span class="font-medium text-green-600">💰 ${recipe.costPerUnit.toFixed(2)} บาท/หน่วย</span>
+                                <span class="text-purple-600">📊 รวม ${recipe.totalCost.toFixed(2)} บาท</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1 ml-4">
+                            <button onclick="viewRecipeDetails(${recipe.id})" class="text-purple-500 hover:text-purple-700 text-xs px-2 py-1 bg-white rounded border">👁️</button>
+                            <button onclick="copyRecipe(${recipe.id})" class="text-blue-500 hover:text-blue-700 text-xs px-2 py-1 bg-white rounded border">📋</button>
+                            <button onclick="editRecipe(${recipe.id})" class="text-green-500 hover:text-green-700 text-xs px-2 py-1 bg-white rounded border">✏️</button>
+                            <button onclick="removeRecipe(${recipe.id})" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 bg-white rounded border">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDetailedRecipe(recipe) {
+            const categoryIcon = getCategoryIcon(recipe.category);
+            
+            // Create detailed cost breakdown display
+            let costBreakdown = '';
+            
+            // Show base recipe cost if exists
+            if (recipe.baseRecipeName && recipe.baseCost > 0) {
+                costBreakdown = `
+                    <div class="text-xs text-blue-600 mt-1">
+                        📋 พื้นฐาน: ${recipe.baseRecipeName} (${recipe.baseCost.toFixed(2)} บาท)
+                    </div>
+                `;
+            }
+            
+            // Show ingredients breakdown
+            if (recipe.ingredients && recipe.ingredients.length > 0) {
+                costBreakdown += `
+                    <div class="text-xs text-orange-600 mt-1">
+                        🧂 วัตถุดิบ:
+                    </div>
+                    <div class="text-xs text-gray-600 ml-2">
+                `;
+                
+                recipe.ingredients.forEach(ingredient => {
+                    const unitPrice = ingredient.unitPrice || 0;
+                    const cost = ingredient.cost || (ingredient.amount * unitPrice);
+                    costBreakdown += `
+                        <div class="flex justify-between">
+                            <span>• ${ingredient.name} ${ingredient.amount} ${ingredient.unit}</span>
+                            <span>${cost.toFixed(2)} บาท</span>
+                        </div>
+                    `;
+                });
+                
+                costBreakdown += `</div>`;
+                
+                if (recipe.additionalCost > 0) {
+                    costBreakdown += `
+                        <div class="text-xs text-orange-600 mt-1">
+                            รวมวัตถุดิบ: ${recipe.additionalCost.toFixed(2)} บาท
+                        </div>
+                    `;
+                }
+            }
+            
+            return `
+                <div class="p-3 border rounded-lg bg-purple-50">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xl">${categoryIcon}</span>
+                        <div class="font-medium text-lg">${recipe.name}</div>
+                        <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">${recipe.category}</span>
+                    </div>
+                    <div class="text-sm text-gray-600">ได้ ${recipe.yield} หน่วย | ต้นทุนรวม ${recipe.totalCost.toFixed(2)} บาท</div>
+                    <div class="text-sm text-green-600 font-medium">ต้นทุน/หน่วย: ${recipe.costPerUnit.toFixed(2)} บาท</div>
+                    ${costBreakdown}
+                    <div class="text-xs text-gray-500 mt-2">สร้างเมื่อ: ${recipe.created}</div>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="viewRecipeDetails(${recipe.id})" class="text-purple-500 hover:text-purple-700 text-sm">👁️ ดูรายละเอียด</button>
+                        <button onclick="copyRecipe(${recipe.id})" class="text-blue-500 hover:text-blue-700 text-sm">📋 คัดลอก</button>
+                        <button onclick="editRecipe(${recipe.id})" class="text-green-500 hover:text-green-700 text-sm">✏️ แก้ไข</button>
+                        <button onclick="removeRecipe(${recipe.id})" class="text-red-500 hover:text-red-700 text-sm">🗑️ ลบสูตร</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'ขนมปัง': '🍞',
+                'โดนัท': '🍩',
+                'เค้ก': '🎂',
+                'คุกกี้': '🍪',
+                'มัฟฟิน': '🧁',
+                'ครัวซอง': '🥐',
+                'พาย': '🥧',
+                'ขนมไทย': '🍮',
+                'อื่นๆ': '🍰'
+            };
+            return icons[category] || '🍰';
+        }
+
+        function updateRecipeOptions() {
+            const selects = document.querySelectorAll('.ingredient-select');
+            const options = '<option value="">เลือกวัตถุดิบ</option>' + 
+                inventory.map(item => `<option value="${item.name}">${item.name} (${item.unit})</option>`).join('');
+            selects.forEach(select => select.innerHTML = options);
+            
+            // Update base recipe options
+            const baseRecipeSelect = document.getElementById('baseRecipe');
+            baseRecipeSelect.innerHTML = '<option value="">เลือกสูตรพื้นฐาน หรือเริ่มใหม่</option>' + 
+                recipes.map(recipe => `<option value="${recipe.id}">${recipe.name} (${recipe.yield} หน่วย)</option>`).join('');
+            
+            // Initialize filtered recipes and update display
+            filteredRecipes = [...recipes];
+            updateRecipesList();
         }
 
         function copyRecipe(id) {
@@ -1607,6 +2229,7 @@
             
             // Fill form with recipe data (with "สำเนา" prefix)
             document.getElementById('recipeName').value = `สำเนา ${recipe.name}`;
+            document.getElementById('recipeCategory').value = recipe.category || '';
             document.getElementById('recipeYield').value = recipe.yield;
             
             // Clear existing ingredients except first row
@@ -1647,6 +2270,7 @@
             
             // Fill form with recipe data
             document.getElementById('recipeName').value = recipe.name;
+            document.getElementById('recipeCategory').value = recipe.category || '';
             document.getElementById('recipeYield').value = recipe.yield;
             document.getElementById('baseRecipe').value = '';
             
@@ -1679,6 +2303,7 @@
             if (!editingRecipeId) return;
             
             const name = document.getElementById('recipeName').value;
+            const category = document.getElementById('recipeCategory').value;
             const yield = parseFloat(document.getElementById('recipeYield').value);
             
             if (!name || !yield) {
@@ -1737,6 +2362,7 @@
                 recipes[recipeIndex] = {
                     ...recipes[recipeIndex],
                     name,
+                    category: category || 'อื่นๆ',
                     yield,
                     ingredients,
                     additionalCost: totalCost,
@@ -1777,6 +2403,7 @@
             
             // Clear form
             document.getElementById('recipeName').value = '';
+            document.getElementById('recipeCategory').value = '';
             document.getElementById('recipeYield').value = '';
             document.getElementById('baseRecipe').value = '';
             clearAllIngredients();
@@ -1786,7 +2413,9 @@
             const recipe = recipes.find(r => r.id === id);
             if (!recipe) return;
             
-            let message = `📋 รายละเอียดสูตร: ${recipe.name}\n`;
+            const categoryIcon = getCategoryIcon(recipe.category);
+            let message = `${categoryIcon} รายละเอียดสูตร: ${recipe.name}\n`;
+            message += `🏷️ หมวดหมู่: ${recipe.category}\n`;
             message += `📈 ได้: ${recipe.yield} ชิ้น\n\n`;
             
             // Show base recipe if exists
@@ -2798,6 +3427,10 @@
             // Show inventory section by default
             showSection('inventory');
             
+            // Initialize filters
+            filteredInventory = [...inventory];
+            filteredRecipes = [...recipes];
+            
             // Update all displays
             updateInventoryDisplay();
             updatePurchaseOptions();
@@ -2807,5 +3440,5 @@
             updateCostAnalysis();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'969bdc4143edc8d7',t:'MTc1NDI4NzQ5OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a520ec53b745ba',t:'MTc1NDM4NDY4My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
