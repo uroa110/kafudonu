@@ -13,61 +13,70 @@
 <body class="bg-gradient-to-br from-orange-50 to-amber-50 min-h-screen">
     <div class="container mx-auto px-4 py-6">
         <!-- Header -->
-        <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
-            <h1 class="text-2xl sm:text-3xl font-bold text-orange-800 mb-2">🧁 Bakery Pro</h1>
-            <p class="text-sm sm:text-base text-gray-600">ระบบจัดการเบเกอรี่ครบวงจร</p>
+        <div class="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg p-6 mb-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">🧁 Bakery Pro</h1>
+                    <p class="text-orange-100">ระบบจัดการเบเกอรี่ครบวงจร</p>
+                </div>
+                <div class="hidden sm:block text-right">
+                    <div class="text-sm text-orange-100">วันที่</div>
+                    <div class="text-lg font-semibold" id="currentDate"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Navigation -->
-        <div class="bg-white rounded-xl shadow-lg p-3 sm:p-4 mb-4 sm:mb-6">
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-2">
-                <button onclick="showSection('inventory')" class="nav-btn bg-blue-500 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base">
-                    <div class="flex flex-col sm:flex-row items-center gap-1">
-                        <span>📦</span>
-                        <span>คลังสินค้า</span>
+        <div class="bg-white rounded-xl shadow-lg p-4 mb-6">
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                <button onclick="showSection('inventory')" class="nav-btn group bg-blue-50 hover:bg-blue-500 text-blue-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-blue-200 hover:border-blue-500">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-2xl">📦</span>
+                        <span class="text-sm font-medium">คลังสินค้า</span>
                     </div>
                 </button>
-                <button onclick="showSection('purchase')" class="nav-btn bg-green-500 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-green-600 transition-colors text-sm sm:text-base">
-                    <div class="flex flex-col sm:flex-row items-center gap-1">
-                        <span>🛒</span>
-                        <span>ซื้อของ</span>
+                <button onclick="showSection('purchase')" class="nav-btn group bg-green-50 hover:bg-green-500 text-green-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-green-200 hover:border-green-500">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-2xl">🛒</span>
+                        <span class="text-sm font-medium">ซื้อของ</span>
                     </div>
                 </button>
-                <button onclick="showSection('recipes')" class="nav-btn bg-purple-500 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-purple-600 transition-colors text-sm sm:text-base">
-                    <div class="flex flex-col sm:flex-row items-center gap-1">
-                        <span>📋</span>
-                        <span>สูตร</span>
+                <button onclick="showSection('recipes')" class="nav-btn group bg-purple-50 hover:bg-purple-500 text-purple-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-purple-200 hover:border-purple-500">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-2xl">📋</span>
+                        <span class="text-sm font-medium">สูตร</span>
                     </div>
                 </button>
-                <button onclick="showSection('production')" class="nav-btn bg-indigo-500 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm sm:text-base">
-                    <div class="flex flex-col sm:flex-row items-center gap-1">
-                        <span>🏭</span>
-                        <span>การผลิต</span>
+                <button onclick="showSection('production')" class="nav-btn group bg-indigo-50 hover:bg-indigo-500 text-indigo-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-indigo-200 hover:border-indigo-500">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-2xl">🏭</span>
+                        <span class="text-sm font-medium">การผลิต</span>
                     </div>
                 </button>
-                <button onclick="showSection('sales')" class="nav-btn bg-pink-500 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-pink-600 transition-colors text-sm sm:text-base">
-                    <div class="flex flex-col sm:flex-row items-center gap-1">
-                        <span>💰</span>
-                        <span>ขาย</span>
+                <button onclick="showSection('sales')" class="nav-btn group bg-pink-50 hover:bg-pink-500 text-pink-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-pink-200 hover:border-pink-500">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-2xl">💰</span>
+                        <span class="text-sm font-medium">ขาย</span>
                     </div>
                 </button>
-                <button onclick="showSection('reports')" class="nav-btn bg-teal-500 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-teal-600 transition-colors text-sm sm:text-base">
-                    <div class="flex flex-col sm:flex-row items-center gap-1">
-                        <span>📊</span>
-                        <span>รายงาน</span>
+                <button onclick="showSection('reports')" class="nav-btn group bg-teal-50 hover:bg-teal-500 text-teal-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-teal-200 hover:border-teal-500">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-2xl">📊</span>
+                        <span class="text-sm font-medium">รายงาน</span>
                     </div>
                 </button>
-                <button onclick="showSection('costs')" class="nav-btn bg-orange-500 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm sm:text-base">
-                    <div class="flex flex-col sm:flex-row items-center gap-1">
-                        <span>📈</span>
-                        <span>ต้นทุน</span>
+
+                <button onclick="showSection('pricing')" class="nav-btn group bg-yellow-50 hover:bg-yellow-500 text-yellow-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-yellow-200 hover:border-yellow-500">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-2xl">💲</span>
+                        <span class="text-sm font-medium">ราคาขาย</span>
                     </div>
                 </button>
             </div>
         </div>
 
         <!-- Inventory Section -->
-        <div id="inventory" class="section bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
+        <div id="inventory" class="section bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
             <div class="border-b border-gray-200 pb-4 mb-6">
                 <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-2">📦 ระบบคลังสินค้า</h2>
                 <p class="text-sm text-gray-600">จัดการวัตถุดิบและติดตามสต็อก</p>
@@ -142,7 +151,7 @@
                 </div>
                 
                 <!-- คลังสินค้าปัจจุบัน -->
-                <div class="bg-gray-50 rounded-lg p-4">
+                <div class="bg-white rounded-lg p-4 border-2 border-blue-100">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
                         <h3 class="text-lg font-semibold text-gray-800">
                             📋 คลังสินค้าปัจจุบัน
@@ -225,7 +234,7 @@
         </div>
 
         <!-- Purchase Section -->
-        <div id="purchase" class="section bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+        <div id="purchase" class="section bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
             <div class="border-b border-gray-200 pb-4 mb-6">
                 <h2 class="text-xl sm:text-2xl font-bold text-green-800 mb-2">🛒 ระบบการซื้อของ</h2>
                 <p class="text-sm text-gray-600">สั่งซื้อวัตถุดิบและติดตามประวัติการซื้อ</p>
@@ -286,7 +295,7 @@
                 </div>
                 
                 <!-- ประวัติการซื้อ -->
-                <div class="bg-gray-50 rounded-lg p-4">
+                <div class="bg-white rounded-lg p-4 border-2 border-green-100">
                     <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">
                         📜 ประวัติการซื้อ
                     </h3>
@@ -298,7 +307,7 @@
         </div>
 
         <!-- Production Section -->
-        <div id="production" class="section bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+        <div id="production" class="section bg-gradient-to-br from-indigo-50 to-purple-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
             <div class="border-b border-gray-200 pb-4 mb-6">
                 <h2 class="text-xl sm:text-2xl font-bold text-indigo-800 mb-2">🏭 ระบบวางแผนการผลิต</h2>
                 <p class="text-sm text-gray-600">วางแผนการผลิตและติดตามการใช้วัตถุดิบ</p>
@@ -339,7 +348,7 @@
                 </div>
                 
                 <!-- ประวัติการผลิต -->
-                <div class="bg-gray-50 rounded-lg p-4">
+                <div class="bg-white rounded-lg p-4 border-2 border-indigo-100">
                     <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">
                         📜 ประวัติการผลิต
                     </h3>
@@ -351,7 +360,7 @@
         </div>
 
         <!-- Recipes Section -->
-        <div id="recipes" class="section bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+        <div id="recipes" class="section bg-gradient-to-br from-purple-50 to-pink-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
             <div class="border-b border-gray-200 pb-4 mb-6">
                 <h2 class="text-xl sm:text-2xl font-bold text-purple-800 mb-2">📋 ระบบสูตรและคำนวณต้นทุน</h2>
                 <p class="text-sm text-gray-600">สร้างสูตรใหม่และคำนวณต้นทุนการผลิต</p>
@@ -426,7 +435,7 @@
                 </div>
                 
                 <!-- สูตรทั้งหมด -->
-                <div class="bg-gray-50 rounded-lg p-4">
+                <div class="bg-white rounded-lg p-4 border-2 border-purple-100">
                     <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
                         <h3 class="text-lg font-semibold text-gray-800">
                             📚 สูตรทั้งหมด
@@ -480,7 +489,7 @@
         </div>
 
         <!-- Sales Section -->
-        <div id="sales" class="section bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+        <div id="sales" class="section bg-gradient-to-br from-pink-50 to-rose-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
             <div class="border-b border-gray-200 pb-4 mb-6">
                 <h2 class="text-xl sm:text-2xl font-bold text-pink-800 mb-2">💰 ระบบการขาย</h2>
                 <p class="text-sm text-gray-600">บันทึกการขายและติดตามสต็อกสินค้า</p>
@@ -507,35 +516,22 @@
                             </div>
                         </div>
                         
-                        <!-- ปรับสต็อกคงเหลือ -->
-                        <div id="stockAdjustment" class="hidden bg-blue-50 p-3 rounded-lg border border-blue-200">
-                            <h5 class="font-medium text-blue-800 mb-2 text-sm">📦 ปรับสต็อกคงเหลือ (ไม่บังคับ)</h5>
-                            <div class="flex gap-2 items-end">
-                                <div class="flex-1">
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">จำนวนที่เหลือจริง</label>
-                                    <input type="number" id="actualStock" placeholder="เช่น 5" class="w-full p-2 border rounded-lg text-sm" oninput="calculateStockAdjustment()">
-                                </div>
-                                <button onclick="adjustStock()" id="adjustStockBtn" class="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 text-sm disabled:bg-gray-400" disabled>ปรับสต็อก</button>
-                            </div>
-                            <div id="stockAdjustmentInfo" class="hidden mt-2 text-xs">
-                                <!-- Stock adjustment calculation will be shown here -->
-                            </div>
-                        </div>
+
                         
                         <div class="space-y-3">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่ขาย</label>
-                                <input type="number" id="saleQuantity" placeholder="จำนวนที่ขาย" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSaleTotal()">
-                            </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่เหลือหลังขาย (ไม่บังคับ)</label>
                                 <input type="number" id="remainingStock" placeholder="เช่น 5 (จำนวนที่เหลือจริง)" class="w-full p-3 border rounded-lg text-sm" oninput="calculateFromRemaining()">
                                 <p class="text-xs text-blue-600 mt-1">💡 กรอกจำนวนที่เหลือจริง ระบบจะคำนวณจำนวนที่ขายให้อัตโนมัติ</p>
                             </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">ราคาขายต่อหน่วย (บาท)</label>
-                            <input type="number" id="salePrice" placeholder="ราคาขายต่อหน่วย" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSaleTotal()">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่ขาย</label>
+                                <input type="number" id="saleQuantity" placeholder="จำนวนที่ขาย" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSaleTotal()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ราคาขายต่อหน่วย (บาท)</label>
+                                <input type="number" id="salePrice" placeholder="ราคาขายต่อหน่วย" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSaleTotal()">
+                            </div>
                         </div>
                         
                         <!-- แสดงการคำนวณ -->
@@ -574,7 +570,7 @@
                 <!-- สต็อกสินค้าและประวัติการขาย -->
                 <div class="space-y-4">
                     <!-- สต็อกสินค้า -->
-                    <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="bg-white rounded-lg p-4 border-2 border-blue-100">
                         <h3 class="text-lg font-semibold mb-4 text-blue-800 border-b border-blue-200 pb-2">
                             📦 สต็อกสินค้า
                         </h3>
@@ -584,7 +580,7 @@
                     </div>
                     
                     <!-- ประวัติการขาย -->
-                    <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="bg-white rounded-lg p-4 border-2 border-pink-100">
                         <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">
                             📜 ประวัติการขาย
                         </h3>
@@ -597,7 +593,7 @@
         </div>
 
         <!-- Reports Section -->
-        <div id="reports" class="section bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+        <div id="reports" class="section bg-gradient-to-br from-teal-50 to-cyan-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
             <div class="border-b border-gray-200 pb-4 mb-6">
                 <h2 class="text-xl sm:text-2xl font-bold text-teal-800 mb-2">📊 ระบบรายงาน</h2>
                 <p class="text-sm text-gray-600">วิเคราะห์ยอดขายและพฤติกรรมลูกค้า</p>
@@ -695,68 +691,136 @@
             </div>
         </div>
 
-        <!-- Costs Section -->
-        <div id="costs" class="section bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+        <!-- Pricing Section -->
+        <div id="pricing" class="section bg-gradient-to-br from-yellow-50 to-amber-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
             <div class="border-b border-gray-200 pb-4 mb-6">
-                <h2 class="text-xl sm:text-2xl font-bold text-orange-800 mb-2">📊 ระบบวิเคราะห์ต้นทุน</h2>
-                <p class="text-sm text-gray-600">จัดการต้นทุนคงที่และวิเคราะห์จุดคุ้มทุน</p>
+                <h2 class="text-xl sm:text-2xl font-bold text-yellow-800 mb-2">💲 ระบบจัดการราคาขาย</h2>
+                <p class="text-sm text-gray-600">กำหนดราคาขายและคำนวณกำไรสำหรับแต่ละสินค้า</p>
             </div>
             
             <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
-                <!-- ต้นทุนคงที่ -->
-                <div class="bg-orange-50 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold mb-4 text-orange-800 border-b border-orange-200 pb-2">
-                        💰 ต้นทุนคงที่ (รายเดือน)
+                <!-- กำหนดราคาขาย -->
+                <div class="bg-yellow-50 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold mb-4 text-yellow-800 border-b border-yellow-200 pb-2">
+                        🏷️ กำหนดราคาขาย
                     </h3>
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">ค่าเช่า</label>
-                            <input type="number" id="rentCost" placeholder="ค่าเช่า (บาท)" class="w-full p-3 border rounded-lg text-sm">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">เลือกสินค้า</label>
+                            <select id="pricingProduct" class="w-full p-3 border rounded-lg text-sm" onchange="updatePricingInfo()">
+                                <option value="">เลือกสินค้า</option>
+                            </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">ค่าไฟ/น้ำ</label>
-                            <input type="number" id="utilityCost" placeholder="ค่าไฟ/น้ำ (บาท)" class="w-full p-3 border rounded-lg text-sm">
+                        
+                        <!-- แสดงข้อมูลต้นทุน -->
+                        <div id="costInfo" class="hidden bg-white p-4 rounded-lg border border-yellow-200">
+                            <h4 class="font-medium text-yellow-800 mb-3 text-sm">📊 ข้อมูลต้นทุน</h4>
+                            <div id="costDetails" class="text-sm text-yellow-700 space-y-2">
+                                <!-- Cost details will be shown here -->
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">ค่าแรงงาน</label>
-                            <input type="number" id="laborCost" placeholder="ค่าแรงงาน (บาท)" class="w-full p-3 border rounded-lg text-sm">
+                        
+                        <!-- กำหนดราคาขาย -->
+                        <div id="pricingSection" class="hidden space-y-4">
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <h4 class="font-medium text-blue-800 mb-3 text-sm">💰 กำหนดราคาขาย</h4>
+                                
+                                <!-- วิธีการกำหนดราคา -->
+                                <div class="mb-3">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">วิธีการกำหนดราคา</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="pricingMethod" value="markup" class="mr-2" onchange="updatePricingMethod()" checked>
+                                            <span class="text-sm">กำหนดจากเปอร์เซ็นต์กำไร (Markup)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="pricingMethod" value="margin" class="mr-2" onchange="updatePricingMethod()">
+                                            <span class="text-sm">กำหนดจากอัตรากำไร (Margin)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="pricingMethod" value="fixed" class="mr-2" onchange="updatePricingMethod()">
+                                            <span class="text-sm">กำหนดราคาคงที่</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Markup Method -->
+                                <div id="markupMethod" class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">เปอร์เซ็นต์กำไร (%)</label>
+                                        <input type="number" id="markupPercent" placeholder="เช่น 100 (หมายถึง 100%)" class="w-full p-2 border rounded-lg text-sm" oninput="calculatePriceFromMarkup()">
+                                        <p class="text-xs text-blue-600 mt-1">💡 100% = ราคาขาย 2 เท่าของต้นทุน</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Margin Method -->
+                                <div id="marginMethod" class="hidden space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">อัตรากำไร (%)</label>
+                                        <input type="number" id="marginPercent" placeholder="เช่น 50 (หมายถึง 50%)" class="w-full p-2 border rounded-lg text-sm" oninput="calculatePriceFromMargin()">
+                                        <p class="text-xs text-blue-600 mt-1">💡 50% = กำไร 50% ของราคาขาย</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Fixed Price Method -->
+                                <div id="fixedMethod" class="hidden space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">ราคาขาย (บาท)</label>
+                                        <input type="number" id="fixedPrice" placeholder="ราคาขายที่ต้องการ" class="w-full p-2 border rounded-lg text-sm" oninput="calculateProfitFromFixed()">
+                                    </div>
+                                </div>
+                                
+                                <!-- ผลการคำนวณ -->
+                                <div id="pricingResult" class="hidden mt-4 p-3 bg-green-100 rounded-lg border border-green-300">
+                                    <h5 class="font-medium text-green-800 mb-2 text-sm">📈 ผลการคำนวณ</h5>
+                                    <div id="pricingCalculation" class="text-sm text-green-700 space-y-1">
+                                        <!-- Pricing calculation will be shown here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button onclick="savePricing()" id="savePricingBtn" class="w-full bg-yellow-500 text-white p-3 rounded-lg hover:bg-yellow-600 text-sm font-medium" disabled>บันทึกราคาขาย</button>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">อื่นๆ</label>
-                            <input type="number" id="otherFixedCost" placeholder="อื่นๆ (บาท)" class="w-full p-3 border rounded-lg text-sm">
-                        </div>
-                        <button onclick="updateFixedCosts()" class="w-full bg-orange-500 text-white p-3 rounded-lg hover:bg-orange-600 text-sm font-medium">อัพเดทต้นทุนคงที่</button>
                     </div>
                 </div>
                 
-                <!-- วิเคราะห์ต้นทุน -->
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">
-                        📈 วิเคราะห์ต้นทุน
-                    </h3>
-                    <div id="costAnalysis" class="space-y-4">
-                        <div class="p-4 bg-orange-100 rounded-lg border border-orange-200">
-                            <h4 class="font-semibold text-orange-800 text-sm mb-2">ต้นทุนคงที่รวม/เดือน</h4>
-                            <p class="text-xl font-bold text-orange-600" id="totalFixedCost">0 บาท</p>
+                <!-- รายการราคาขาย -->
+                <div class="bg-white rounded-lg p-4 border-2 border-yellow-100">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">
+                            📋 รายการราคาขาย
+                        </h3>
+                        <div class="text-sm text-gray-600">
+                            <span id="pricingCount">0</span> รายการ
                         </div>
-                        
-                        <div class="p-4 bg-blue-100 rounded-lg border border-blue-200">
-                            <h4 class="font-semibold text-blue-800 text-sm mb-2">ต้นทุนแปรผัน/หน่วย</h4>
-                            <div id="variableCostsList" class="text-sm">
-                                <!-- Variable costs per product will be shown here -->
-                            </div>
+                    </div>
+                    
+                    <!-- Filter Options -->
+                    <div class="mb-4">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterPricing('all')" class="pricing-filter-btn active px-3 py-1 rounded-full text-xs bg-yellow-500 text-white hover:bg-yellow-600">
+                                ทั้งหมด
+                            </button>
+                            <button onclick="filterPricing('high-profit')" class="pricing-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                💰 กำไรสูง (>50%)
+                            </button>
+                            <button onclick="filterPricing('medium-profit')" class="pricing-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                📊 กำไรปานกลาง (20-50%)
+                            </button>
+                            <button onclick="filterPricing('low-profit')" class="pricing-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                ⚠️ กำไรต่ำ (<20%)
+                            </button>
                         </div>
-                        
-                        <div class="p-4 bg-green-100 rounded-lg border border-green-200">
-                            <h4 class="font-semibold text-green-800 text-sm mb-2">จุดคุ้มทุน</h4>
-                            <div id="breakEvenAnalysis" class="text-sm">
-                                <!-- Break-even analysis will be shown here -->
-                            </div>
-                        </div>
+                    </div>
+                    
+                    <div id="pricingList" class="space-y-3 max-h-80 overflow-y-auto">
+                        <!-- Pricing list will be displayed here -->
                     </div>
                 </div>
             </div>
         </div>
+
+
     </div>
 
     <script>
@@ -767,7 +831,8 @@
         let productions = JSON.parse(localStorage.getItem('bakery_productions') || '[]');
         let sales = JSON.parse(localStorage.getItem('bakery_sales') || '[]');
         let productStock = JSON.parse(localStorage.getItem('bakery_product_stock') || '{}');
-        let fixedCosts = JSON.parse(localStorage.getItem('bakery_fixed_costs') || '{}');
+
+        let productPricing = JSON.parse(localStorage.getItem('bakery_product_pricing') || '{}');
         
         // Search and filter state
         let currentFilter = 'all';
@@ -778,6 +843,10 @@
         let currentRecipeFilter = 'all';
         let currentRecipeView = 'compact';
         let filteredRecipes = [];
+        
+        // Pricing filter state
+        let currentPricingFilter = 'all';
+        let filteredPricing = [];
 
         // Navigation
         function showSection(sectionName) {
@@ -788,9 +857,23 @@
             
             // Update navigation buttons
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('ring-2', 'ring-offset-2');
+                btn.classList.remove('bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-indigo-500', 'bg-pink-500', 'bg-teal-500', 'bg-orange-500', 'text-white');
+                btn.classList.add('bg-gray-50', 'hover:bg-gray-100');
             });
-            event.target.classList.add('ring-2', 'ring-offset-2');
+            
+            // Add active state to clicked button
+            const targetBtn = event.target.closest('.nav-btn');
+            if (targetBtn) {
+                targetBtn.classList.remove('bg-gray-50', 'hover:bg-gray-100');
+                if (sectionName === 'inventory') targetBtn.classList.add('bg-blue-500', 'text-white');
+                if (sectionName === 'purchase') targetBtn.classList.add('bg-green-500', 'text-white');
+                if (sectionName === 'recipes') targetBtn.classList.add('bg-purple-500', 'text-white');
+                if (sectionName === 'production') targetBtn.classList.add('bg-indigo-500', 'text-white');
+                if (sectionName === 'sales') targetBtn.classList.add('bg-pink-500', 'text-white');
+                if (sectionName === 'reports') targetBtn.classList.add('bg-teal-500', 'text-white');
+    
+                if (sectionName === 'pricing') targetBtn.classList.add('bg-yellow-500', 'text-white');
+            }
             
             // Refresh data when switching sections
             if (sectionName === 'inventory') updateInventoryDisplay();
@@ -799,7 +882,8 @@
             if (sectionName === 'production') updateProductionOptions();
             if (sectionName === 'sales') updateSalesOptions();
             if (sectionName === 'reports') initializeReports();
-            if (sectionName === 'costs') updateCostAnalysis();
+
+            if (sectionName === 'pricing') updatePricingOptions();
         }
 
         // Price calculation function
@@ -1257,41 +1341,71 @@
                 }
                 
                 return `
-                    <div class="p-4 border rounded-lg ${lowStock ? 'bg-red-50 border-red-200' : 'bg-gray-50'} hover:shadow-md transition-shadow">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <div class="font-medium text-lg">${displayName}</div>
-                                
-                                <!-- Stock Information -->
-                                <div class="mt-2 space-y-1">
-                                    <div class="text-sm text-gray-700">
-                                        <span class="font-medium">คงเหลือ:</span> ${item.quantity.toLocaleString()} ${item.unit}
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden ${lowStock ? 'ring-2 ring-red-200' : ''}">
+                        <!-- Header -->
+                        <div class="px-4 py-3 bg-gradient-to-r ${lowStock ? 'from-red-50 to-red-100 border-b border-red-200' : 'from-blue-50 to-indigo-50 border-b border-gray-200'}">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full ${lowStock ? 'bg-red-100' : 'bg-blue-100'} flex items-center justify-center">
+                                        <span class="text-lg">${lowStock ? '⚠️' : '📦'}</span>
                                     </div>
+                                    <div>
+                                        <h3 class="font-semibold text-lg text-gray-800">${displayName}</h3>
+                                        ${lowStock ? '<span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium">ใกล้หมด</span>' : ''}
+                                    </div>
+                                </div>
+                                <button onclick="removeInventoryItem(${item.id})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="p-4 space-y-4">
+                            <!-- Stock Status -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">คงเหลือทั้งหมด</div>
+                                    <div class="text-xl font-bold text-gray-800">${item.quantity.toLocaleString()}</div>
+                                    <div class="text-sm text-gray-600">${item.unit}</div>
+                                </div>
+                                <div class="bg-blue-50 rounded-lg p-3">
+                                    <div class="text-xs font-medium text-blue-500 uppercase tracking-wide mb-1">หน่วยซื้อ</div>
+                                    <div class="text-xl font-bold text-blue-700">${packagesLeft}</div>
                                     <div class="text-sm text-blue-600">
-                                        <span class="font-medium">เท่ากับ:</span> ${packagesLeft} หน่วยซื้อ
-                                        ${remainingUnits > 0 ? ` + ${remainingUnits.toLocaleString()} ${item.unit}` : ''}
+                                        ${remainingUnits > 0 ? `+ ${remainingUnits.toLocaleString()} ${item.unit}` : 'หน่วยซื้อ'}
                                     </div>
                                 </div>
-                                
-                                <!-- Package Information -->
-                                <div class="mt-2 p-2 bg-blue-100 rounded text-xs">
-                                    <div class="font-medium text-blue-800">📦 ข้อมูลการซื้อ:</div>
-                                    <div class="text-blue-700">
-                                        • 1 หน่วยซื้อ = ${item.packageQuantity} ${item.unit} = ${item.packagePrice} บาท
-                                    </div>
-                                    <div class="text-blue-700">
-                                        • ราคาต่อหน่วย = ${item.unitPrice.toFixed(4)} บาท/${item.unit}
-                                    </div>
-                                </div>
-                                
-                                <div class="text-xs text-gray-500 mt-2">อัพเดทล่าสุด: ${item.lastUpdated}</div>
                             </div>
                             
-                            <div class="text-right ml-4">
-                                ${lowStock ? '<div class="text-red-500 text-sm font-medium mb-2">⚠️ ใกล้หมด</div>' : ''}
-                                <button onclick="removeInventoryItem(${item.id})" class="text-red-500 hover:text-red-700 p-1">
-                                    🗑️
-                                </button>
+                            <!-- Purchase Information -->
+                            <div class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-3 border border-indigo-100">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-indigo-600">💰</span>
+                                    <h4 class="font-medium text-indigo-800">ข้อมูลการซื้อ</h4>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">1 หน่วยซื้อ:</span>
+                                        <span class="font-medium text-gray-800">${item.packageQuantity.toLocaleString()} ${item.unit}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">ราคา/หน่วยซื้อ:</span>
+                                        <span class="font-medium text-gray-800">${item.packagePrice.toLocaleString()} บาท</span>
+                                    </div>
+                                    <div class="flex justify-between sm:col-span-2 pt-2 border-t border-indigo-200">
+                                        <span class="text-indigo-600 font-medium">ราคาต่อ${item.unit}:</span>
+                                        <span class="font-bold text-indigo-700">${item.unitPrice.toFixed(4)} บาท</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Last Updated -->
+                            <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                                <span>อัพเดทล่าสุด</span>
+                                <span class="font-medium">${item.lastUpdated}</span>
                             </div>
                         </div>
                     </div>
@@ -1460,14 +1574,64 @@
             
             const recentPurchases = purchases.slice(-10).reverse();
             list.innerHTML = recentPurchases.map(purchase => `
-                <div class="p-3 border rounded-lg bg-green-50 hover:shadow-md transition-shadow">
-                    <div class="font-medium">${purchase.itemName}</div>
-                    <div class="text-sm text-gray-600 space-y-1">
-                        <div>ซื้อ: ${purchase.purchaseQuantity} หน่วยซื้อ → ได้ ${purchase.actualQuantityAdded.toLocaleString()} ${purchase.unit}</div>
-                        <div>ต้นทุน: ${purchase.totalCost.toLocaleString()} บาท</div>
-                        <div class="text-blue-600">ผู้จำหน่าย: ${purchase.supplier}</div>
+                <div class="bg-white border border-green-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+                    <!-- Header -->
+                    <div class="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                <span class="text-lg">🛒</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg text-gray-800">${purchase.itemName}</h3>
+                                <div class="text-sm text-green-600 font-medium">${purchase.supplier}</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-xs text-gray-500 mt-2">${purchase.date} ${purchase.time}</div>
+                    
+                    <!-- Content -->
+                    <div class="p-4 space-y-3">
+                        <!-- Purchase Details -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50 rounded-lg p-3">
+                                <div class="text-xs font-medium text-blue-500 uppercase tracking-wide mb-1">จำนวนซื้อ</div>
+                                <div class="text-lg font-bold text-blue-700">${purchase.purchaseQuantity}</div>
+                                <div class="text-sm text-blue-600">หน่วยซื้อ</div>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-3">
+                                <div class="text-xs font-medium text-green-500 uppercase tracking-wide mb-1">ได้รับจริง</div>
+                                <div class="text-lg font-bold text-green-700">${purchase.actualQuantityAdded.toLocaleString()}</div>
+                                <div class="text-sm text-green-600">${purchase.unit}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cost Information -->
+                        <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-3 border border-orange-100">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-orange-600">💰</span>
+                                <h4 class="font-medium text-orange-800">ข้อมูลต้นทุน</h4>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">ราคา/หน่วยซื้อ:</span>
+                                    <span class="font-medium text-gray-800">${purchase.packagePrice.toLocaleString()} บาท</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">ราคา/${purchase.unit}:</span>
+                                    <span class="font-medium text-gray-800">${purchase.unitPrice.toFixed(4)} บาท</span>
+                                </div>
+                                <div class="flex justify-between col-span-2 pt-2 border-t border-orange-200">
+                                    <span class="text-orange-600 font-medium">ต้นทุนรวม:</span>
+                                    <span class="font-bold text-orange-700">${purchase.totalCost.toLocaleString()} บาท</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timestamp -->
+                        <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                            <span>วันที่ซื้อ</span>
+                            <span class="font-medium">${purchase.date} ${purchase.time}</span>
+                        </div>
+                    </div>
                 </div>
             `).join('');
         }
@@ -1682,28 +1846,87 @@
             const recentProductions = productions.slice(-10).reverse();
             
             list.innerHTML = recentProductions.map(production => `
-                <div class="p-3 border rounded-lg bg-indigo-50">
-                    <div class="font-medium">${production.recipeName}</div>
-                    <div class="text-sm text-gray-600">
-                        ผลิต: ${production.quantity} หน่วย | ต้นทุน: ${production.totalCost.toFixed(2)} บาท
-                    </div>
-                    <div class="text-sm text-indigo-600">
-                        ต้นทุน/หน่วย: ${production.costPerUnit.toFixed(2)} บาท
-                    </div>
-                    <div class="text-xs text-gray-500">
-                        วันที่: ${production.productionDate} | ${production.timestamp}
-                    </div>
-                    <div class="mt-2">
-                        <button onclick="toggleIngredientDetails(${production.id})" class="text-xs text-indigo-600 hover:text-indigo-800">
-                            ดูรายละเอียดวัตถุดิบ
-                        </button>
-                        <div id="details-${production.id}" class="hidden mt-2 text-xs bg-white p-2 rounded border">
-                            ${production.usedIngredients.map(ing => `
-                                <div class="flex justify-between">
-                                    <span>${ing.name}</span>
-                                    <span>${ing.amount.toFixed(2)} ${ing.unit}</span>
+                <div class="bg-white border border-indigo-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+                    <!-- Header -->
+                    <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <span class="text-lg">🏭</span>
                                 </div>
-                            `).join('')}
+                                <div>
+                                    <h3 class="font-semibold text-lg text-gray-800">${production.recipeName}</h3>
+                                    <div class="text-sm text-indigo-600 font-medium">${production.productionDate}</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-indigo-700">${production.quantity}</div>
+                                <div class="text-xs text-indigo-500">หน่วย</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="p-4 space-y-3">
+                        <!-- Production Stats -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-orange-50 rounded-lg p-3">
+                                <div class="text-xs font-medium text-orange-500 uppercase tracking-wide mb-1">ต้นทุนรวม</div>
+                                <div class="text-lg font-bold text-orange-700">${production.totalCost.toFixed(2)}</div>
+                                <div class="text-sm text-orange-600">บาท</div>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-3">
+                                <div class="text-xs font-medium text-purple-500 uppercase tracking-wide mb-1">ต้นทุน/หน่วย</div>
+                                <div class="text-lg font-bold text-purple-700">${production.costPerUnit.toFixed(2)}</div>
+                                <div class="text-sm text-purple-600">บาท</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cost Breakdown -->
+                        ${production.baseCost > 0 ? `
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-100">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-blue-600">📋</span>
+                                <h4 class="font-medium text-blue-800">แยกต้นทุน</h4>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">สูตรพื้นฐาน:</span>
+                                    <span class="font-medium text-gray-800">${production.baseCost.toFixed(2)} บาท</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">วัตถุดิบเพิ่ม:</span>
+                                    <span class="font-medium text-gray-800">${production.ingredientsCost.toFixed(2)} บาท</span>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Ingredients Toggle -->
+                        <div class="border-t border-gray-100 pt-3">
+                            <button onclick="toggleIngredientDetails(${production.id})" class="w-full flex items-center justify-between p-2 text-sm text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors">
+                                <span class="font-medium">ดูรายละเอียดวัตถุดิบ</span>
+                                <svg class="w-4 h-4 transform transition-transform" id="arrow-${production.id}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="details-${production.id}" class="hidden mt-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">วัตถุดิบที่ใช้</div>
+                                <div class="space-y-2">
+                                    ${production.usedIngredients.map(ing => `
+                                        <div class="flex justify-between items-center py-1 px-2 bg-white rounded border">
+                                            <span class="text-sm font-medium text-gray-700">${ing.name}</span>
+                                            <span class="text-sm text-gray-600">${ing.amount.toFixed(2)} ${ing.unit}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timestamp -->
+                        <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                            <span>เวลาผลิต</span>
+                            <span class="font-medium">${production.timestamp}</span>
                         </div>
                     </div>
                 </div>
@@ -1712,7 +1935,15 @@
 
         function toggleIngredientDetails(productionId) {
             const details = document.getElementById(`details-${productionId}`);
+            const arrow = document.getElementById(`arrow-${productionId}`);
+            
             details.classList.toggle('hidden');
+            
+            if (details.classList.contains('hidden')) {
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                arrow.style.transform = 'rotate(180deg)';
+            }
         }
 
         function updateTodayProductionSummary() {
@@ -2550,11 +2781,25 @@
         // Sales Management
         function updateSalesOptions() {
             const select = document.getElementById('saleProduct');
-            select.innerHTML = '<option value="">เลือกสินค้า</option>' + 
-                recipes.map(recipe => {
-                    const stock = productStock[recipe.name] || 0;
-                    return `<option value="${recipe.name}" data-cost="${recipe.costPerUnit}">${recipe.name} (เหลือ: ${stock} หน่วย)</option>`;
-                }).join('');
+            
+            // Filter recipes to show only those that have been produced (have stock or production history)
+            const producedRecipes = recipes.filter(recipe => {
+                const stock = productStock[recipe.name] || 0;
+                const hasProduction = productions.some(p => p.recipeName === recipe.name);
+                return stock > 0 || hasProduction;
+            });
+            
+            if (producedRecipes.length === 0) {
+                select.innerHTML = '<option value="">ยังไม่มีสินค้าที่ผลิตแล้ว</option>';
+            } else {
+                select.innerHTML = '<option value="">เลือกสินค้า</option>' + 
+                    producedRecipes.map(recipe => {
+                        const stock = productStock[recipe.name] || 0;
+                        const stockStatus = stock > 0 ? `เหลือ: ${stock} หน่วย` : 'หมด';
+                        return `<option value="${recipe.name}" data-cost="${recipe.costPerUnit}" ${stock === 0 ? 'disabled' : ''}>${recipe.name} (${stockStatus})</option>`;
+                    }).join('');
+            }
+            
             updateSalesHistory();
             updateTodaySummary();
             updateProductStock();
@@ -2564,21 +2809,19 @@
             const productName = document.getElementById('saleProduct').value;
             const productInfo = document.getElementById('productInfo');
             const productDetails = document.getElementById('productDetails');
-            const stockAdjustment = document.getElementById('stockAdjustment');
             
             if (!productName) {
                 productInfo.classList.add('hidden');
-                stockAdjustment.classList.add('hidden');
                 return;
             }
             
             const recipe = recipes.find(r => r.name === productName);
             const stock = productStock[productName] || 0;
+            const pricing = productPricing[productName];
             
             if (!recipe) return;
             
             productInfo.classList.remove('hidden');
-            stockAdjustment.classList.remove('hidden');
             
             // Get today's production for this product
             const today = new Date().toISOString().split('T')[0];
@@ -2587,196 +2830,67 @@
             );
             const todayProduced = todayProductions.reduce((sum, p) => sum + p.quantity, 0);
             
+            // Auto-fill sale price if pricing is set
+            if (pricing && pricing.sellingPrice) {
+                document.getElementById('salePrice').value = pricing.sellingPrice.toFixed(2);
+            }
+            
+            let pricingInfo = '';
+            if (pricing) {
+                pricingInfo = `
+                    <div class="text-green-600"><strong>ราคาขายที่กำหนด:</strong> ${pricing.sellingPrice.toFixed(2)} บาท</div>
+                    <div class="text-purple-600"><strong>กำไรคาดหวัง:</strong> ${pricing.profitPerUnit.toFixed(2)} บาท (${pricing.profitMargin.toFixed(1)}%)</div>
+                `;
+            } else {
+                pricingInfo = '<div class="text-orange-600"><strong>ยังไม่ได้กำหนดราคาขาย</strong> - ไปที่หน้าราคาขายเพื่อกำหนด</div>';
+            }
+            
             productDetails.innerHTML = `
                 <div class="space-y-1">
                     <div><strong>สินค้า:</strong> ${recipe.name}</div>
                     <div><strong>ต้นทุนต่อหน่วย:</strong> ${recipe.costPerUnit.toFixed(2)} บาท</div>
+                    ${pricingInfo}
                     <div class="text-blue-600"><strong>คงเหลือในสต็อก:</strong> ${stock} หน่วย</div>
                     ${todayProduced > 0 ? `<div class="text-green-600"><strong>ผลิตวันนี้:</strong> ${todayProduced} หน่วย</div>` : ''}
                 </div>
             `;
             
             // Clear previous calculations
-            document.getElementById('actualStock').value = '';
             document.getElementById('saleQuantity').value = '';
             document.getElementById('remainingStock').value = '';
-            document.getElementById('salePrice').value = '';
+            if (!pricing || !pricing.sellingPrice) {
+                document.getElementById('salePrice').value = '';
+            }
             document.getElementById('saleCalculation').classList.add('hidden');
-            document.getElementById('stockAdjustmentInfo').classList.add('hidden');
             document.getElementById('recordSaleBtn').disabled = true;
-            document.getElementById('adjustStockBtn').disabled = true;
         }
 
-        function calculateStockAdjustment() {
-            const productName = document.getElementById('saleProduct').value;
-            const actualStock = parseFloat(document.getElementById('actualStock').value);
-            const stockAdjustmentInfo = document.getElementById('stockAdjustmentInfo');
-            const adjustStockBtn = document.getElementById('adjustStockBtn');
-            
-            if (!productName || isNaN(actualStock) || actualStock < 0) {
-                stockAdjustmentInfo.classList.add('hidden');
-                adjustStockBtn.disabled = true;
-                return;
-            }
-            
-            const currentStock = productStock[productName] || 0;
-            const difference = actualStock - currentStock;
-            
-            // Get today's production for calculation
-            const today = new Date().toISOString().split('T')[0];
-            const todayProductions = productions.filter(p => 
-                p.productionDate === today && p.recipeName === productName
-            );
-            const todayProduced = todayProductions.reduce((sum, p) => sum + p.quantity, 0);
-            
-            // Calculate sold quantity (produced today - remaining)
-            const soldToday = Math.max(0, todayProduced - actualStock);
-            
-            stockAdjustmentInfo.classList.remove('hidden');
-            
-            if (difference === 0) {
-                stockAdjustmentInfo.innerHTML = `
-                    <div class="text-gray-600">✅ สต็อกตรงกับระบบแล้ว</div>
-                `;
-                adjustStockBtn.disabled = true;
-            } else {
-                let calculationText = '';
-                if (todayProduced > 0) {
-                    calculationText = `
-                        <div class="text-blue-700">📊 การคำนวณ:</div>
-                        <div class="text-blue-600">• ผลิตวันนี้: ${todayProduced} หน่วย</div>
-                        <div class="text-blue-600">• เหลือจริง: ${actualStock} หน่วย</div>
-                        <div class="text-green-600 font-medium">• ขายได้วันนี้: ${soldToday} หน่วย</div>
-                        <div class="mt-1 pt-1 border-t border-blue-200">
-                    `;
-                }
-                
-                if (difference > 0) {
-                    calculationText += `<div class="text-green-600">📈 เพิ่มสต็อก: +${difference} หน่วย</div>`;
-                } else {
-                    calculationText += `<div class="text-red-600">📉 ลดสต็อก: ${difference} หน่วย</div>`;
-                }
-                
-                if (todayProduced > 0) {
-                    calculationText += `</div>`;
-                }
-                
-                stockAdjustmentInfo.innerHTML = calculationText;
-                adjustStockBtn.disabled = false;
-            }
-        }
 
-        function adjustStock() {
-            const productName = document.getElementById('saleProduct').value;
-            const actualStock = parseFloat(document.getElementById('actualStock').value);
-            
-            if (!productName || isNaN(actualStock) || actualStock < 0) {
-                alert('กรุณาระบุจำนวนที่เหลือจริง');
-                return;
-            }
-            
-            const currentStock = productStock[productName] || 0;
-            const difference = actualStock - currentStock;
-            
-            // Get today's production for automatic sale recording
-            const today = new Date().toISOString().split('T')[0];
-            const todayProductions = productions.filter(p => 
-                p.productionDate === today && p.recipeName === productName
-            );
-            const todayProduced = todayProductions.reduce((sum, p) => sum + p.quantity, 0);
-            
-            // Calculate sold quantity if there was production today
-            const soldToday = Math.max(0, todayProduced - actualStock);
-            
-            // Update stock
-            productStock[productName] = actualStock;
-            
-            // If there was production today and items were sold, record the sale automatically
-            if (soldToday > 0) {
-                const recipe = recipes.find(r => r.name === productName);
-                if (recipe) {
-                    // Use a default selling price (2x cost) for automatic sale recording
-                    const defaultSellingPrice = recipe.costPerUnit * 2;
-                    const totalRevenue = soldToday * defaultSellingPrice;
-                    const totalCost = soldToday * recipe.costPerUnit;
-                    const profit = totalRevenue - totalCost;
-                    
-                    // Record the automatic sale
-                    sales.push({
-                        id: Date.now(),
-                        productName,
-                        quantity: soldToday,
-                        salePrice: defaultSellingPrice,
-                        totalRevenue,
-                        totalCost,
-                        profit,
-                        date: new Date().toLocaleDateString('th-TH'),
-                        time: new Date().toLocaleTimeString('th-TH'),
-                        autoGenerated: true,
-                        note: 'บันทึกอัตโนมัติจากการปรับสต็อก'
-                    });
-                    
-                    localStorage.setItem('bakery_sales', JSON.stringify(sales));
-                }
-            }
-            
-            localStorage.setItem('bakery_product_stock', JSON.stringify(productStock));
-            
-            // Update displays
-            updateSaleInfo();
-            updateProductStock();
-            updateSalesHistory();
-            updateTodaySummary();
-            updateSalesOptions();
-            
-            // Show success message
-            let message = `ปรับสต็อก ${productName} สำเร็จ!\n\n`;
-            message += `สต็อกใหม่: ${actualStock} หน่วย\n`;
-            
-            if (difference > 0) {
-                message += `เพิ่มสต็อก: +${difference} หน่วย`;
-            } else if (difference < 0) {
-                message += `ลดสต็อก: ${difference} หน่วย`;
-            }
-            
-            if (soldToday > 0) {
-                message += `\n\n📊 บันทึกการขายอัตโนมัติ:\n`;
-                message += `• ขายได้: ${soldToday} หน่วย\n`;
-                message += `• ราคาขาย: ${(recipe.costPerUnit * 2).toFixed(2)} บาท/หน่วย\n`;
-                message += `• ยอดขาย: ${(soldToday * recipe.costPerUnit * 2).toFixed(2)} บาท\n`;
-                message += `• กำไร: ${(soldToday * recipe.costPerUnit).toFixed(2)} บาท`;
-            }
-            
-            alert(message);
-        }
 
         function calculateFromRemaining() {
             const productName = document.getElementById('saleProduct').value;
             const remainingStock = parseFloat(document.getElementById('remainingStock').value);
             
             if (!productName || isNaN(remainingStock) || remainingStock < 0) {
+                // Clear sale quantity if invalid input
+                document.getElementById('saleQuantity').value = '';
+                calculateSaleTotal();
                 return;
             }
             
             const currentStock = productStock[productName] || 0;
             
-            // Get today's production for this product
-            const today = new Date().toISOString().split('T')[0];
-            const todayProductions = productions.filter(p => 
-                p.productionDate === today && p.recipeName === productName
-            );
-            const todayProduced = todayProductions.reduce((sum, p) => sum + p.quantity, 0);
-            
-            // Calculate sold quantity
-            let soldQuantity = 0;
-            
-            if (todayProduced > 0) {
-                // If produced today, calculate from production
-                soldQuantity = Math.max(0, todayProduced - remainingStock);
-            } else {
-                // If no production today, calculate from current stock
-                soldQuantity = Math.max(0, currentStock - remainingStock);
+            // Validate that remaining stock doesn't exceed current stock
+            if (remainingStock > currentStock) {
+                alert(`จำนวนที่เหลือไม่สามารถมากกว่าสต็อกปัจจุบัน (${currentStock} หน่วย)`);
+                document.getElementById('remainingStock').value = '';
+                document.getElementById('saleQuantity').value = '';
+                calculateSaleTotal();
+                return;
             }
+            
+            // Calculate sold quantity from current stock
+            const soldQuantity = Math.max(0, currentStock - remainingStock);
             
             // Update the sale quantity field
             document.getElementById('saleQuantity').value = soldQuantity;
@@ -2793,7 +2907,7 @@
             const saleDetails = document.getElementById('saleDetails');
             const recordSaleBtn = document.getElementById('recordSaleBtn');
             
-            if (!productName || !quantity || !salePrice || quantity <= 0 || salePrice <= 0) {
+            if (!productName || isNaN(quantity) || isNaN(salePrice) || quantity <= 0 || salePrice <= 0) {
                 saleCalculation.classList.add('hidden');
                 recordSaleBtn.disabled = true;
                 return;
@@ -2810,6 +2924,7 @@
                 saleDetails.innerHTML = `
                     <div class="text-red-600 font-medium">⚠️ สต็อกไม่เพียงพอ!</div>
                     <div class="text-red-600 text-sm">ต้องการ: ${quantity} หน่วย | มีอยู่: ${stock} หน่วย</div>
+                    <div class="text-red-600 text-xs mt-1">กรุณาปรับจำนวนที่ขายให้น้อยกว่าหรือเท่ากับสต็อกที่มี</div>
                 `;
                 recordSaleBtn.disabled = true;
                 return;
@@ -2818,7 +2933,7 @@
             const totalRevenue = quantity * salePrice;
             const totalCost = quantity * recipe.costPerUnit;
             const profit = totalRevenue - totalCost;
-            const profitMargin = ((profit / totalRevenue) * 100).toFixed(1);
+            const profitMargin = totalRevenue > 0 ? ((profit / totalRevenue) * 100).toFixed(1) : '0';
             
             saleCalculation.classList.remove('hidden');
             saleDetails.innerHTML = `
@@ -2843,8 +2958,8 @@
                         <span>อัตรากำไร:</span>
                         <span class="text-sm">${profitMargin}%</span>
                     </div>
-                    <div class="text-blue-600 text-sm mt-2">
-                        เหลือในสต็อก: ${stock - quantity} หน่วย
+                    <div class="text-blue-600 text-sm mt-2 bg-blue-50 p-2 rounded">
+                        📦 เหลือในสต็อกหลังขาย: <span class="font-bold">${stock - quantity} หน่วย</span>
                     </div>
                 </div>
             `;
@@ -2930,14 +3045,27 @@
                 const lowStock = stock < 5; // Warning when stock is less than 5
                 
                 return `
-                    <div class="flex justify-between items-center p-2 rounded ${lowStock ? 'bg-red-100' : 'bg-blue-100'}">
-                        <div>
-                            <div class="font-medium text-sm">${recipe.name}</div>
-                            <div class="text-xs text-gray-600">ต้นทุน: ${recipe.costPerUnit.toFixed(2)} บาท/หน่วย</div>
+                    <div class="bg-white border ${lowStock ? 'border-red-200' : 'border-blue-200'} rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+                        <div class="px-3 py-2 bg-gradient-to-r ${lowStock ? 'from-red-50 to-red-100' : 'from-blue-50 to-blue-100'} border-b ${lowStock ? 'border-red-200' : 'border-blue-200'}">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full ${lowStock ? 'bg-red-100' : 'bg-blue-100'} flex items-center justify-center">
+                                        <span class="text-sm">${lowStock ? '⚠️' : '📦'}</span>
+                                    </div>
+                                    <h4 class="font-medium text-sm text-gray-800">${recipe.name}</h4>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-bold ${lowStock ? 'text-red-600' : 'text-blue-600'}">${stock}</div>
+                                    <div class="text-xs ${lowStock ? 'text-red-500' : 'text-blue-500'}">หน่วย</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-right">
-                            <div class="font-bold ${lowStock ? 'text-red-600' : 'text-blue-600'}">${stock} หน่วย</div>
-                            ${lowStock ? '<div class="text-red-500 text-xs">⚠️ ใกล้หมด</div>' : ''}
+                        <div class="px-3 py-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-600">ต้นทุน/หน่วย:</span>
+                                <span class="font-medium text-gray-800">${recipe.costPerUnit.toFixed(2)} บาท</span>
+                            </div>
+                            ${lowStock ? '<div class="text-red-500 text-xs font-medium mt-1">⚠️ สต็อกใกล้หมด</div>' : ''}
                         </div>
                     </div>
                 `;
@@ -2954,15 +3082,82 @@
             
             const recentSales = sales.slice(-10).reverse();
             list.innerHTML = recentSales.map(sale => `
-                <div class="p-3 border rounded-lg ${sale.autoGenerated ? 'bg-blue-50 border-blue-200' : 'bg-pink-50'}">
-                    <div class="flex justify-between items-start">
-                        <div class="font-medium">${sale.productName}</div>
-                        ${sale.autoGenerated ? '<div class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">🤖 อัตโนมัติ</div>' : ''}
+                <div class="bg-white border ${sale.autoGenerated ? 'border-blue-200' : 'border-pink-200'} rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+                    <!-- Header -->
+                    <div class="px-4 py-3 bg-gradient-to-r ${sale.autoGenerated ? 'from-blue-50 to-cyan-50 border-b border-blue-200' : 'from-pink-50 to-rose-50 border-b border-pink-200'}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full ${sale.autoGenerated ? 'bg-blue-100' : 'bg-pink-100'} flex items-center justify-center">
+                                    <span class="text-lg">${sale.autoGenerated ? '🤖' : '💰'}</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-lg text-gray-800">${sale.productName}</h3>
+                                    ${sale.autoGenerated ? '<div class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full font-medium">บันทึกอัตโนมัติ</div>' : ''}
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold ${sale.profit > 0 ? 'text-green-600' : 'text-red-600'}">${sale.profit.toFixed(2)}</div>
+                                <div class="text-xs ${sale.profit > 0 ? 'text-green-500' : 'text-red-500'}">บาท กำไร</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-sm text-gray-600">${sale.quantity} หน่วย × ${sale.salePrice.toFixed(2)} บาท = ${sale.totalRevenue.toFixed(2)} บาท</div>
-                    <div class="text-sm ${sale.profit > 0 ? 'text-green-600' : 'text-red-600'} font-medium">กำไร: ${sale.profit.toFixed(2)} บาท</div>
-                    ${sale.note ? `<div class="text-xs text-blue-600 mt-1">${sale.note}</div>` : ''}
-                    <div class="text-xs text-gray-500">${sale.date} ${sale.time}</div>
+                    
+                    <!-- Content -->
+                    <div class="p-4 space-y-3">
+                        <!-- Sale Details -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">จำนวน</div>
+                                <div class="text-lg font-bold text-gray-800">${sale.quantity}</div>
+                                <div class="text-sm text-gray-600">หน่วย</div>
+                            </div>
+                            <div class="bg-blue-50 rounded-lg p-3">
+                                <div class="text-xs font-medium text-blue-500 uppercase tracking-wide mb-1">ราคา/หน่วย</div>
+                                <div class="text-lg font-bold text-blue-700">${sale.salePrice.toFixed(2)}</div>
+                                <div class="text-sm text-blue-600">บาท</div>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-3">
+                                <div class="text-xs font-medium text-green-500 uppercase tracking-wide mb-1">ยอดขาย</div>
+                                <div class="text-lg font-bold text-green-700">${sale.totalRevenue.toFixed(2)}</div>
+                                <div class="text-sm text-green-600">บาท</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Profit Analysis -->
+                        <div class="bg-gradient-to-r ${sale.profit > 0 ? 'from-green-50 to-emerald-50 border border-green-100' : 'from-red-50 to-pink-50 border border-red-100'} rounded-lg p-3">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="${sale.profit > 0 ? 'text-green-600' : 'text-red-600'}">${sale.profit > 0 ? '📈' : '📉'}</span>
+                                <h4 class="font-medium ${sale.profit > 0 ? 'text-green-800' : 'text-red-800'}">การวิเคราะห์กำไร</h4>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">ยอดขาย:</span>
+                                    <span class="font-medium text-gray-800">${sale.totalRevenue.toFixed(2)} บาท</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">ต้นทุน:</span>
+                                    <span class="font-medium text-gray-800">${sale.totalCost.toFixed(2)} บาท</span>
+                                </div>
+                                <div class="flex justify-between col-span-2 pt-2 border-t ${sale.profit > 0 ? 'border-green-200' : 'border-red-200'}">
+                                    <span class="${sale.profit > 0 ? 'text-green-600' : 'text-red-600'} font-medium">กำไร/ขาดทุน:</span>
+                                    <span class="font-bold ${sale.profit > 0 ? 'text-green-700' : 'text-red-700'}">${sale.profit.toFixed(2)} บาท</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${sale.note ? `
+                        <div class="bg-blue-50 rounded-lg p-2 border border-blue-100">
+                            <div class="text-xs font-medium text-blue-600 mb-1">หมายเหตุ</div>
+                            <div class="text-sm text-blue-700">${sale.note}</div>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Timestamp -->
+                        <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                            <span>วันที่ขาย</span>
+                            <span class="font-medium">${sale.date} ${sale.time}</span>
+                        </div>
+                    </div>
                 </div>
             `).join('');
         }
@@ -3090,39 +3285,219 @@
                 </div>
             `;
             
-            // Top products
+            // Calculate production data for the day
+            const productionData = {};
+            dailyProductions.forEach(prod => {
+                if (productionData[prod.recipeName]) {
+                    productionData[prod.recipeName] += prod.quantity;
+                } else {
+                    productionData[prod.recipeName] = prod.quantity;
+                }
+            });
+            
+            // Top products with detailed sales breakdown and production comparison
             const productSales = {};
             dailySales.forEach(sale => {
                 if (productSales[sale.productName]) {
                     productSales[sale.productName].quantity += sale.quantity;
                     productSales[sale.productName].revenue += sale.totalRevenue;
+                    productSales[sale.productName].profit += sale.profit;
+                    productSales[sale.productName].sales.push(sale);
                 } else {
                     productSales[sale.productName] = {
                         quantity: sale.quantity,
-                        revenue: sale.totalRevenue
+                        revenue: sale.totalRevenue,
+                        profit: sale.profit,
+                        sales: [sale]
                     };
                 }
             });
             
-            const topProducts = Object.entries(productSales)
-                .sort((a, b) => b[1].quantity - a[1].quantity)
-                .slice(0, 5);
+            // Combine all products (both produced and sold)
+            const allProducts = new Set([...Object.keys(productionData), ...Object.keys(productSales)]);
+            const productAnalysis = Array.from(allProducts).map(productName => {
+                const produced = productionData[productName] || 0;
+                const sold = productSales[productName]?.quantity || 0;
+                const salesData = productSales[productName];
+                const sellThroughRate = produced > 0 ? (sold / produced * 100) : (sold > 0 ? 100 : 0);
+                
+                return {
+                    name: productName,
+                    produced,
+                    sold,
+                    sellThroughRate,
+                    revenue: salesData?.revenue || 0,
+                    profit: salesData?.profit || 0,
+                    sales: salesData?.sales || []
+                };
+            }).sort((a, b) => b.sold - a.sold);
             
             const topProductsDiv = document.getElementById('dailyTopProducts');
-            if (topProducts.length === 0) {
-                topProductsDiv.innerHTML = '<div class="text-gray-500 text-center py-4">ไม่มีการขายในวันนี้</div>';
+            if (productAnalysis.length === 0) {
+                topProductsDiv.innerHTML = '<div class="text-gray-500 text-center py-4">ไม่มีการผลิตหรือขายในวันนี้</div>';
             } else {
-                topProductsDiv.innerHTML = topProducts.map((product, index) => `
-                    <div class="flex justify-between items-center p-2 bg-white rounded border">
-                        <div>
-                            <div class="font-medium">${index + 1}. ${product[0]}</div>
-                            <div class="text-sm text-gray-600">${product[1].revenue.toFixed(2)} บาท</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-bold text-blue-600">${product[1].quantity} หน่วย</div>
-                        </div>
+                topProductsDiv.innerHTML = `
+                    <div class="space-y-4">
+                        <h4 class="font-medium text-gray-800 border-b pb-2">📊 วิเคราะห์การผลิตและการขาย</h4>
+                        ${productAnalysis.map((product, index) => {
+                            // Determine sell-through performance
+                            let performanceColor = 'text-gray-600';
+                            let performanceBg = 'bg-gray-50';
+                            let performanceIcon = '📊';
+                            
+                            if (product.sellThroughRate >= 80) {
+                                performanceColor = 'text-green-600';
+                                performanceBg = 'bg-green-50';
+                                performanceIcon = '🔥';
+                            } else if (product.sellThroughRate >= 50) {
+                                performanceColor = 'text-yellow-600';
+                                performanceBg = 'bg-yellow-50';
+                                performanceIcon = '📈';
+                            } else if (product.sellThroughRate > 0) {
+                                performanceColor = 'text-orange-600';
+                                performanceBg = 'bg-orange-50';
+                                performanceIcon = '📉';
+                            } else if (product.produced > 0) {
+                                performanceColor = 'text-red-600';
+                                performanceBg = 'bg-red-50';
+                                performanceIcon = '⚠️';
+                            }
+                            
+                            return `
+                                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
+                                    <!-- Product Header with Performance -->
+                                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b">
+                                        <div class="flex justify-between items-center">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                                    <span class="text-sm font-bold text-blue-600">${index + 1}</span>
+                                                </div>
+                                                <div>
+                                                    <div class="font-semibold text-gray-800">${product.name}</div>
+                                                    <div class="text-xs text-blue-600">${product.sales.length} ครั้งขาย</div>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="font-bold text-blue-600">${product.sold} หน่วย</div>
+                                                <div class="text-sm text-green-600">${product.revenue.toFixed(2)} บาท</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Production vs Sales Analysis -->
+                                    <div class="p-4">
+                                        <!-- Performance Indicator -->
+                                        <div class="mb-4 p-3 ${performanceBg} rounded-lg border border-opacity-20">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-lg">${performanceIcon}</span>
+                                                    <div>
+                                                        <div class="font-medium ${performanceColor}">
+                                                            อัตราการขาย ${product.sellThroughRate.toFixed(1)}%
+                                                        </div>
+                                                        <div class="text-xs text-gray-600">
+                                                            ${product.produced > 0 ? 
+                                                                `ผลิต ${product.produced} ขาย ${product.sold} หน่วย` : 
+                                                                product.sold > 0 ? 'ขายจากสต็อกเดิม' : 'ไม่มีการขาย'
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right">
+                                                    ${product.produced > product.sold && product.produced > 0 ? `
+                                                        <div class="text-xs text-orange-600">
+                                                            เหลือ ${product.produced - product.sold} หน่วย
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Visual Progress Bar -->
+                                            ${product.produced > 0 ? `
+                                                <div class="mt-2">
+                                                    <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                                        <span>การขาย</span>
+                                                        <span>${product.sold}/${product.produced}</span>
+                                                    </div>
+                                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                                        <div class="h-2 rounded-full transition-all duration-300 ${
+                                                            product.sellThroughRate >= 80 ? 'bg-green-500' :
+                                                            product.sellThroughRate >= 50 ? 'bg-yellow-500' :
+                                                            product.sellThroughRate > 0 ? 'bg-orange-500' : 'bg-red-500'
+                                                        }" style="width: ${Math.min(product.sellThroughRate, 100)}%"></div>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                        
+                                        <!-- Production & Sales Stats -->
+                                        <div class="grid grid-cols-2 gap-4 mb-4">
+                                            <div class="bg-indigo-50 rounded-lg p-3 border border-indigo-100">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="text-indigo-600">🏭</span>
+                                                    <div class="text-xs font-medium text-indigo-600 uppercase tracking-wide">ผลิต</div>
+                                                </div>
+                                                <div class="text-xl font-bold text-indigo-700">${product.produced}</div>
+                                                <div class="text-sm text-indigo-600">หน่วย</div>
+                                            </div>
+                                            <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="text-green-600">💰</span>
+                                                    <div class="text-xs font-medium text-green-600 uppercase tracking-wide">ขาย</div>
+                                                </div>
+                                                <div class="text-xl font-bold text-green-700">${product.sold}</div>
+                                                <div class="text-sm text-green-600">หน่วย</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Sales Details (if any) -->
+                                        ${product.sales.length > 0 ? `
+                                            <div class="space-y-2">
+                                                <div class="text-sm font-medium text-gray-700 border-b pb-1">รายละเอียดการขาย</div>
+                                                ${product.sales.map(sale => `
+                                                    <div class="flex justify-between items-center text-sm py-2 px-3 bg-gray-50 rounded-lg">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="text-gray-600">${sale.time}</span>
+                                                            ${sale.autoGenerated ? '<span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">อัตโนมัติ</span>' : ''}
+                                                        </div>
+                                                        <div class="flex gap-4 text-xs">
+                                                            <span class="font-medium">${sale.quantity} หน่วย</span>
+                                                            <span class="text-blue-600">${sale.salePrice.toFixed(2)} บาท/หน่วย</span>
+                                                            <span class="text-green-600 font-medium">${sale.totalRevenue.toFixed(2)} บาท</span>
+                                                        </div>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        ` : ''}
+                                        
+                                        <!-- Summary -->
+                                        <div class="mt-4 pt-3 border-t border-gray-200">
+                                            <div class="grid grid-cols-3 gap-4 text-center">
+                                                <div>
+                                                    <div class="text-xs text-gray-500 mb-1">ยอดขาย</div>
+                                                    <div class="font-bold text-green-600">${product.revenue.toFixed(2)} บาท</div>
+                                                </div>
+                                                <div>
+                                                    <div class="text-xs text-gray-500 mb-1">กำไร</div>
+                                                    <div class="font-bold ${product.profit > 0 ? 'text-green-600' : 'text-red-600'}">${product.profit.toFixed(2)} บาท</div>
+                                                </div>
+                                                <div>
+                                                    <div class="text-xs text-gray-500 mb-1">ประสิทธิภาพ</div>
+                                                    <div class="font-bold ${performanceColor}">
+                                                        ${product.sellThroughRate >= 80 ? 'ดีเยี่ยม' :
+                                                          product.sellThroughRate >= 50 ? 'ดี' :
+                                                          product.sellThroughRate > 0 ? 'ปานกลาง' :
+                                                          product.produced > 0 ? 'ต้องปรับปรุง' : 'ไม่มีข้อมูล'}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
-                `).join('');
+                `;
             }
         }
 
@@ -3182,7 +3557,17 @@
                 </div>
             `;
             
-            // Daily analysis within week
+            // Get weekly production data
+            const weeklyProductionData = {};
+            weeklyProductions.forEach(prod => {
+                if (weeklyProductionData[prod.recipeName]) {
+                    weeklyProductionData[prod.recipeName] += prod.quantity;
+                } else {
+                    weeklyProductionData[prod.recipeName] = prod.quantity;
+                }
+            });
+
+            // Daily analysis within week with product breakdown and production comparison
             const dailyAnalysis = {};
             const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
             
@@ -3190,31 +3575,188 @@
                 const currentDate = new Date(weekStart);
                 currentDate.setDate(currentDate.getDate() + i);
                 const dateStr = currentDate.toLocaleDateString('th-TH');
+                const dateISO = currentDate.toISOString().split('T')[0];
                 const dayName = days[currentDate.getDay()];
                 
                 const daySales = weeklySales.filter(sale => sale.date === dateStr);
+                const dayProductions = weeklyProductions.filter(p => p.productionDate === dateISO);
                 const dayRevenue = daySales.reduce((sum, sale) => sum + sale.totalRevenue, 0);
+                const dayItems = daySales.reduce((sum, sale) => sum + sale.quantity, 0);
+                
+                // Production data for this day
+                const dayProductionData = {};
+                dayProductions.forEach(prod => {
+                    if (dayProductionData[prod.recipeName]) {
+                        dayProductionData[prod.recipeName] += prod.quantity;
+                    } else {
+                        dayProductionData[prod.recipeName] = prod.quantity;
+                    }
+                });
+                
+                // Product breakdown for each day with production comparison
+                const dayProductSales = {};
+                daySales.forEach(sale => {
+                    if (dayProductSales[sale.productName]) {
+                        dayProductSales[sale.productName].quantity += sale.quantity;
+                        dayProductSales[sale.productName].revenue += sale.totalRevenue;
+                    } else {
+                        dayProductSales[sale.productName] = {
+                            quantity: sale.quantity,
+                            revenue: sale.totalRevenue
+                        };
+                    }
+                });
+                
+                // Combine production and sales data
+                const allDayProducts = new Set([...Object.keys(dayProductionData), ...Object.keys(dayProductSales)]);
+                const dayProductAnalysis = Array.from(allDayProducts).map(productName => {
+                    const produced = dayProductionData[productName] || 0;
+                    const sold = dayProductSales[productName]?.quantity || 0;
+                    const revenue = dayProductSales[productName]?.revenue || 0;
+                    const sellThroughRate = produced > 0 ? (sold / produced * 100) : (sold > 0 ? 100 : 0);
+                    
+                    return {
+                        name: productName,
+                        produced,
+                        sold,
+                        revenue,
+                        sellThroughRate
+                    };
+                }).sort((a, b) => b.sold - a.sold);
                 
                 dailyAnalysis[dayName] = {
                     date: dateStr,
                     revenue: dayRevenue,
-                    items: daySales.reduce((sum, sale) => sum + sale.quantity, 0)
+                    items: dayItems,
+                    products: dayProductSales,
+                    productAnalysis: dayProductAnalysis,
+                    salesCount: daySales.length,
+                    productionCount: dayProductions.length
                 };
             }
             
             const dayAnalysisDiv = document.getElementById('weeklyDayAnalysis');
-            dayAnalysisDiv.innerHTML = Object.entries(dailyAnalysis).map(([day, data]) => `
-                <div class="flex justify-between items-center p-2 bg-white rounded border">
-                    <div>
-                        <div class="font-medium">${day}</div>
-                        <div class="text-xs text-gray-500">${data.date}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="font-bold text-teal-600">${data.revenue.toFixed(2)} บาท</div>
-                        <div class="text-sm text-gray-600">${data.items} หน่วย</div>
-                    </div>
+            dayAnalysisDiv.innerHTML = `
+                <div class="space-y-4">
+                    <h4 class="font-medium text-gray-800 border-b pb-2">📅 วิเคราะห์รายวัน (การผลิต vs การขาย)</h4>
+                    ${Object.entries(dailyAnalysis).map(([day, data]) => `
+                        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
+                            <!-- Day Header -->
+                            <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-4 py-3 border-b">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center">
+                                            <span class="text-sm font-bold text-teal-600">${day.charAt(0)}</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-gray-800">${day}</div>
+                                            <div class="text-xs text-teal-600">${data.date} • ${data.salesCount} ครั้งขาย • ${data.productionCount} ครั้งผลิต</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-bold text-teal-600">${data.revenue.toFixed(2)} บาท</div>
+                                        <div class="text-sm text-gray-600">${data.items} หน่วย</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Product Analysis -->
+                            ${data.productAnalysis.length > 0 ? `
+                                <div class="p-4">
+                                    <div class="space-y-3">
+                                        ${data.productAnalysis.map(product => {
+                                            // Determine performance styling
+                                            let performanceColor = 'text-gray-600';
+                                            let performanceBg = 'bg-gray-50';
+                                            let performanceIcon = '📊';
+                                            
+                                            if (product.sellThroughRate >= 80) {
+                                                performanceColor = 'text-green-600';
+                                                performanceBg = 'bg-green-50';
+                                                performanceIcon = '🔥';
+                                            } else if (product.sellThroughRate >= 50) {
+                                                performanceColor = 'text-yellow-600';
+                                                performanceBg = 'bg-yellow-50';
+                                                performanceIcon = '📈';
+                                            } else if (product.sellThroughRate > 0) {
+                                                performanceColor = 'text-orange-600';
+                                                performanceBg = 'bg-orange-50';
+                                                performanceIcon = '📉';
+                                            } else if (product.produced > 0) {
+                                                performanceColor = 'text-red-600';
+                                                performanceBg = 'bg-red-50';
+                                                performanceIcon = '⚠️';
+                                            }
+                                            
+                                            return `
+                                                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                                    <!-- Product Header -->
+                                                    <div class="bg-gray-50 px-3 py-2 border-b">
+                                                        <div class="flex justify-between items-center">
+                                                            <div class="font-medium text-gray-800">${product.name}</div>
+                                                            <div class="text-sm ${performanceColor} font-medium">
+                                                                ${performanceIcon} ${product.sellThroughRate.toFixed(1)}%
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Product Stats -->
+                                                    <div class="p-3">
+                                                        <div class="grid grid-cols-3 gap-3 mb-3">
+                                                            <div class="text-center">
+                                                                <div class="text-xs text-gray-500 mb-1">ผลิต</div>
+                                                                <div class="font-bold text-indigo-600">${product.produced}</div>
+                                                            </div>
+                                                            <div class="text-center">
+                                                                <div class="text-xs text-gray-500 mb-1">ขาย</div>
+                                                                <div class="font-bold text-green-600">${product.sold}</div>
+                                                            </div>
+                                                            <div class="text-center">
+                                                                <div class="text-xs text-gray-500 mb-1">ยอดขาย</div>
+                                                                <div class="font-bold text-green-600">${product.revenue.toFixed(2)}</div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Progress Bar -->
+                                                        ${product.produced > 0 ? `
+                                                            <div class="mt-2">
+                                                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                                                    <span>อัตราการขาย</span>
+                                                                    <span>${product.sold}/${product.produced}</span>
+                                                                </div>
+                                                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                                                    <div class="h-2 rounded-full transition-all duration-300 ${
+                                                                        product.sellThroughRate >= 80 ? 'bg-green-500' :
+                                                                        product.sellThroughRate >= 50 ? 'bg-yellow-500' :
+                                                                        product.sellThroughRate > 0 ? 'bg-orange-500' : 'bg-red-500'
+                                                                    }" style="width: ${Math.min(product.sellThroughRate, 100)}%"></div>
+                                                                </div>
+                                                                ${product.produced > product.sold ? `
+                                                                    <div class="text-xs text-orange-600 mt-1">
+                                                                        เหลือ ${product.produced - product.sold} หน่วย
+                                                                    </div>
+                                                                ` : ''}
+                                                            </div>
+                                                        ` : product.sold > 0 ? `
+                                                            <div class="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                                                                ขายจากสต็อกเดิม
+                                                            </div>
+                                                        ` : ''}
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="p-4 text-center text-gray-500 text-sm">
+                                    ไม่มีการผลิตหรือขายในวันนี้
+                                </div>
+                            `}
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
         }
 
         function generateMonthlyReport() {
@@ -3273,36 +3815,93 @@
                 </div>
             `;
             
-            // Monthly trends
-            const weeklyTrends = {};
-            for (let week = 1; week <= 5; week++) {
-                weeklyTrends[`สัปดาห์ที่ ${week}`] = {
-                    revenue: 0,
-                    items: 0
-                };
-            }
+            // Monthly trends with daily breakdown
+            const dailyTrends = {};
             
+            // Group sales by date
             monthlySales.forEach(sale => {
-                const saleDate = parseThaiDate(sale.date);
-                const weekOfMonth = Math.ceil(saleDate.getDate() / 7);
-                const weekKey = `สัปดาห์ที่ ${weekOfMonth}`;
+                const saleDate = sale.date;
+                if (!dailyTrends[saleDate]) {
+                    dailyTrends[saleDate] = {
+                        revenue: 0,
+                        items: 0,
+                        products: {},
+                        salesCount: 0
+                    };
+                }
                 
-                if (weeklyTrends[weekKey]) {
-                    weeklyTrends[weekKey].revenue += sale.totalRevenue;
-                    weeklyTrends[weekKey].items += sale.quantity;
+                dailyTrends[saleDate].revenue += sale.totalRevenue;
+                dailyTrends[saleDate].items += sale.quantity;
+                dailyTrends[saleDate].salesCount++;
+                
+                // Product breakdown
+                if (dailyTrends[saleDate].products[sale.productName]) {
+                    dailyTrends[saleDate].products[sale.productName].quantity += sale.quantity;
+                    dailyTrends[saleDate].products[sale.productName].revenue += sale.totalRevenue;
+                } else {
+                    dailyTrends[saleDate].products[sale.productName] = {
+                        quantity: sale.quantity,
+                        revenue: sale.totalRevenue
+                    };
                 }
             });
             
+            // Sort by date (most recent first)
+            const sortedDailyTrends = Object.entries(dailyTrends)
+                .sort((a, b) => parseThaiDate(b[0]) - parseThaiDate(a[0]))
+                .slice(0, 15); // Show last 15 days with sales
+            
             const trendsDiv = document.getElementById('monthlyTrends');
-            trendsDiv.innerHTML = Object.entries(weeklyTrends).map(([week, data]) => `
-                <div class="flex justify-between items-center p-2 bg-white rounded border">
-                    <div class="font-medium">${week}</div>
-                    <div class="text-right">
-                        <div class="font-bold text-teal-600">${data.revenue.toFixed(2)} บาท</div>
-                        <div class="text-sm text-gray-600">${data.items} หน่วย</div>
+            if (sortedDailyTrends.length === 0) {
+                trendsDiv.innerHTML = '<div class="text-gray-500 text-center py-4">ไม่มีการขายในเดือนนี้</div>';
+            } else {
+                trendsDiv.innerHTML = `
+                    <div class="space-y-3">
+                        <h4 class="font-medium text-gray-800 border-b pb-2">📈 รายละเอียดการขายรายวัน (15 วันล่าสุด)</h4>
+                        ${sortedDailyTrends.map(([date, data]) => `
+                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                <!-- Date Header -->
+                                <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-2 border-b">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-medium text-gray-800">${date}</div>
+                                            <div class="text-xs text-teal-600">${data.salesCount} ครั้ง</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="font-bold text-teal-600">${data.revenue.toFixed(2)} บาท</div>
+                                            <div class="text-sm text-gray-600">${data.items} หน่วย</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Product Details -->
+                                <div class="p-3">
+                                    <div class="text-xs text-gray-500 mb-2">สินค้าที่ขาย:</div>
+                                    <div class="space-y-1">
+                                        ${Object.entries(data.products)
+                                            .sort((a, b) => b[1].quantity - a[1].quantity)
+                                            .map(([productName, productData]) => `
+                                            <div class="flex justify-between items-center text-sm py-1 px-2 bg-gray-50 rounded">
+                                                <span class="text-gray-700">${productName}</span>
+                                                <div class="flex gap-3 text-xs">
+                                                    <span><strong>${productData.quantity}</strong> หน่วย</span>
+                                                    <span class="text-green-600"><strong>${productData.revenue.toFixed(2)}</strong> บาท</span>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                        
+                        ${Object.keys(dailyTrends).length > 15 ? `
+                            <div class="text-center text-sm text-gray-500 py-2">
+                                และอีก ${Object.keys(dailyTrends).length - 15} วันที่มีการขาย...
+                            </div>
+                        ` : ''}
                     </div>
-                </div>
-            `).join('');
+                `;
+            }
             
             // Customer analysis (simplified)
             const productAnalysis = {};
@@ -3404,15 +4003,19 @@
         }
 
         function getDateOfWeek(year, week) {
-            const simple = new Date(year, 0, 1 + (week - 1) * 7);
-            const dow = simple.getDay();
-            const ISOweekStart = simple;
-            if (dow <= 4) {
-                ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-            } else {
-                ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-            }
-            return ISOweekStart;
+            // Create January 4th of the given year (always in week 1)
+            const jan4 = new Date(year, 0, 4);
+            
+            // Find the Monday of week 1
+            const jan4Day = jan4.getDay() || 7; // Convert Sunday (0) to 7
+            const mondayOfWeek1 = new Date(jan4);
+            mondayOfWeek1.setDate(jan4.getDate() - jan4Day + 1);
+            
+            // Calculate the Monday of the requested week
+            const mondayOfRequestedWeek = new Date(mondayOfWeek1);
+            mondayOfRequestedWeek.setDate(mondayOfWeek1.getDate() + (week - 1) * 7);
+            
+            return mondayOfRequestedWeek;
         }
 
         function parseThaiDate(thaiDateStr) {
@@ -3422,95 +4025,549 @@
                 // Assuming format is DD/MM/YYYY (Thai format)
                 const day = parseInt(parts[0]);
                 const month = parseInt(parts[1]) - 1; // Month is 0-indexed
-                const year = parseInt(parts[2]) - 543; // Convert from Buddhist to Gregorian year
+                let year = parseInt(parts[2]);
+                
+                // Check if year is in Buddhist era (> 2500) and convert to Gregorian
+                if (year > 2500) {
+                    year = year - 543;
+                }
+                
                 return new Date(year, month, day);
             }
             return new Date();
         }
 
-        // Cost Analysis Management
-        function updateFixedCosts() {
-            const rent = parseFloat(document.getElementById('rentCost').value) || 0;
-            const utility = parseFloat(document.getElementById('utilityCost').value) || 0;
-            const labor = parseFloat(document.getElementById('laborCost').value) || 0;
-            const other = parseFloat(document.getElementById('otherFixedCost').value) || 0;
+        // Pricing Management
+        function updatePricingOptions() {
+            const select = document.getElementById('pricingProduct');
+            if (select) {
+                // Filter recipes to show only those that have been produced (have stock or production history)
+                const producedRecipes = recipes.filter(recipe => {
+                    const stock = productStock[recipe.name] || 0;
+                    const hasProduction = productions.some(p => p.recipeName === recipe.name);
+                    return stock > 0 || hasProduction;
+                });
+                
+                if (producedRecipes.length === 0) {
+                    select.innerHTML = '<option value="">ยังไม่มีสินค้าที่ผลิตแล้ว</option>';
+                } else {
+                    select.innerHTML = '<option value="">เลือกสินค้า</option>' + 
+                        producedRecipes.map(recipe => `<option value="${recipe.name}">${recipe.name} (ต้นทุน: ${recipe.costPerUnit.toFixed(2)} บาท)</option>`).join('');
+                }
+            }
             
-            fixedCosts = {
-                rent,
-                utility,
-                labor,
-                other,
-                total: rent + utility + labor + other,
+            // Initialize filtered pricing and update display
+            filteredPricing = Object.entries(productPricing).map(([productName, pricing]) => ({
+                productName,
+                ...pricing
+            }));
+            updatePricingList();
+        }
+
+        function updatePricingInfo() {
+            const productName = document.getElementById('pricingProduct').value;
+            const costInfo = document.getElementById('costInfo');
+            const costDetails = document.getElementById('costDetails');
+            const pricingSection = document.getElementById('pricingSection');
+            
+            if (!productName) {
+                costInfo.classList.add('hidden');
+                pricingSection.classList.add('hidden');
+                return;
+            }
+            
+            const recipe = recipes.find(r => r.name === productName);
+            if (!recipe) return;
+            
+            // Show cost information
+            costInfo.classList.remove('hidden');
+            pricingSection.classList.remove('hidden');
+            
+            // Display cost breakdown
+            let costBreakdown = `
+                <div class="flex justify-between">
+                    <span>ต้นทุนต่อหน่วย:</span>
+                    <span class="font-bold">${recipe.costPerUnit.toFixed(2)} บาท</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>ได้จากสูตร:</span>
+                    <span>${recipe.yield} หน่วย</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>ต้นทุนรวม:</span>
+                    <span>${recipe.totalCost.toFixed(2)} บาท</span>
+                </div>
+            `;
+            
+            // Show base recipe cost if exists
+            if (recipe.baseRecipeName && recipe.baseCost > 0) {
+                costBreakdown += `
+                    <div class="border-t pt-2 mt-2">
+                        <div class="text-xs text-blue-600 mb-1">รายละเอียดต้นทุน:</div>
+                        <div class="flex justify-between text-xs">
+                            <span>• สูตรพื้นฐาน (${recipe.baseRecipeName}):</span>
+                            <span>${recipe.baseCost.toFixed(2)} บาท</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>• วัตถุดิบเพิ่มเติม:</span>
+                            <span>${recipe.additionalCost.toFixed(2)} บาท</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            costDetails.innerHTML = costBreakdown;
+            
+            // Load existing pricing if available
+            const existingPricing = productPricing[productName];
+            if (existingPricing) {
+                // Set the pricing method
+                document.querySelector(`input[name="pricingMethod"][value="${existingPricing.method}"]`).checked = true;
+                updatePricingMethod();
+                
+                // Set the values
+                if (existingPricing.method === 'markup') {
+                    document.getElementById('markupPercent').value = existingPricing.markupPercent;
+                    calculatePriceFromMarkup();
+                } else if (existingPricing.method === 'margin') {
+                    document.getElementById('marginPercent').value = existingPricing.marginPercent;
+                    calculatePriceFromMargin();
+                } else if (existingPricing.method === 'fixed') {
+                    document.getElementById('fixedPrice').value = existingPricing.sellingPrice;
+                    calculateProfitFromFixed();
+                }
+            } else {
+                // Clear form
+                clearPricingForm();
+            }
+        }
+
+        function updatePricingMethod() {
+            const method = document.querySelector('input[name="pricingMethod"]:checked').value;
+            
+            // Hide all method sections
+            document.getElementById('markupMethod').classList.add('hidden');
+            document.getElementById('marginMethod').classList.add('hidden');
+            document.getElementById('fixedMethod').classList.add('hidden');
+            document.getElementById('pricingResult').classList.add('hidden');
+            
+            // Show selected method
+            document.getElementById(method + 'Method').classList.remove('hidden');
+            
+            // Clear inputs
+            document.getElementById('markupPercent').value = '';
+            document.getElementById('marginPercent').value = '';
+            document.getElementById('fixedPrice').value = '';
+            
+            document.getElementById('savePricingBtn').disabled = true;
+        }
+
+        function calculatePriceFromMarkup() {
+            const productName = document.getElementById('pricingProduct').value;
+            const markupPercent = parseFloat(document.getElementById('markupPercent').value);
+            
+            if (!productName || isNaN(markupPercent) || markupPercent < 0) {
+                document.getElementById('pricingResult').classList.add('hidden');
+                document.getElementById('savePricingBtn').disabled = true;
+                return;
+            }
+            
+            const recipe = recipes.find(r => r.name === productName);
+            if (!recipe) return;
+            
+            const costPerUnit = recipe.costPerUnit;
+            const sellingPrice = costPerUnit * (1 + markupPercent / 100);
+            const profitPerUnit = sellingPrice - costPerUnit;
+            const profitMargin = (profitPerUnit / sellingPrice) * 100;
+            
+            showPricingResult({
+                method: 'markup',
+                costPerUnit,
+                sellingPrice,
+                profitPerUnit,
+                profitMargin,
+                markupPercent,
+                calculation: `ต้นทุน ${costPerUnit.toFixed(2)} บาท × (1 + ${markupPercent}%) = ${sellingPrice.toFixed(2)} บาท`
+            });
+        }
+
+        function calculatePriceFromMargin() {
+            const productName = document.getElementById('pricingProduct').value;
+            const marginPercent = parseFloat(document.getElementById('marginPercent').value);
+            
+            if (!productName || isNaN(marginPercent) || marginPercent < 0 || marginPercent >= 100) {
+                document.getElementById('pricingResult').classList.add('hidden');
+                document.getElementById('savePricingBtn').disabled = true;
+                return;
+            }
+            
+            const recipe = recipes.find(r => r.name === productName);
+            if (!recipe) return;
+            
+            const costPerUnit = recipe.costPerUnit;
+            const sellingPrice = costPerUnit / (1 - marginPercent / 100);
+            const profitPerUnit = sellingPrice - costPerUnit;
+            const markupPercent = (profitPerUnit / costPerUnit) * 100;
+            
+            showPricingResult({
+                method: 'margin',
+                costPerUnit,
+                sellingPrice,
+                profitPerUnit,
+                profitMargin: marginPercent,
+                markupPercent,
+                calculation: `ต้นทุน ${costPerUnit.toFixed(2)} บาท ÷ (1 - ${marginPercent}%) = ${sellingPrice.toFixed(2)} บาท`
+            });
+        }
+
+        function calculateProfitFromFixed() {
+            const productName = document.getElementById('pricingProduct').value;
+            const fixedPrice = parseFloat(document.getElementById('fixedPrice').value);
+            
+            if (!productName || isNaN(fixedPrice) || fixedPrice <= 0) {
+                document.getElementById('pricingResult').classList.add('hidden');
+                document.getElementById('savePricingBtn').disabled = true;
+                return;
+            }
+            
+            const recipe = recipes.find(r => r.name === productName);
+            if (!recipe) return;
+            
+            const costPerUnit = recipe.costPerUnit;
+            const sellingPrice = fixedPrice;
+            const profitPerUnit = sellingPrice - costPerUnit;
+            const profitMargin = sellingPrice > 0 ? (profitPerUnit / sellingPrice) * 100 : 0;
+            const markupPercent = costPerUnit > 0 ? (profitPerUnit / costPerUnit) * 100 : 0;
+            
+            showPricingResult({
+                method: 'fixed',
+                costPerUnit,
+                sellingPrice,
+                profitPerUnit,
+                profitMargin,
+                markupPercent,
+                calculation: `ราคาขาย ${sellingPrice.toFixed(2)} บาท - ต้นทุน ${costPerUnit.toFixed(2)} บาท = กำไร ${profitPerUnit.toFixed(2)} บาท`
+            });
+        }
+
+        function showPricingResult(data) {
+            const pricingResult = document.getElementById('pricingResult');
+            const pricingCalculation = document.getElementById('pricingCalculation');
+            
+            pricingResult.classList.remove('hidden');
+            
+            const profitColor = data.profitPerUnit > 0 ? 'text-green-700' : 'text-red-700';
+            
+            pricingCalculation.innerHTML = `
+                <div class="font-medium mb-2">📊 ${data.calculation}</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-xs text-gray-600">ราคาขาย</div>
+                        <div class="font-bold text-blue-700">${data.sellingPrice.toFixed(2)} บาท</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-600">กำไรต่อหน่วย</div>
+                        <div class="font-bold ${profitColor}">${data.profitPerUnit.toFixed(2)} บาท</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-600">อัตรากำไร (Margin)</div>
+                        <div class="font-bold ${profitColor}">${data.profitMargin.toFixed(1)}%</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-600">เปอร์เซ็นต์กำไร (Markup)</div>
+                        <div class="font-bold ${profitColor}">${data.markupPercent.toFixed(1)}%</div>
+                    </div>
+                </div>
+                ${data.profitPerUnit <= 0 ? '<div class="mt-2 text-red-600 text-xs">⚠️ ราคาขายต่ำกว่าต้นทุน จะขาดทุน!</div>' : ''}
+            `;
+            
+            document.getElementById('savePricingBtn').disabled = false;
+        }
+
+        function savePricing() {
+            const productName = document.getElementById('pricingProduct').value;
+            const methodRadio = document.querySelector('input[name="pricingMethod"]:checked');
+            
+            if (!productName) {
+                alert('กรุณาเลือกสินค้า');
+                return;
+            }
+            
+            if (!methodRadio) {
+                alert('กรุณาเลือกวิธีการกำหนดราคา');
+                return;
+            }
+            
+            const method = methodRadio.value;
+            const recipe = recipes.find(r => r.name === productName);
+            if (!recipe) {
+                alert('ไม่พบข้อมูลสูตรสินค้า');
+                return;
+            }
+            
+            let pricingData = {
+                productName,
+                method,
+                costPerUnit: recipe.costPerUnit,
                 updated: new Date().toLocaleDateString('th-TH')
             };
             
-            localStorage.setItem('bakery_fixed_costs', JSON.stringify(fixedCosts));
-            updateCostAnalysis();
+            // Get pricing data based on method
+            if (method === 'markup') {
+                const markupPercent = parseFloat(document.getElementById('markupPercent').value);
+                if (isNaN(markupPercent) || markupPercent < 0) {
+                    alert('กรุณาระบุเปอร์เซ็นต์กำไรที่ถูกต้อง');
+                    return;
+                }
+                
+                const sellingPrice = recipe.costPerUnit * (1 + markupPercent / 100);
+                const profitPerUnit = sellingPrice - recipe.costPerUnit;
+                const profitMargin = (profitPerUnit / sellingPrice) * 100;
+                
+                pricingData = {
+                    ...pricingData,
+                    markupPercent,
+                    sellingPrice,
+                    profitPerUnit,
+                    profitMargin
+                };
+            } else if (method === 'margin') {
+                const marginPercent = parseFloat(document.getElementById('marginPercent').value);
+                if (isNaN(marginPercent) || marginPercent < 0 || marginPercent >= 100) {
+                    alert('กรุณาระบุอัตรากำไรระหว่าง 0-99%');
+                    return;
+                }
+                
+                const sellingPrice = recipe.costPerUnit / (1 - marginPercent / 100);
+                const profitPerUnit = sellingPrice - recipe.costPerUnit;
+                const markupPercent = (profitPerUnit / recipe.costPerUnit) * 100;
+                
+                pricingData = {
+                    ...pricingData,
+                    marginPercent,
+                    markupPercent,
+                    sellingPrice,
+                    profitPerUnit,
+                    profitMargin: marginPercent
+                };
+            } else if (method === 'fixed') {
+                const sellingPrice = parseFloat(document.getElementById('fixedPrice').value);
+                if (isNaN(sellingPrice) || sellingPrice <= 0) {
+                    alert('กรุณาระบุราคาขายที่ถูกต้อง');
+                    return;
+                }
+                
+                const profitPerUnit = sellingPrice - recipe.costPerUnit;
+                const profitMargin = sellingPrice > 0 ? (profitPerUnit / sellingPrice) * 100 : 0;
+                const markupPercent = recipe.costPerUnit > 0 ? (profitPerUnit / recipe.costPerUnit) * 100 : 0;
+                
+                pricingData = {
+                    ...pricingData,
+                    sellingPrice,
+                    profitPerUnit,
+                    profitMargin,
+                    markupPercent
+                };
+            }
             
-            alert(`อัพเดทต้นทุนคงที่สำเร็จ!\n\nต้นทุนคงที่รวม: ${fixedCosts.total.toFixed(2)} บาท/เดือน`);
+            // Save to storage
+            productPricing[productName] = pricingData;
+            localStorage.setItem('bakery_product_pricing', JSON.stringify(productPricing));
+            
+            // Update display
+            updatePricingOptions();
+            
+            // Clear form
+            clearPricingForm();
+            
+            alert(`บันทึกราคาขาย "${productName}" สำเร็จ!\n\n` +
+                  `ราคาขาย: ${pricingData.sellingPrice.toFixed(2)} บาท\n` +
+                  `กำไรต่อหน่วย: ${pricingData.profitPerUnit.toFixed(2)} บาท\n` +
+                  `อัตรากำไร: ${pricingData.profitMargin.toFixed(1)}%`);
         }
 
-        function updateCostAnalysis() {
-            // Load fixed costs form
-            if (fixedCosts.rent !== undefined) {
-                document.getElementById('rentCost').value = fixedCosts.rent;
-                document.getElementById('utilityCost').value = fixedCosts.utility;
-                document.getElementById('laborCost').value = fixedCosts.labor;
-                document.getElementById('otherFixedCost').value = fixedCosts.other;
-            }
+        function clearPricingForm() {
+            const productSelect = document.getElementById('pricingProduct');
+            const costInfo = document.getElementById('costInfo');
+            const pricingSection = document.getElementById('pricingSection');
+            const pricingResult = document.getElementById('pricingResult');
+            const savePricingBtn = document.getElementById('savePricingBtn');
             
-            // Update total fixed cost display
-            const totalFixedCost = fixedCosts.total || 0;
-            document.getElementById('totalFixedCost').textContent = totalFixedCost.toFixed(2) + ' บาท';
+            if (productSelect) productSelect.value = '';
+            if (costInfo) costInfo.classList.add('hidden');
+            if (pricingSection) pricingSection.classList.add('hidden');
+            if (pricingResult) pricingResult.classList.add('hidden');
+            if (savePricingBtn) savePricingBtn.disabled = true;
             
-            // Variable costs per product
-            const variableCostsList = document.getElementById('variableCostsList');
-            if (recipes.length === 0) {
-                variableCostsList.innerHTML = '<div class="text-gray-500">ยังไม่มีสูตรสินค้า</div>';
-            } else {
-                variableCostsList.innerHTML = recipes.map(recipe => `
-                    <div class="flex justify-between items-center py-1">
-                        <span>${recipe.name}</span>
-                        <span class="font-medium">${recipe.costPerUnit.toFixed(2)} บาท/หน่วย</span>
-                    </div>
-                `).join('');
-            }
-            
-            // Break-even analysis
-            const breakEvenAnalysis = document.getElementById('breakEvenAnalysis');
-            if (recipes.length === 0 || totalFixedCost === 0) {
-                breakEvenAnalysis.innerHTML = '<div class="text-gray-500">ต้องมีข้อมูลต้นทุนคงที่และสูตรสินค้า</div>';
-            } else {
-                const analysisHtml = recipes.map(recipe => {
-                    // Assume selling price is 2x cost (100% markup) for break-even calculation
-                    const assumedSellingPrice = recipe.costPerUnit * 2;
-                    const contributionMargin = assumedSellingPrice - recipe.costPerUnit;
-                    const breakEvenUnits = contributionMargin > 0 ? Math.ceil(totalFixedCost / contributionMargin) : 'ไม่สามารถคำนวณได้';
-                    const breakEvenRevenue = breakEvenUnits !== 'ไม่สามารถคำนวณได้' ? (breakEvenUnits * assumedSellingPrice).toFixed(2) : 'ไม่สามารถคำนวณได้';
-                    
-                    return `
-                        <div class="border-b pb-2 mb-2">
-                            <div class="font-medium">${recipe.name}</div>
-                            <div class="text-xs space-y-1">
-                                <div>ต้นทุน: ${recipe.costPerUnit.toFixed(2)} บาท/หน่วย</div>
-                                <div>ราคาขายสมมติ (2x): ${assumedSellingPrice.toFixed(2)} บาท/หน่วย</div>
-                                <div>กำไรต่อหน่วย: ${contributionMargin.toFixed(2)} บาท</div>
-                                <div class="font-medium text-green-700">จุดคุ้มทุน: ${breakEvenUnits} หน่วย/เดือน</div>
-                                <div class="font-medium text-green-700">ยอดขายคุ้มทุน: ${breakEvenRevenue} บาท/เดือน</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                breakEvenAnalysis.innerHTML = `
-                    <div class="text-xs text-green-600 mb-2">💡 คำนวณจากราคาขาย 2 เท่าของต้นทุน</div>
-                    ${analysisHtml}
-                `;
+            // Reset to markup method
+            const markupRadio = document.querySelector('input[name="pricingMethod"][value="markup"]');
+            if (markupRadio) {
+                markupRadio.checked = true;
+                updatePricingMethod();
             }
         }
+
+        function filterPricing(filterType) {
+            currentPricingFilter = filterType;
+            
+            // Update filter button styles
+            document.querySelectorAll('.pricing-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-yellow-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            event.target.classList.add('active', 'bg-yellow-500', 'text-white');
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            applyPricingFilter();
+        }
+
+        function applyPricingFilter() {
+            const allPricing = Object.entries(productPricing).map(([productName, pricing]) => ({
+                productName,
+                ...pricing
+            }));
+            
+            if (currentPricingFilter === 'all') {
+                filteredPricing = allPricing;
+            } else {
+                filteredPricing = allPricing.filter(pricing => {
+                    const margin = pricing.profitMargin || 0;
+                    
+                    switch (currentPricingFilter) {
+                        case 'high-profit':
+                            return margin > 50;
+                        case 'medium-profit':
+                            return margin >= 20 && margin <= 50;
+                        case 'low-profit':
+                            return margin < 20;
+                        default:
+                            return true;
+                    }
+                });
+            }
+            
+            updatePricingList();
+        }
+
+        function updatePricingList() {
+            const list = document.getElementById('pricingList');
+            const countElement = document.getElementById('pricingCount');
+            
+            // Update count
+            countElement.textContent = filteredPricing.length;
+            
+            if (Object.keys(productPricing).length === 0) {
+                list.innerHTML = '<div class="text-center text-gray-500 py-8">ยังไม่มีการกำหนดราคาขาย<br>เริ่มกำหนดราคาสินค้าแรกของคุณเลย!</div>';
+                return;
+            }
+            
+            if (filteredPricing.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-lg mb-2">🔍 ไม่พบสินค้าในหมวดหมู่นี้</div>
+                        <div class="text-sm">ลองเปลี่ยนตัวกรองดู</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = filteredPricing.map(pricing => {
+                const profitColor = pricing.profitPerUnit > 0 ? 'text-green-600' : 'text-red-600';
+                const profitIcon = pricing.profitPerUnit > 0 ? '📈' : '📉';
+                
+                // Determine profit level for styling
+                let profitLevel = 'low';
+                let profitBg = 'bg-red-50 border-red-200';
+                if (pricing.profitMargin > 50) {
+                    profitLevel = 'high';
+                    profitBg = 'bg-green-50 border-green-200';
+                } else if (pricing.profitMargin >= 20) {
+                    profitLevel = 'medium';
+                    profitBg = 'bg-yellow-50 border-yellow-200';
+                }
+                
+                return `
+                    <div class="p-4 border rounded-lg ${profitBg} hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-medium text-lg">${pricing.productName}</div>
+                                <div class="text-sm text-gray-600 mt-1">
+                                    ต้นทุน: ${pricing.costPerUnit.toFixed(2)} บาท/หน่วย
+                                </div>
+                                
+                                <!-- Pricing Information -->
+                                <div class="mt-2 space-y-1">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-medium">ราคาขาย:</span>
+                                        <span class="font-bold text-blue-600">${pricing.sellingPrice.toFixed(2)} บาท</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm">กำไรต่อหน่วย:</span>
+                                        <span class="font-medium ${profitColor}">${profitIcon} ${pricing.profitPerUnit.toFixed(2)} บาท</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm">อัตรากำไร:</span>
+                                        <span class="font-medium ${profitColor}">${pricing.profitMargin.toFixed(1)}%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Method Information -->
+                                <div class="mt-2 p-2 bg-blue-100 rounded text-xs">
+                                    <div class="font-medium text-blue-800">วิธีการกำหนดราคา:</div>
+                                    <div class="text-blue-700">
+                                        ${pricing.method === 'markup' ? `Markup ${pricing.markupPercent}%` : 
+                                          pricing.method === 'margin' ? `Margin ${pricing.profitMargin.toFixed(1)}%` : 
+                                          'ราคาคงที่'}
+                                    </div>
+                                </div>
+                                
+                                <div class="text-xs text-gray-500 mt-2">อัพเดทล่าสุด: ${pricing.updated}</div>
+                            </div>
+                            
+                            <div class="text-right ml-4">
+                                <button onclick="editPricing('${pricing.productName}')" class="text-green-500 hover:text-green-700 p-1 mr-1">
+                                    ✏️
+                                </button>
+                                <button onclick="removePricing('${pricing.productName}')" class="text-red-500 hover:text-red-700 p-1">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editPricing(productName) {
+            // Set the product
+            document.getElementById('pricingProduct').value = productName;
+            updatePricingInfo();
+            
+            // Scroll to form
+            document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function removePricing(productName) {
+            if (confirm(`คุณแน่ใจหรือไม่ที่จะลบการกำหนดราคาของ "${productName}"?`)) {
+                delete productPricing[productName];
+                localStorage.setItem('bakery_product_pricing', JSON.stringify(productPricing));
+                updatePricingOptions();
+            }
+        }
+
+
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            // Set current date in header
+            const currentDate = new Date().toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('currentDate').textContent = currentDate;
+            
             // Set today's date for production
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('productionDate').value = today;
@@ -3521,6 +4578,10 @@
             // Initialize filters
             filteredInventory = [...inventory];
             filteredRecipes = [...recipes];
+            filteredPricing = Object.entries(productPricing).map(([productName, pricing]) => ({
+                productName,
+                ...pricing
+            }));
             
             // Update all displays
             updateInventoryDisplay();
@@ -3528,8 +4589,8 @@
             updateRecipeOptions();
             updateProductionOptions();
             updateSalesOptions();
-            updateCostAnalysis();
+
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96a5a2aaa14dc8d7',t:'MTc1NDM4OTk5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96aedb83353745cc',t:'MTc1NDQ4NjY5OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
