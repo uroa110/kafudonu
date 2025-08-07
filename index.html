@@ -10,7 +10,7 @@
         body { font-family: 'Kanit', sans-serif; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-orange-50 to-amber-50 min-h-screen">
+<body class="bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 min-h-screen">
     <div class="container mx-auto px-4 py-6">
         <!-- Header -->
         <div class="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg p-6 mb-6 text-white">
@@ -26,60 +26,136 @@
             </div>
         </div>
 
-        <!-- Navigation -->
+        <!-- Navigation Dropdown -->
         <div class="bg-white rounded-xl shadow-lg p-4 mb-6">
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-                <button onclick="showSection('inventory')" class="nav-btn group bg-blue-50 hover:bg-blue-500 text-blue-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-blue-200 hover:border-blue-500">
-                    <div class="flex flex-col items-center gap-2">
-                        <span class="text-2xl">📦</span>
-                        <span class="text-sm font-medium">คลังสินค้า</span>
+            <div class="relative">
+                <button onclick="toggleNavDropdown()" class="w-full flex items-center justify-between p-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg hover:from-orange-600 hover:to-amber-600 transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl" id="currentSectionIcon">📦</span>
+                        <div>
+                            <div class="font-semibold text-lg" id="currentSectionName">คลังสินค้า</div>
+                            <div class="text-sm opacity-90" id="currentSectionCategory">📦 จัดการวัตถุดิบ</div>
+                        </div>
                     </div>
+                    <svg class="w-6 h-6 transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
                 </button>
-                <button onclick="showSection('purchase')" class="nav-btn group bg-green-50 hover:bg-green-500 text-green-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-green-200 hover:border-green-500">
-                    <div class="flex flex-col items-center gap-2">
-                        <span class="text-2xl">🛒</span>
-                        <span class="text-sm font-medium">ซื้อของ</span>
+                
+                <!-- Dropdown Menu -->
+                <div id="navDropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+                    <!-- หมวด 1: จัดการวัตถุดิบ -->
+                    <div class="border-b border-gray-100">
+                        <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-green-50">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-gradient-to-r from-blue-400 to-green-400 rounded-full"></div>
+                                <h3 class="font-semibold text-gray-800">📦 จัดการวัตถุดิบ</h3>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <button onclick="selectSection('inventory', '📦', 'คลังสินค้า', '📦 จัดการวัตถุดิบ')" class="nav-dropdown-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors text-left">
+                                <span class="text-xl">📦</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">คลังสินค้า</div>
+                                    <div class="text-xs text-gray-600">จัดการวัตถุดิบและติดตามสต็อก</div>
+                                </div>
+                            </button>
+                            <button onclick="selectSection('purchase', '🛒', 'ซื้อของ', '📦 จัดการวัตถุดิบ')" class="nav-dropdown-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-green-50 transition-colors text-left">
+                                <span class="text-xl">🛒</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">ซื้อของ</div>
+                                    <div class="text-xs text-gray-600">สั่งซื้อวัตถุดิบและบันทึกการซื้อ</div>
+                                </div>
+                            </button>
+                        </div>
                     </div>
-                </button>
-                <button onclick="showSection('recipes')" class="nav-btn group bg-purple-50 hover:bg-purple-500 text-purple-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-purple-200 hover:border-purple-500">
-                    <div class="flex flex-col items-center gap-2">
-                        <span class="text-2xl">📋</span>
-                        <span class="text-sm font-medium">สูตร</span>
-                    </div>
-                </button>
-                <button onclick="showSection('production')" class="nav-btn group bg-indigo-50 hover:bg-indigo-500 text-indigo-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-indigo-200 hover:border-indigo-500">
-                    <div class="flex flex-col items-center gap-2">
-                        <span class="text-2xl">🏭</span>
-                        <span class="text-sm font-medium">การผลิต</span>
-                    </div>
-                </button>
-                <button onclick="showSection('sales')" class="nav-btn group bg-pink-50 hover:bg-pink-500 text-pink-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-pink-200 hover:border-pink-500">
-                    <div class="flex flex-col items-center gap-2">
-                        <span class="text-2xl">💰</span>
-                        <span class="text-sm font-medium">ขาย</span>
-                    </div>
-                </button>
-                <button onclick="showSection('reports')" class="nav-btn group bg-teal-50 hover:bg-teal-500 text-teal-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-teal-200 hover:border-teal-500">
-                    <div class="flex flex-col items-center gap-2">
-                        <span class="text-2xl">📊</span>
-                        <span class="text-sm font-medium">รายงาน</span>
-                    </div>
-                </button>
 
-                <button onclick="showSection('pricing')" class="nav-btn group bg-yellow-50 hover:bg-yellow-500 text-yellow-600 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 border border-yellow-200 hover:border-yellow-500">
-                    <div class="flex flex-col items-center gap-2">
-                        <span class="text-2xl">💲</span>
-                        <span class="text-sm font-medium">ราคาขาย</span>
+                    <!-- หมวด 2: สูตรและราคา -->
+                    <div class="border-b border-gray-100">
+                        <div class="px-4 py-3 bg-gradient-to-r from-purple-50 to-yellow-50">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-gradient-to-r from-purple-400 to-yellow-400 rounded-full"></div>
+                                <h3 class="font-semibold text-gray-800">📋 สูตรและราคา</h3>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <button onclick="selectSection('recipes', '📋', 'สูตร', '📋 สูตรและราคา')" class="nav-dropdown-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-purple-50 transition-colors text-left">
+                                <span class="text-xl">📋</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">สูตร</div>
+                                    <div class="text-xs text-gray-600">สร้างสูตรและคำนวณต้นทุน</div>
+                                </div>
+                            </button>
+                            <button onclick="selectSection('pricing', '💲', 'ราคาขาย', '📋 สูตรและราคา')" class="nav-dropdown-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-yellow-50 transition-colors text-left">
+                                <span class="text-xl">💲</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">ราคาขาย</div>
+                                    <div class="text-xs text-gray-600">กำหนดราคาขายและคำนวณกำไร</div>
+                                </div>
+                            </button>
+                        </div>
                     </div>
-                </button>
+
+                    <!-- หมวด 3: ผลิตและขาย -->
+                    <div class="border-b border-gray-100">
+                        <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-pink-50">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-gradient-to-r from-indigo-400 to-pink-400 rounded-full"></div>
+                                <h3 class="font-semibold text-gray-800">🏪 ผลิตและขาย</h3>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <button onclick="selectSection('production', '🏭', 'การผลิต', '🏪 ผลิตและขาย')" class="nav-dropdown-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-indigo-50 transition-colors text-left">
+                                <span class="text-xl">🏭</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">การผลิต</div>
+                                    <div class="text-xs text-gray-600">วางแผนการผลิตและติดตามการใช้วัตถุดิบ</div>
+                                </div>
+                            </button>
+                            <button onclick="selectSection('sales', '💰', 'ขาย', '🏪 ผลิตและขาย')" class="nav-dropdown-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-pink-50 transition-colors text-left">
+                                <span class="text-xl">💰</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">ขาย</div>
+                                    <div class="text-xs text-gray-600">บันทึกการขายและคำนวณกำไร</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- หมวด 4: ค่าใช้จ่ายและรายงาน -->
+                    <div>
+                        <div class="px-4 py-3 bg-gradient-to-r from-teal-50 to-cyan-50">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-full"></div>
+                                <h3 class="font-semibold text-gray-800">💼 ค่าใช้จ่ายและรายงาน</h3>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <button onclick="selectSection('expenses', '💼', 'ค่าใช้จ่ายคงที่', '💼 ค่าใช้จ่ายและรายงาน')" class="nav-dropdown-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-teal-50 transition-colors text-left">
+                                <span class="text-xl">💼</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">ค่าใช้จ่ายคงที่</div>
+                                    <div class="text-xs text-gray-600">จัดการค่าเช่า ค่าไฟ ค่าน้ำ และค่าใช้จ่ายอื่นๆ</div>
+                                </div>
+                            </button>
+                            <button onclick="selectSection('reports', '📊', 'รายงาน', '💼 ค่าใช้จ่ายและรายงาน')" class="nav-dropdown-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-teal-50 transition-colors text-left">
+                                <span class="text-xl">📊</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">รายงาน</div>
+                                    <div class="text-xs text-gray-600">วิเคราะห์ยอดขายและสรุปผลประกอบการ</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Inventory Section -->
-        <div id="inventory" class="section bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
-            <div class="border-b border-gray-200 pb-4 mb-6">
-                <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-2">📦 ระบบคลังสินค้า</h2>
-                <p class="text-sm text-gray-600">จัดการวัตถุดิบและติดตามสต็อก</p>
+        <div id="inventory" class="section bg-gradient-to-br from-blue-100 to-indigo-200 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg p-4 mb-6 shadow-md">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">📦 ระบบคลังสินค้า</h2>
+                <p class="text-blue-100">จัดการวัตถุดิบและติดตามสต็อก</p>
             </div>
             
             <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
@@ -234,10 +310,10 @@
         </div>
 
         <!-- Purchase Section -->
-        <div id="purchase" class="section bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
-            <div class="border-b border-gray-200 pb-4 mb-6">
-                <h2 class="text-xl sm:text-2xl font-bold text-green-800 mb-2">🛒 ระบบการซื้อของ</h2>
-                <p class="text-sm text-gray-600">สั่งซื้อวัตถุดิบและติดตามประวัติการซื้อ</p>
+        <div id="purchase" class="section bg-gradient-to-br from-green-100 to-emerald-200 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+            <div class="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg p-4 mb-6 shadow-md">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">🛒 ระบบการซื้อของ</h2>
+                <p class="text-green-100">สั่งซื้อวัตถุดิบและติดตามประวัติการซื้อ</p>
             </div>
             
             <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
@@ -307,10 +383,10 @@
         </div>
 
         <!-- Production Section -->
-        <div id="production" class="section bg-gradient-to-br from-indigo-50 to-purple-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
-            <div class="border-b border-gray-200 pb-4 mb-6">
-                <h2 class="text-xl sm:text-2xl font-bold text-indigo-800 mb-2">🏭 ระบบวางแผนการผลิต</h2>
-                <p class="text-sm text-gray-600">วางแผนการผลิตและติดตามการใช้วัตถุดิบ</p>
+        <div id="production" class="section bg-gradient-to-br from-indigo-100 to-purple-200 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg p-4 mb-6 shadow-md">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">🏭 ระบบวางแผนการผลิต</h2>
+                <p class="text-indigo-100">วางแผนการผลิตและติดตามการใช้วัตถุดิบ</p>
             </div>
             
             <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
@@ -360,10 +436,10 @@
         </div>
 
         <!-- Recipes Section -->
-        <div id="recipes" class="section bg-gradient-to-br from-purple-50 to-pink-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
-            <div class="border-b border-gray-200 pb-4 mb-6">
-                <h2 class="text-xl sm:text-2xl font-bold text-purple-800 mb-2">📋 ระบบสูตรและคำนวณต้นทุน</h2>
-                <p class="text-sm text-gray-600">สร้างสูตรใหม่และคำนวณต้นทุนการผลิต</p>
+        <div id="recipes" class="section bg-gradient-to-br from-purple-100 to-pink-200 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg p-4 mb-6 shadow-md">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">📋 ระบบสูตรและคำนวณต้นทุน</h2>
+                <p class="text-purple-100">สร้างสูตรใหม่และคำนวณต้นทุนการผลิต</p>
             </div>
             
             <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
@@ -489,10 +565,10 @@
         </div>
 
         <!-- Sales Section -->
-        <div id="sales" class="section bg-gradient-to-br from-pink-50 to-rose-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
-            <div class="border-b border-gray-200 pb-4 mb-6">
-                <h2 class="text-xl sm:text-2xl font-bold text-pink-800 mb-2">💰 ระบบการขาย</h2>
-                <p class="text-sm text-gray-600">บันทึกการขายและติดตามสต็อกสินค้า</p>
+        <div id="sales" class="section bg-gradient-to-br from-pink-100 to-rose-200 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+            <div class="bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg p-4 mb-6 shadow-md">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">💰 ระบบการขาย</h2>
+                <p class="text-pink-100">บันทึกการขายโดยใส่จำนวนที่เหลือ ระบบจะคำนวณขายได้ให้อัตโนมัติ</p>
             </div>
             
             <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
@@ -516,17 +592,11 @@
                             </div>
                         </div>
                         
-
-                        
                         <div class="space-y-3">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่เหลือหลังขาย (ไม่บังคับ)</label>
-                                <input type="number" id="remainingStock" placeholder="เช่น 5 (จำนวนที่เหลือจริง)" class="w-full p-3 border rounded-lg text-sm" oninput="calculateFromRemaining()">
-                                <p class="text-xs text-blue-600 mt-1">💡 กรอกจำนวนที่เหลือจริง ระบบจะคำนวณจำนวนที่ขายให้อัตโนมัติ</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่ขาย</label>
-                                <input type="number" id="saleQuantity" placeholder="จำนวนที่ขาย" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSaleTotal()">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่เหลือ (ตอนปิดร้าน)</label>
+                                <input type="number" id="remainingQuantity" placeholder="จำนวนที่เหลือ" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSoldQuantity()">
+                                <p class="text-xs text-blue-600 mt-1">💡 ใส่จำนวนที่เหลือ ระบบจะคำนวณขายได้ให้</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">ราคาขายต่อหน่วย (บาท)</label>
@@ -567,36 +637,150 @@
                     </div>
                 </div>
                 
-                <!-- สต็อกสินค้าและประวัติการขาย -->
-                <div class="space-y-4">
-                    <!-- สต็อกสินค้า -->
-                    <div class="bg-white rounded-lg p-4 border-2 border-blue-100">
-                        <h3 class="text-lg font-semibold mb-4 text-blue-800 border-b border-blue-200 pb-2">
-                            📦 สต็อกสินค้า
+                <!-- ประวัติการขาย -->
+                <div class="bg-white rounded-lg p-4 border-2 border-pink-100">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">
+                        📜 ประวัติการขาย
+                    </h3>
+                    <div id="salesHistory" class="space-y-3 max-h-80 overflow-y-auto">
+                        <!-- Sales history will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expenses Section -->
+        <div id="expenses" class="section bg-gradient-to-br from-slate-100 to-gray-200 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+            <div class="bg-gradient-to-r from-slate-600 to-gray-600 text-white rounded-lg p-4 mb-6 shadow-md">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">💼 ระบบจัดการค่าใช้จ่ายคงที่</h2>
+                <p class="text-slate-100">จัดการค่าเช่า ค่าไฟ ค่าน้ำ และค่าใช้จ่ายประจำอื่นๆ</p>
+            </div>
+            
+            <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
+                <!-- เพิ่มค่าใช้จ่ายใหม่ -->
+                <div class="bg-slate-50 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold mb-4 text-slate-800 border-b border-slate-200 pb-2">
+                        ➕ เพิ่มค่าใช้จ่ายใหม่
+                    </h3>
+                    <div class="space-y-4">
+                        <!-- ประเภทค่าใช้จ่าย -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">ประเภทค่าใช้จ่าย</label>
+                            <select id="expenseType" class="w-full p-3 border rounded-lg text-sm" onchange="updateExpenseTypeInfo()">
+                                <option value="">เลือกประเภท</option>
+                                <option value="rent">🏠 ค่าเช่าร้าน/บ้าน</option>
+                                <option value="utilities">⚡ ค่าสาธารณูปโภค (ไฟ/น้ำ/แก๊ส)</option>
+                                <option value="insurance">🛡️ ค่าประกันภัย</option>
+                                <option value="equipment">🔧 ค่าเช่าอุปกรณ์</option>
+                                <option value="license">📋 ค่าใบอนุญาต/ภาษี</option>
+                                <option value="marketing">📢 ค่าโฆษณา/การตลาด</option>
+                                <option value="salary">👥 เงินเดือน/ค่าแรง</option>
+                                <option value="maintenance">🔨 ค่าบำรุงรักษา</option>
+                                <option value="other">📝 อื่นๆ</option>
+                            </select>
+                        </div>
+                        
+                        <!-- รายละเอียด -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">รายละเอียด</label>
+                            <input type="text" id="expenseDescription" placeholder="เช่น ค่าเช่าร้าน เดือนมกราคม" class="w-full p-3 border rounded-lg text-sm">
+                        </div>
+                        
+                        <!-- จำนวนเงิน -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนเงิน (บาท)</label>
+                            <input type="number" id="expenseAmount" placeholder="เช่น 15000" class="w-full p-3 border rounded-lg text-sm" oninput="calculateExpenseImpact()">
+                        </div>
+                        
+                        <!-- ประเภทการจ่าย -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">ประเภทการจ่าย</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" name="expenseFrequency" value="monthly" class="mr-2" onchange="updateExpenseFrequency()" checked>
+                                    <span class="text-sm">รายเดือน (จ่ายทุกเดือน)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="expenseFrequency" value="yearly" class="mr-2" onchange="updateExpenseFrequency()">
+                                    <span class="text-sm">รายปี (จ่ายครั้งเดียวต่อปี)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="expenseFrequency" value="one-time" class="mr-2" onchange="updateExpenseFrequency()">
+                                    <span class="text-sm">ครั้งเดียว (จ่ายเฉพาะครั้งนี้)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- วันที่จ่าย -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">วันที่จ่าย</label>
+                            <input type="date" id="expenseDate" class="w-full p-3 border rounded-lg text-sm" value="">
+                        </div>
+                        
+                        <!-- การคำนวณผลกระทบ -->
+                        <div id="expenseImpact" class="hidden bg-orange-100 p-3 rounded-lg border border-orange-300">
+                            <h5 class="font-medium text-orange-800 mb-2 text-sm">📊 ผลกระทบต่อต้นทุน</h5>
+                            <div id="impactCalculation" class="text-sm text-orange-700">
+                                <!-- Impact calculation will be shown here -->
+                            </div>
+                        </div>
+                        
+                        <button onclick="addExpense()" id="addExpenseBtn" class="w-full bg-slate-500 text-white p-3 rounded-lg hover:bg-slate-600 disabled:bg-gray-400 text-sm font-medium" disabled>เพิ่มค่าใช้จ่าย</button>
+                    </div>
+                </div>
+                
+                <!-- รายการค่าใช้จ่าย -->
+                <div class="bg-white rounded-lg p-4 border-2 border-slate-100">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">
+                            📋 รายการค่าใช้จ่าย
                         </h3>
-                        <div id="productStock" class="space-y-2 max-h-40 overflow-y-auto">
-                            <!-- Product stock will be displayed here -->
+                        <div class="text-sm text-gray-600">
+                            <span id="expensesCount">0</span> รายการ
                         </div>
                     </div>
                     
-                    <!-- ประวัติการขาย -->
-                    <div class="bg-white rounded-lg p-4 border-2 border-pink-100">
-                        <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">
-                            📜 ประวัติการขาย
-                        </h3>
-                        <div id="salesHistory" class="space-y-3 max-h-40 overflow-y-auto">
-                            <!-- Sales history will be displayed here -->
+                    <!-- สรุปค่าใช้จ่ายรายเดือน -->
+                    <div class="mb-4 p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-lg border border-red-200">
+                        <h4 class="font-medium text-red-800 mb-3 text-sm">💰 สรุปค่าใช้จ่ายรายเดือน</h4>
+                        <div id="monthlyExpensesSummary" class="space-y-2">
+                            <!-- Monthly expenses summary will be shown here -->
                         </div>
+                    </div>
+                    
+                    <!-- Filter Options -->
+                    <div class="mb-4">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterExpenses('all')" class="expense-filter-btn active px-3 py-1 rounded-full text-xs bg-slate-500 text-white hover:bg-slate-600">
+                                ทั้งหมด
+                            </button>
+                            <button onclick="filterExpenses('monthly')" class="expense-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                📅 รายเดือน
+                            </button>
+                            <button onclick="filterExpenses('yearly')" class="expense-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                📆 รายปี
+                            </button>
+                            <button onclick="filterExpenses('rent')" class="expense-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                🏠 ค่าเช่า
+                            </button>
+                            <button onclick="filterExpenses('utilities')" class="expense-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                ⚡ สาธารณูปโภค
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="expensesList" class="space-y-3 max-h-80 overflow-y-auto">
+                        <!-- Expenses list will be displayed here -->
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Reports Section -->
-        <div id="reports" class="section bg-gradient-to-br from-teal-50 to-cyan-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
-            <div class="border-b border-gray-200 pb-4 mb-6">
-                <h2 class="text-xl sm:text-2xl font-bold text-teal-800 mb-2">📊 ระบบรายงาน</h2>
-                <p class="text-sm text-gray-600">วิเคราะห์ยอดขายและพฤติกรรมลูกค้า</p>
+        <div id="reports" class="section bg-gradient-to-br from-teal-100 to-cyan-200 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+            <div class="bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg p-4 mb-6 shadow-md">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">📊 ระบบรายงาน</h2>
+                <p class="text-teal-100">วิเคราะห์ยอดขายและพฤติกรรมลูกค้า</p>
             </div>
             
             <!-- Report Navigation -->
@@ -692,10 +876,10 @@
         </div>
 
         <!-- Pricing Section -->
-        <div id="pricing" class="section bg-gradient-to-br from-yellow-50 to-amber-100 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
-            <div class="border-b border-gray-200 pb-4 mb-6">
-                <h2 class="text-xl sm:text-2xl font-bold text-yellow-800 mb-2">💲 ระบบจัดการราคาขาย</h2>
-                <p class="text-sm text-gray-600">กำหนดราคาขายและคำนวณกำไรสำหรับแต่ละสินค้า</p>
+        <div id="pricing" class="section bg-gradient-to-br from-yellow-100 to-amber-200 rounded-xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 hidden">
+            <div class="bg-gradient-to-r from-yellow-600 to-amber-600 text-white rounded-lg p-4 mb-6 shadow-md">
+                <h2 class="text-xl sm:text-2xl font-bold mb-2">💲 ระบบจัดการราคาขาย</h2>
+                <p class="text-yellow-100">กำหนดราคาขายและคำนวณกำไรสำหรับแต่ละสินค้า</p>
             </div>
             
             <div class="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
@@ -830,7 +1014,7 @@
         let recipes = JSON.parse(localStorage.getItem('bakery_recipes') || '[]');
         let productions = JSON.parse(localStorage.getItem('bakery_productions') || '[]');
         let sales = JSON.parse(localStorage.getItem('bakery_sales') || '[]');
-        let productStock = JSON.parse(localStorage.getItem('bakery_product_stock') || '{}');
+        let expenses = JSON.parse(localStorage.getItem('bakery_expenses') || '[]');
 
         let productPricing = JSON.parse(localStorage.getItem('bakery_product_pricing') || '{}');
         
@@ -847,33 +1031,44 @@
         // Pricing filter state
         let currentPricingFilter = 'all';
         let filteredPricing = [];
+        
+        // Expenses filter state
+        let currentExpenseFilter = 'all';
+        let filteredExpenses = [];
 
         // Navigation
+        function toggleNavDropdown() {
+            const dropdown = document.getElementById('navDropdown');
+            const arrow = document.getElementById('dropdownArrow');
+            
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                dropdown.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function selectSection(sectionName, icon, name, category) {
+            // Hide dropdown
+            document.getElementById('navDropdown').classList.add('hidden');
+            document.getElementById('dropdownArrow').style.transform = 'rotate(0deg)';
+            
+            // Update current section display
+            document.getElementById('currentSectionIcon').textContent = icon;
+            document.getElementById('currentSectionName').textContent = name;
+            document.getElementById('currentSectionCategory').textContent = category;
+            
+            // Show selected section
+            showSection(sectionName);
+        }
+
         function showSection(sectionName) {
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.add('hidden');
             });
             document.getElementById(sectionName).classList.remove('hidden');
-            
-            // Update navigation buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-indigo-500', 'bg-pink-500', 'bg-teal-500', 'bg-orange-500', 'text-white');
-                btn.classList.add('bg-gray-50', 'hover:bg-gray-100');
-            });
-            
-            // Add active state to clicked button
-            const targetBtn = event.target.closest('.nav-btn');
-            if (targetBtn) {
-                targetBtn.classList.remove('bg-gray-50', 'hover:bg-gray-100');
-                if (sectionName === 'inventory') targetBtn.classList.add('bg-blue-500', 'text-white');
-                if (sectionName === 'purchase') targetBtn.classList.add('bg-green-500', 'text-white');
-                if (sectionName === 'recipes') targetBtn.classList.add('bg-purple-500', 'text-white');
-                if (sectionName === 'production') targetBtn.classList.add('bg-indigo-500', 'text-white');
-                if (sectionName === 'sales') targetBtn.classList.add('bg-pink-500', 'text-white');
-                if (sectionName === 'reports') targetBtn.classList.add('bg-teal-500', 'text-white');
-    
-                if (sectionName === 'pricing') targetBtn.classList.add('bg-yellow-500', 'text-white');
-            }
             
             // Refresh data when switching sections
             if (sectionName === 'inventory') updateInventoryDisplay();
@@ -881,10 +1076,21 @@
             if (sectionName === 'recipes') updateRecipeOptions();
             if (sectionName === 'production') updateProductionOptions();
             if (sectionName === 'sales') updateSalesOptions();
+            if (sectionName === 'expenses') updateExpensesOptions();
             if (sectionName === 'reports') initializeReports();
-
             if (sectionName === 'pricing') updatePricingOptions();
         }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('navDropdown');
+            const button = event.target.closest('button[onclick="toggleNavDropdown()"]');
+            
+            if (!button && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+                document.getElementById('dropdownArrow').style.transform = 'rotate(0deg)';
+            }
+        });
 
         // Price calculation function
         function calculateUnitPrice() {
@@ -1805,16 +2011,9 @@
                 timestamp: new Date().toLocaleString('th-TH')
             });
             
-            // Add to product stock
-            if (!productStock[recipeName]) {
-                productStock[recipeName] = 0;
-            }
-            productStock[recipeName] += quantity;
-            
-            // Save data
+            // Save data (no need to save product stock anymore)
             localStorage.setItem('bakery_inventory', JSON.stringify(inventory));
             localStorage.setItem('bakery_productions', JSON.stringify(productions));
-            localStorage.setItem('bakery_product_stock', JSON.stringify(productStock));
             
             // Update displays
             updateInventoryDisplay();
@@ -1835,8 +2034,8 @@
                 message += `🧂 ต้นทุนส่วนผสมเพิ่ม: ${ingredientsCost.toFixed(2)} บาท\n`;
             }
             message += `💰 ต้นทุนรวม: ${totalCost.toFixed(2)} บาท\n`;
-            message += `🎯 ต้นทุนต่อชิ้น: ${(totalCost / quantity).toFixed(2)} บาท\n`;
-            message += `📦 เพิ่มเข้าสต็อกสินค้า: ${quantity} หน่วย`;
+            message += `🎯 ต้นทุนต่อชิ้น: ${(totalCost / quantity).toFixed(2)} บาท\n\n`;
+            message += `🧁 ขนมสดใหม่พร้อมขาย - ไม่มีการเก็บสต็อก`;
             
             alert(message);
         }
@@ -2782,27 +2981,16 @@
         function updateSalesOptions() {
             const select = document.getElementById('saleProduct');
             
-            // Filter recipes to show only those that have been produced (have stock or production history)
-            const producedRecipes = recipes.filter(recipe => {
-                const stock = productStock[recipe.name] || 0;
-                const hasProduction = productions.some(p => p.recipeName === recipe.name);
-                return stock > 0 || hasProduction;
-            });
-            
-            if (producedRecipes.length === 0) {
-                select.innerHTML = '<option value="">ยังไม่มีสินค้าที่ผลิตแล้ว</option>';
+            // Show all recipes that have been created (no stock checking needed for daily fresh products)
+            if (recipes.length === 0) {
+                select.innerHTML = '<option value="">ยังไม่มีสูตรสินค้า</option>';
             } else {
                 select.innerHTML = '<option value="">เลือกสินค้า</option>' + 
-                    producedRecipes.map(recipe => {
-                        const stock = productStock[recipe.name] || 0;
-                        const stockStatus = stock > 0 ? `เหลือ: ${stock} หน่วย` : 'หมด';
-                        return `<option value="${recipe.name}" data-cost="${recipe.costPerUnit}" ${stock === 0 ? 'disabled' : ''}>${recipe.name} (${stockStatus})</option>`;
-                    }).join('');
+                    recipes.map(recipe => `<option value="${recipe.name}" data-cost="${recipe.costPerUnit}">${recipe.name} (ต้นทุน: ${recipe.costPerUnit.toFixed(2)} บาท)</option>`).join('');
             }
             
             updateSalesHistory();
             updateTodaySummary();
-            updateProductStock();
         }
 
         function updateSaleInfo() {
@@ -2816,7 +3004,6 @@
             }
             
             const recipe = recipes.find(r => r.name === productName);
-            const stock = productStock[productName] || 0;
             const pricing = productPricing[productName];
             
             if (!recipe) return;
@@ -2850,14 +3037,23 @@
                     <div><strong>สินค้า:</strong> ${recipe.name}</div>
                     <div><strong>ต้นทุนต่อหน่วย:</strong> ${recipe.costPerUnit.toFixed(2)} บาท</div>
                     ${pricingInfo}
-                    <div class="text-blue-600"><strong>คงเหลือในสต็อก:</strong> ${stock} หน่วย</div>
-                    ${todayProduced > 0 ? `<div class="text-green-600"><strong>ผลิตวันนี้:</strong> ${todayProduced} หน่วย</div>` : ''}
+                    ${todayProduced > 0 ? `
+                        <div class="text-green-600 bg-green-50 p-2 rounded border border-green-200">
+                            <strong>🏭 ผลิตวันนี้:</strong> ${todayProduced} หน่วย
+                        </div>
+                    ` : `
+                        <div class="text-orange-600 bg-orange-50 p-2 rounded border border-orange-200">
+                            <strong>⚠️ ยังไม่มีการผลิตวันนี้</strong> - ไปที่หน้าการผลิตก่อน
+                        </div>
+                    `}
+                    <div class="text-blue-600 text-sm mt-2 bg-blue-50 p-2 rounded">
+                        💡 <strong>วิธีใช้:</strong> ใส่จำนวนที่เหลือ ระบบจะคำนวณขายได้ให้อัตโนมัติ
+                    </div>
                 </div>
             `;
             
             // Clear previous calculations
-            document.getElementById('saleQuantity').value = '';
-            document.getElementById('remainingStock').value = '';
+            document.getElementById('remainingQuantity').value = '';
             if (!pricing || !pricing.sellingPrice) {
                 document.getElementById('salePrice').value = '';
             }
@@ -2867,68 +3063,85 @@
 
 
 
-        function calculateFromRemaining() {
+
+
+        function calculateSoldQuantity() {
             const productName = document.getElementById('saleProduct').value;
-            const remainingStock = parseFloat(document.getElementById('remainingStock').value);
+            const remainingQuantity = parseFloat(document.getElementById('remainingQuantity').value);
             
-            if (!productName || isNaN(remainingStock) || remainingStock < 0) {
-                // Clear sale quantity if invalid input
-                document.getElementById('saleQuantity').value = '';
-                calculateSaleTotal();
+            if (!productName || isNaN(remainingQuantity) || remainingQuantity < 0) {
+                document.getElementById('saleCalculation').classList.add('hidden');
+                document.getElementById('recordSaleBtn').disabled = true;
                 return;
             }
             
-            const currentStock = productStock[productName] || 0;
+            // Get today's production for this product
+            const today = new Date().toISOString().split('T')[0];
+            const todayProductions = productions.filter(p => 
+                p.productionDate === today && p.recipeName === productName
+            );
+            const todayProduced = todayProductions.reduce((sum, p) => sum + p.quantity, 0);
             
-            // Validate that remaining stock doesn't exceed current stock
-            if (remainingStock > currentStock) {
-                alert(`จำนวนที่เหลือไม่สามารถมากกว่าสต็อกปัจจุบัน (${currentStock} หน่วย)`);
-                document.getElementById('remainingStock').value = '';
-                document.getElementById('saleQuantity').value = '';
-                calculateSaleTotal();
+            if (todayProduced === 0) {
+                alert('ยังไม่มีการผลิตสินค้านี้วันนี้ กรุณาไปที่หน้าการผลิตก่อน');
+                document.getElementById('remainingQuantity').value = '';
                 return;
             }
             
-            // Calculate sold quantity from current stock
-            const soldQuantity = Math.max(0, currentStock - remainingStock);
+            if (remainingQuantity > todayProduced) {
+                alert(`จำนวนที่เหลือ (${remainingQuantity}) มากกว่าที่ผลิตวันนี้ (${todayProduced}) กรุณาตรวจสอบ`);
+                document.getElementById('remainingQuantity').value = '';
+                return;
+            }
             
-            // Update the sale quantity field
-            document.getElementById('saleQuantity').value = soldQuantity;
+            // Calculate sold quantity
+            const soldQuantity = todayProduced - remainingQuantity;
             
-            // Trigger calculation
-            calculateSaleTotal();
+            // Update the display and trigger price calculation
+            calculateSaleTotal(soldQuantity);
         }
 
-        function calculateSaleTotal() {
+        function calculateSaleTotal(soldQuantity = null) {
             const productName = document.getElementById('saleProduct').value;
-            const quantity = parseFloat(document.getElementById('saleQuantity').value);
+            const remainingQuantity = parseFloat(document.getElementById('remainingQuantity').value);
             const salePrice = parseFloat(document.getElementById('salePrice').value);
             const saleCalculation = document.getElementById('saleCalculation');
             const saleDetails = document.getElementById('saleDetails');
             const recordSaleBtn = document.getElementById('recordSaleBtn');
             
-            if (!productName || isNaN(quantity) || isNaN(salePrice) || quantity <= 0 || salePrice <= 0) {
+            if (!productName) {
+                saleCalculation.classList.add('hidden');
+                recordSaleBtn.disabled = true;
+                return;
+            }
+            
+            // Get today's production for this product
+            const today = new Date().toISOString().split('T')[0];
+            const todayProductions = productions.filter(p => 
+                p.productionDate === today && p.recipeName === productName
+            );
+            const todayProduced = todayProductions.reduce((sum, p) => sum + p.quantity, 0);
+            
+            // Calculate sold quantity
+            let quantity;
+            if (soldQuantity !== null) {
+                quantity = soldQuantity;
+            } else if (!isNaN(remainingQuantity) && remainingQuantity >= 0) {
+                quantity = todayProduced - remainingQuantity;
+            } else {
+                saleCalculation.classList.add('hidden');
+                recordSaleBtn.disabled = true;
+                return;
+            }
+            
+            if (isNaN(salePrice) || salePrice <= 0 || quantity < 0) {
                 saleCalculation.classList.add('hidden');
                 recordSaleBtn.disabled = true;
                 return;
             }
             
             const recipe = recipes.find(r => r.name === productName);
-            const stock = productStock[productName] || 0;
-            
             if (!recipe) return;
-            
-            // Check if enough stock
-            if (quantity > stock) {
-                saleCalculation.classList.remove('hidden');
-                saleDetails.innerHTML = `
-                    <div class="text-red-600 font-medium">⚠️ สต็อกไม่เพียงพอ!</div>
-                    <div class="text-red-600 text-sm">ต้องการ: ${quantity} หน่วย | มีอยู่: ${stock} หน่วย</div>
-                    <div class="text-red-600 text-xs mt-1">กรุณาปรับจำนวนที่ขายให้น้อยกว่าหรือเท่ากับสต็อกที่มี</div>
-                `;
-                recordSaleBtn.disabled = true;
-                return;
-            }
             
             const totalRevenue = quantity * salePrice;
             const totalCost = quantity * recipe.costPerUnit;
@@ -2937,29 +3150,52 @@
             
             saleCalculation.classList.remove('hidden');
             saleDetails.innerHTML = `
-                <div class="space-y-1">
-                    <div class="flex justify-between">
-                        <span>ยอดขาย:</span>
-                        <span class="font-medium">${totalRevenue.toFixed(2)} บาท</span>
+                <div class="space-y-2">
+                    <!-- Calculation Summary -->
+                    <div class="bg-blue-50 p-3 rounded border border-blue-200">
+                        <div class="font-medium text-blue-800 mb-2">📊 การคำนวณ</div>
+                        <div class="text-sm text-blue-700 space-y-1">
+                            <div class="flex justify-between">
+                                <span>ผลิตวันนี้:</span>
+                                <span class="font-medium">${todayProduced} หน่วย</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>เหลือ:</span>
+                                <span class="font-medium">${remainingQuantity} หน่วย</span>
+                            </div>
+                            <div class="flex justify-between border-t border-blue-300 pt-1">
+                                <span class="font-medium">ขายได้:</span>
+                                <span class="font-bold text-blue-800">${quantity} หน่วย</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex justify-between">
-                        <span>ต้นทุน:</span>
-                        <span>${totalCost.toFixed(2)} บาท</span>
+                    
+                    <!-- Financial Summary -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between">
+                            <span>ยอดขาย:</span>
+                            <span class="font-medium">${totalRevenue.toFixed(2)} บาท</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>ต้นทุน:</span>
+                            <span>${totalCost.toFixed(2)} บาท</span>
+                        </div>
+                        <div class="flex justify-between border-t pt-1">
+                            <span>กำไร:</span>
+                            <span class="font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}">${profit.toFixed(2)} บาท</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>กำไรต่อหน่วย:</span>
+                            <span class="text-sm">${quantity > 0 ? (profit / quantity).toFixed(2) : '0'} บาท</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>อัตรากำไร:</span>
+                            <span class="text-sm">${profitMargin}%</span>
+                        </div>
                     </div>
-                    <div class="flex justify-between border-t pt-1">
-                        <span>กำไร:</span>
-                        <span class="font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}">${profit.toFixed(2)} บาท</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>กำไรต่อหน่วย:</span>
-                        <span class="text-sm">${(profit / quantity).toFixed(2)} บาท</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>อัตรากำไร:</span>
-                        <span class="text-sm">${profitMargin}%</span>
-                    </div>
-                    <div class="text-blue-600 text-sm mt-2 bg-blue-50 p-2 rounded">
-                        📦 เหลือในสต็อกหลังขาย: <span class="font-bold">${stock - quantity} หน่วย</span>
+                    
+                    <div class="text-green-600 text-sm mt-2 bg-green-50 p-2 rounded">
+                        ✅ <strong>พร้อมบันทึกการขาย</strong> - คำนวณจากจำนวนที่เหลือ
                     </div>
                 </div>
             `;
@@ -2969,108 +3205,86 @@
 
         function recordSale() {
             const productName = document.getElementById('saleProduct').value;
-            const quantity = parseFloat(document.getElementById('saleQuantity').value);
+            const remainingQuantity = parseFloat(document.getElementById('remainingQuantity').value);
             const salePrice = parseFloat(document.getElementById('salePrice').value);
 
-            if (!productName || !quantity || !salePrice) {
+            if (!productName || isNaN(remainingQuantity) || !salePrice) {
                 alert('กรุณากรอกข้อมูลให้ครบถ้วน');
                 return;
             }
 
             const recipe = recipes.find(r => r.name === productName);
-            const stock = productStock[productName] || 0;
-
             if (!recipe) {
                 alert('ไม่พบสูตรสินค้า');
                 return;
             }
 
-            if (quantity > stock) {
-                alert(`สต็อกไม่เพียงพอ! มีอยู่ ${stock} หน่วย ต้องการ ${quantity} หน่วย`);
+            // Get today's production for this product
+            const today = new Date().toISOString().split('T')[0];
+            const todayProductions = productions.filter(p => 
+                p.productionDate === today && p.recipeName === productName
+            );
+            const todayProduced = todayProductions.reduce((sum, p) => sum + p.quantity, 0);
+
+            if (todayProduced === 0) {
+                alert('ยังไม่มีการผลิตสินค้านี้วันนี้');
                 return;
             }
 
-            const totalRevenue = quantity * salePrice;
-            const totalCost = quantity * recipe.costPerUnit;
-            const profit = totalRevenue - totalCost;
+            if (remainingQuantity > todayProduced) {
+                alert(`จำนวนที่เหลือ (${remainingQuantity}) มากกว่าที่ผลิตวันนี้ (${todayProduced})`);
+                return;
+            }
 
-            // Deduct from stock
-            productStock[productName] = stock - quantity;
+            // Calculate sold quantity
+            const soldQuantity = todayProduced - remainingQuantity;
+
+            if (soldQuantity < 0) {
+                alert('จำนวนที่ขายได้ไม่สามารถติดลบได้');
+                return;
+            }
+
+            const totalRevenue = soldQuantity * salePrice;
+            const totalCost = soldQuantity * recipe.costPerUnit;
+            const profit = totalRevenue - totalCost;
 
             sales.push({
                 id: Date.now(),
                 productName,
-                quantity,
+                quantity: soldQuantity,
+                remainingQuantity,
+                producedQuantity: todayProduced,
                 salePrice,
                 totalRevenue,
                 totalCost,
                 profit,
+                calculationMethod: 'remaining', // Mark this as calculated from remaining
                 date: new Date().toLocaleDateString('th-TH'),
                 time: new Date().toLocaleTimeString('th-TH')
             });
 
             localStorage.setItem('bakery_sales', JSON.stringify(sales));
-            localStorage.setItem('bakery_product_stock', JSON.stringify(productStock));
             
             updateSalesHistory();
             updateTodaySummary();
-            updateProductStock();
-            updateSalesOptions(); // Update stock display in dropdown
             
             // Clear form
-            document.getElementById('saleQuantity').value = '';
-            document.getElementById('remainingStock').value = '';
+            document.getElementById('remainingQuantity').value = '';
             document.getElementById('salePrice').value = '';
             document.getElementById('saleCalculation').classList.add('hidden');
             document.getElementById('recordSaleBtn').disabled = true;
             
             alert(`บันทึกการขายสำเร็จ!\n\n` +
                   `สินค้า: ${productName}\n` +
-                  `จำนวน: ${quantity} หน่วย\n` +
+                  `ผลิตวันนี้: ${todayProduced} หน่วย\n` +
+                  `เหลือ: ${remainingQuantity} หน่วย\n` +
+                  `ขายได้: ${soldQuantity} หน่วย\n` +
                   `ยอดขาย: ${totalRevenue.toFixed(2)} บาท\n` +
-                  `กำไร: ${profit.toFixed(2)} บาท\n` +
-                  `เหลือในสต็อก: ${productStock[productName]} หน่วย`);
+                  `กำไร: ${profit.toFixed(2)} บาท\n\n` +
+                  `💡 คำนวณจากจำนวนที่เหลือ - ง่ายและแม่นยำ!`);
         }
 
-        function updateProductStock() {
-            const list = document.getElementById('productStock');
-            
-            if (recipes.length === 0) {
-                list.innerHTML = '<div class="text-center text-gray-500 py-4">ยังไม่มีสูตรสินค้า</div>';
-                return;
-            }
-            
-            list.innerHTML = recipes.map(recipe => {
-                const stock = productStock[recipe.name] || 0;
-                const lowStock = stock < 5; // Warning when stock is less than 5
-                
-                return `
-                    <div class="bg-white border ${lowStock ? 'border-red-200' : 'border-blue-200'} rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
-                        <div class="px-3 py-2 bg-gradient-to-r ${lowStock ? 'from-red-50 to-red-100' : 'from-blue-50 to-blue-100'} border-b ${lowStock ? 'border-red-200' : 'border-blue-200'}">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 rounded-full ${lowStock ? 'bg-red-100' : 'bg-blue-100'} flex items-center justify-center">
-                                        <span class="text-sm">${lowStock ? '⚠️' : '📦'}</span>
-                                    </div>
-                                    <h4 class="font-medium text-sm text-gray-800">${recipe.name}</h4>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-lg font-bold ${lowStock ? 'text-red-600' : 'text-blue-600'}">${stock}</div>
-                                    <div class="text-xs ${lowStock ? 'text-red-500' : 'text-blue-500'}">หน่วย</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-3 py-2">
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="text-gray-600">ต้นทุน/หน่วย:</span>
-                                <span class="font-medium text-gray-800">${recipe.costPerUnit.toFixed(2)} บาท</span>
-                            </div>
-                            ${lowStock ? '<div class="text-red-500 text-xs font-medium mt-1">⚠️ สต็อกใกล้หมด</div>' : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+
 
         function updateSalesHistory() {
             const list = document.getElementById('salesHistory');
@@ -3105,9 +3319,33 @@
                     <!-- Content -->
                     <div class="p-4 space-y-3">
                         <!-- Sale Details -->
+                        ${sale.calculationMethod === 'remaining' ? `
+                        <!-- Calculation from Remaining -->
+                        <div class="bg-blue-50 rounded-lg p-3 border border-blue-200 mb-3">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-blue-600">🧮</span>
+                                <h5 class="font-medium text-blue-800 text-sm">การคำนวณจากจำนวนที่เหลือ</h5>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3 text-sm">
+                                <div class="text-center">
+                                    <div class="text-xs text-blue-600 mb-1">ผลิต</div>
+                                    <div class="font-bold text-blue-700">${sale.producedQuantity || sale.quantity}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xs text-blue-600 mb-1">เหลือ</div>
+                                    <div class="font-bold text-blue-700">${sale.remainingQuantity || 0}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xs text-blue-600 mb-1">ขายได้</div>
+                                    <div class="font-bold text-blue-800">${sale.quantity}</div>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
                         <div class="grid grid-cols-3 gap-4">
                             <div class="bg-gray-50 rounded-lg p-3">
-                                <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">จำนวน</div>
+                                <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">ขายได้</div>
                                 <div class="text-lg font-bold text-gray-800">${sale.quantity}</div>
                                 <div class="text-sm text-gray-600">หน่วย</div>
                             </div>
@@ -4037,51 +4275,480 @@
             return new Date();
         }
 
+        // Expenses Management
+        function updateExpensesOptions() {
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseDate').value = today;
+            
+            // Initialize filtered expenses and update display
+            filteredExpenses = [...expenses];
+            updateExpensesList();
+            updateMonthlyExpensesSummary();
+        }
+
+        function updateExpenseTypeInfo() {
+            const expenseType = document.getElementById('expenseType').value;
+            const descriptionInput = document.getElementById('expenseDescription');
+            
+            // Auto-suggest description based on type
+            const suggestions = {
+                'rent': 'ค่าเช่าร้าน/บ้าน',
+                'utilities': 'ค่าไฟฟ้า/น้ำประปา/แก๊ส',
+                'insurance': 'ค่าประกันภัย',
+                'equipment': 'ค่าเช่าอุปกรณ์',
+                'license': 'ค่าใบอนุญาต/ภาษี',
+                'marketing': 'ค่าโฆษณา/การตลาด',
+                'salary': 'เงินเดือน/ค่าแรง',
+                'maintenance': 'ค่าบำรุงรักษา',
+                'other': 'ค่าใช้จ่ายอื่นๆ'
+            };
+            
+            if (expenseType && suggestions[expenseType]) {
+                descriptionInput.placeholder = `เช่น ${suggestions[expenseType]} เดือน${new Date().toLocaleDateString('th-TH', { month: 'long' })}`;
+            }
+            
+            validateExpenseForm();
+        }
+
+        function updateExpenseFrequency() {
+            calculateExpenseImpact();
+        }
+
+        function calculateExpenseImpact() {
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const frequency = document.querySelector('input[name="expenseFrequency"]:checked')?.value;
+            const expenseImpact = document.getElementById('expenseImpact');
+            const impactCalculation = document.getElementById('impactCalculation');
+            
+            if (!amount || !frequency || amount <= 0) {
+                expenseImpact.classList.add('hidden');
+                validateExpenseForm();
+                return;
+            }
+            
+            // Calculate monthly impact
+            let monthlyImpact = 0;
+            let dailyImpact = 0;
+            let explanation = '';
+            
+            switch (frequency) {
+                case 'monthly':
+                    monthlyImpact = amount;
+                    dailyImpact = amount / 30;
+                    explanation = `ค่าใช้จ่าย ${amount.toLocaleString()} บาท/เดือน`;
+                    break;
+                case 'yearly':
+                    monthlyImpact = amount / 12;
+                    dailyImpact = amount / 365;
+                    explanation = `ค่าใช้จ่าย ${amount.toLocaleString()} บาท/ปี = ${monthlyImpact.toFixed(2)} บาท/เดือน`;
+                    break;
+                case 'one-time':
+                    monthlyImpact = 0;
+                    dailyImpact = 0;
+                    explanation = `ค่าใช้จ่ายครั้งเดียว ${amount.toLocaleString()} บาท (ไม่กระทบต้นทุนประจำ)`;
+                    break;
+            }
+            
+            expenseImpact.classList.remove('hidden');
+            impactCalculation.innerHTML = `
+                <div class="space-y-2">
+                    <div><strong>📊 การคำนวณ:</strong> ${explanation}</div>
+                    ${frequency !== 'one-time' ? `
+                        <div><strong>💰 ผลกระทบรายเดือน:</strong> ${monthlyImpact.toFixed(2)} บาท</div>
+                        <div><strong>📅 ผลกระทบรายวัน:</strong> ${dailyImpact.toFixed(2)} บาท</div>
+                        <div class="text-orange-600 bg-orange-50 p-2 rounded text-xs mt-2">
+                            💡 <strong>คำแนะนำ:</strong> ควรพิจารณาเพิ่มต้นทุนนี้ในการคำนวณราคาขายสินค้า
+                        </div>
+                    ` : `
+                        <div class="text-blue-600 bg-blue-50 p-2 rounded text-xs mt-2">
+                            💡 <strong>หมายเหตุ:</strong> ค่าใช้จ่ายครั้งเดียวจะไม่กระทบต่อต้นทุนการผลิตประจำ
+                        </div>
+                    `}
+                </div>
+            `;
+            
+            validateExpenseForm();
+        }
+
+        function validateExpenseForm() {
+            const expenseType = document.getElementById('expenseType').value;
+            const description = document.getElementById('expenseDescription').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const date = document.getElementById('expenseDate').value;
+            const addExpenseBtn = document.getElementById('addExpenseBtn');
+            
+            const isValid = expenseType && description && amount > 0 && date;
+            addExpenseBtn.disabled = !isValid;
+        }
+
+        function addExpense() {
+            const expenseType = document.getElementById('expenseType').value;
+            const description = document.getElementById('expenseDescription').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const frequency = document.querySelector('input[name="expenseFrequency"]:checked').value;
+            const date = document.getElementById('expenseDate').value;
+            
+            if (!expenseType || !description || !amount || !frequency || !date) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+            
+            // Calculate monthly impact for budgeting
+            let monthlyImpact = 0;
+            switch (frequency) {
+                case 'monthly':
+                    monthlyImpact = amount;
+                    break;
+                case 'yearly':
+                    monthlyImpact = amount / 12;
+                    break;
+                case 'one-time':
+                    monthlyImpact = 0;
+                    break;
+            }
+            
+            const newExpense = {
+                id: Date.now(),
+                type: expenseType,
+                description,
+                amount,
+                frequency,
+                monthlyImpact,
+                date,
+                dateAdded: new Date().toLocaleDateString('th-TH'),
+                timeAdded: new Date().toLocaleTimeString('th-TH')
+            };
+            
+            expenses.push(newExpense);
+            localStorage.setItem('bakery_expenses', JSON.stringify(expenses));
+            
+            // Update displays
+            updateExpensesList();
+            updateMonthlyExpensesSummary();
+            
+            // Clear form
+            clearExpenseForm();
+            
+            // Show success message
+            let message = `เพิ่มค่าใช้จ่าย "${description}" สำเร็จ!\n\n`;
+            message += `ประเภท: ${getExpenseTypeName(expenseType)}\n`;
+            message += `จำนวน: ${amount.toLocaleString()} บาท\n`;
+            message += `ประเภทการจ่าย: ${getFrequencyName(frequency)}\n`;
+            if (monthlyImpact > 0) {
+                message += `ผลกระทบรายเดือน: ${monthlyImpact.toFixed(2)} บาท\n`;
+            }
+            message += `วันที่จ่าย: ${new Date(date).toLocaleDateString('th-TH')}`;
+            
+            alert(message);
+        }
+
+        function clearExpenseForm() {
+            document.getElementById('expenseType').value = '';
+            document.getElementById('expenseDescription').value = '';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            document.querySelector('input[name="expenseFrequency"][value="monthly"]').checked = true;
+            document.getElementById('expenseImpact').classList.add('hidden');
+            document.getElementById('addExpenseBtn').disabled = true;
+        }
+
+        function getExpenseTypeName(type) {
+            const names = {
+                'rent': '🏠 ค่าเช่าร้าน/บ้าน',
+                'utilities': '⚡ ค่าสาธารณูปโภค',
+                'insurance': '🛡️ ค่าประกันภัย',
+                'equipment': '🔧 ค่าเช่าอุปกรณ์',
+                'license': '📋 ค่าใบอนุญาต/ภาษี',
+                'marketing': '📢 ค่าโฆษณา/การตลาด',
+                'salary': '👥 เงินเดือน/ค่าแรง',
+                'maintenance': '🔨 ค่าบำรุงรักษา',
+                'other': '📝 อื่นๆ'
+            };
+            return names[type] || type;
+        }
+
+        function getFrequencyName(frequency) {
+            const names = {
+                'monthly': 'รายเดือน',
+                'yearly': 'รายปี',
+                'one-time': 'ครั้งเดียว'
+            };
+            return names[frequency] || frequency;
+        }
+
+        function filterExpenses(filterType) {
+            currentExpenseFilter = filterType;
+            
+            // Update filter button styles
+            document.querySelectorAll('.expense-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-slate-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            event.target.classList.add('active', 'bg-slate-500', 'text-white');
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            applyExpenseFilter();
+        }
+
+        function applyExpenseFilter() {
+            if (currentExpenseFilter === 'all') {
+                filteredExpenses = [...expenses];
+            } else {
+                filteredExpenses = expenses.filter(expense => {
+                    if (currentExpenseFilter === 'monthly' || currentExpenseFilter === 'yearly' || currentExpenseFilter === 'one-time') {
+                        return expense.frequency === currentExpenseFilter;
+                    } else {
+                        return expense.type === currentExpenseFilter;
+                    }
+                });
+            }
+            
+            updateExpensesList();
+        }
+
+        function updateExpensesList() {
+            const list = document.getElementById('expensesList');
+            const countElement = document.getElementById('expensesCount');
+            
+            // Update count
+            countElement.textContent = filteredExpenses.length;
+            
+            if (expenses.length === 0) {
+                list.innerHTML = '<div class="text-center text-gray-500 py-8">ยังไม่มีค่าใช้จ่ายในระบบ<br>เพิ่มค่าใช้จ่ายแรกของคุณเลย!</div>';
+                return;
+            }
+            
+            if (filteredExpenses.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-lg mb-2">🔍 ไม่พบค่าใช้จ่ายในหมวดหมู่นี้</div>
+                        <div class="text-sm">ลองเปลี่ยนตัวกรองดู</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sortedExpenses = [...filteredExpenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            list.innerHTML = sortedExpenses.map(expense => {
+                const frequencyColor = {
+                    'monthly': 'text-red-600 bg-red-50',
+                    'yearly': 'text-blue-600 bg-blue-50',
+                    'one-time': 'text-green-600 bg-green-50'
+                };
+                
+                return `
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+                        <!-- Header -->
+                        <div class="px-4 py-3 bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                                        <span class="text-lg">${getExpenseTypeIcon(expense.type)}</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-lg text-gray-800">${expense.description}</h3>
+                                        <div class="text-sm text-slate-600">${getExpenseTypeName(expense.type)}</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-bold text-red-600">${expense.amount.toLocaleString()} บาท</div>
+                                    <div class="text-xs ${frequencyColor[expense.frequency]} px-2 py-1 rounded-full font-medium">
+                                        ${getFrequencyName(expense.frequency)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="p-4 space-y-3">
+                            <!-- Impact Analysis -->
+                            ${expense.monthlyImpact > 0 ? `
+                                <div class="bg-orange-50 rounded-lg p-3 border border-orange-200">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-orange-600">📊</span>
+                                        <h4 class="font-medium text-orange-800 text-sm">ผลกระทบต่อต้นทุน</h4>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">รายเดือน:</span>
+                                            <span class="font-medium text-orange-700">${expense.monthlyImpact.toFixed(2)} บาท</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">รายวัน:</span>
+                                            <span class="font-medium text-orange-700">${(expense.monthlyImpact / 30).toFixed(2)} บาท</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                                    <div class="text-sm text-blue-700">
+                                        💡 ค่าใช้จ่ายครั้งเดียว - ไม่กระทบต้นทุนประจำ
+                                    </div>
+                                </div>
+                            `}
+                            
+                            <!-- Date Information -->
+                            <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                                <span>วันที่จ่าย: ${new Date(expense.date).toLocaleDateString('th-TH')}</span>
+                                <span>บันทึกเมื่อ: ${expense.dateAdded} ${expense.timeAdded}</span>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="flex justify-end gap-2 pt-2">
+                                <button onclick="editExpense(${expense.id})" class="text-blue-500 hover:text-blue-700 text-sm px-3 py-1 bg-blue-50 rounded hover:bg-blue-100 transition-colors">
+                                    ✏️ แก้ไข
+                                </button>
+                                <button onclick="removeExpense(${expense.id})" class="text-red-500 hover:text-red-700 text-sm px-3 py-1 bg-red-50 rounded hover:bg-red-100 transition-colors">
+                                    🗑️ ลบ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getExpenseTypeIcon(type) {
+            const icons = {
+                'rent': '🏠',
+                'utilities': '⚡',
+                'insurance': '🛡️',
+                'equipment': '🔧',
+                'license': '📋',
+                'marketing': '📢',
+                'salary': '👥',
+                'maintenance': '🔨',
+                'other': '📝'
+            };
+            return icons[type] || '💼';
+        }
+
+        function updateMonthlyExpensesSummary() {
+            const summaryDiv = document.getElementById('monthlyExpensesSummary');
+            
+            // Calculate monthly expenses by type
+            const monthlyByType = {};
+            let totalMonthly = 0;
+            
+            expenses.forEach(expense => {
+                if (expense.monthlyImpact > 0) {
+                    const typeName = getExpenseTypeName(expense.type);
+                    if (monthlyByType[typeName]) {
+                        monthlyByType[typeName] += expense.monthlyImpact;
+                    } else {
+                        monthlyByType[typeName] = expense.monthlyImpact;
+                    }
+                    totalMonthly += expense.monthlyImpact;
+                }
+            });
+            
+            if (totalMonthly === 0) {
+                summaryDiv.innerHTML = '<div class="text-gray-500 text-sm">ยังไม่มีค่าใช้จ่ายประจำ</div>';
+                return;
+            }
+            
+            // Sort by amount (highest first)
+            const sortedTypes = Object.entries(monthlyByType).sort((a, b) => b[1] - a[1]);
+            
+            summaryDiv.innerHTML = `
+                <div class="space-y-2">
+                    ${sortedTypes.map(([typeName, amount]) => `
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">${typeName}</span>
+                            <span class="font-medium text-red-600">${amount.toFixed(2)} บาท</span>
+                        </div>
+                    `).join('')}
+                    <div class="border-t border-red-300 pt-2 mt-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium text-red-800">รวมรายเดือน:</span>
+                            <span class="font-bold text-red-800 text-lg">${totalMonthly.toFixed(2)} บาท</span>
+                        </div>
+                        <div class="text-xs text-red-600 mt-1">
+                            รายวัน: ${(totalMonthly / 30).toFixed(2)} บาท
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editExpense(id) {
+            const expense = expenses.find(e => e.id === id);
+            if (!expense) return;
+            
+            // Fill form with expense data
+            document.getElementById('expenseType').value = expense.type;
+            document.getElementById('expenseDescription').value = expense.description;
+            document.getElementById('expenseAmount').value = expense.amount;
+            document.getElementById('expenseDate').value = expense.date;
+            document.querySelector(`input[name="expenseFrequency"][value="${expense.frequency}"]`).checked = true;
+            
+            // Update form
+            updateExpenseTypeInfo();
+            calculateExpenseImpact();
+            
+            // Remove the old expense
+            removeExpense(id, false);
+            
+            // Scroll to form
+            document.getElementById('expenses').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function removeExpense(id, confirm = true) {
+            if (confirm && !window.confirm('คุณแน่ใจหรือไม่ที่จะลบค่าใช้จ่ายนี้?')) {
+                return;
+            }
+            
+            expenses = expenses.filter(expense => expense.id !== id);
+            localStorage.setItem('bakery_expenses', JSON.stringify(expenses));
+            
+            // Update displays
+            updateExpensesList();
+            updateMonthlyExpensesSummary();
+        }
+
         // Pricing Management
         function updatePricingOptions() {
             const select = document.getElementById('pricingProduct');
             if (select) {
-                // Filter recipes to show only those that have been produced (have stock or production history)
-                const producedRecipes = recipes.filter(recipe => {
-                    const stock = productStock[recipe.name] || 0;
-                    const hasProduction = productions.some(p => p.recipeName === recipe.name);
-                    return stock > 0 || hasProduction;
-                });
-                
-                if (producedRecipes.length === 0) {
-                    select.innerHTML = '<option value="">ยังไม่มีสินค้าที่ผลิตแล้ว</option>';
+                // Show all recipes (no stock checking needed for daily fresh products)
+                if (recipes.length === 0) {
+                    select.innerHTML = '<option value="">ยังไม่มีสูตรสินค้า</option>';
                 } else {
                     select.innerHTML = '<option value="">เลือกสินค้า</option>' + 
-                        producedRecipes.map(recipe => `<option value="${recipe.name}">${recipe.name} (ต้นทุน: ${recipe.costPerUnit.toFixed(2)} บาท)</option>`).join('');
+                        recipes.map(recipe => `<option value="${recipe.name}">${recipe.name} (ต้นทุน: ${recipe.costPerUnit.toFixed(2)} บาท)</option>`).join('');
                 }
             }
             
             // Initialize filtered pricing and update display
-            filteredPricing = Object.entries(productPricing).map(([productName, pricing]) => ({
-                productName,
-                ...pricing
-            }));
+            applyPricingFilter();
             updatePricingList();
         }
 
         function updatePricingInfo() {
-            const productName = document.getElementById('pricingProduct').value;
+            const productName = document.getElementById('pricingProduct')?.value;
             const costInfo = document.getElementById('costInfo');
             const costDetails = document.getElementById('costDetails');
             const pricingSection = document.getElementById('pricingSection');
             
             if (!productName) {
-                costInfo.classList.add('hidden');
-                pricingSection.classList.add('hidden');
+                if (costInfo) costInfo.classList.add('hidden');
+                if (pricingSection) pricingSection.classList.add('hidden');
                 return;
             }
             
             const recipe = recipes.find(r => r.name === productName);
-            if (!recipe) return;
+            if (!recipe) {
+                console.log('Recipe not found:', productName);
+                return;
+            }
             
             // Show cost information
-            costInfo.classList.remove('hidden');
-            pricingSection.classList.remove('hidden');
+            if (costInfo) costInfo.classList.remove('hidden');
+            if (pricingSection) pricingSection.classList.remove('hidden');
             
             // Display cost breakdown
             let costBreakdown = `
@@ -4116,50 +4783,87 @@
                 `;
             }
             
-            costDetails.innerHTML = costBreakdown;
+            if (costDetails) costDetails.innerHTML = costBreakdown;
             
             // Load existing pricing if available
             const existingPricing = productPricing[productName];
             if (existingPricing) {
                 // Set the pricing method
-                document.querySelector(`input[name="pricingMethod"][value="${existingPricing.method}"]`).checked = true;
-                updatePricingMethod();
-                
-                // Set the values
-                if (existingPricing.method === 'markup') {
-                    document.getElementById('markupPercent').value = existingPricing.markupPercent;
-                    calculatePriceFromMarkup();
-                } else if (existingPricing.method === 'margin') {
-                    document.getElementById('marginPercent').value = existingPricing.marginPercent;
-                    calculatePriceFromMargin();
-                } else if (existingPricing.method === 'fixed') {
-                    document.getElementById('fixedPrice').value = existingPricing.sellingPrice;
-                    calculateProfitFromFixed();
+                const methodRadio = document.querySelector(`input[name="pricingMethod"][value="${existingPricing.method}"]`);
+                if (methodRadio) {
+                    methodRadio.checked = true;
+                    updatePricingMethod();
+                    
+                    // Set the values with a small delay to ensure DOM is ready
+                    setTimeout(() => {
+                        if (existingPricing.method === 'markup') {
+                            const markupInput = document.getElementById('markupPercent');
+                            if (markupInput) {
+                                markupInput.value = existingPricing.markupPercent;
+                                calculatePriceFromMarkup();
+                            }
+                        } else if (existingPricing.method === 'margin') {
+                            const marginInput = document.getElementById('marginPercent');
+                            if (marginInput) {
+                                marginInput.value = existingPricing.marginPercent;
+                                calculatePriceFromMargin();
+                            }
+                        } else if (existingPricing.method === 'fixed') {
+                            const fixedInput = document.getElementById('fixedPrice');
+                            if (fixedInput) {
+                                fixedInput.value = existingPricing.sellingPrice;
+                                calculateProfitFromFixed();
+                            }
+                        }
+                    }, 100);
                 }
             } else {
-                // Clear form
-                clearPricingForm();
+                // Reset to default method and clear values
+                const markupRadio = document.querySelector('input[name="pricingMethod"][value="markup"]');
+                if (markupRadio) {
+                    markupRadio.checked = true;
+                    updatePricingMethod();
+                }
             }
         }
 
         function updatePricingMethod() {
-            const method = document.querySelector('input[name="pricingMethod"]:checked').value;
+            const methodRadio = document.querySelector('input[name="pricingMethod"]:checked');
+            if (!methodRadio) return;
+            
+            const method = methodRadio.value;
             
             // Hide all method sections
-            document.getElementById('markupMethod').classList.add('hidden');
-            document.getElementById('marginMethod').classList.add('hidden');
-            document.getElementById('fixedMethod').classList.add('hidden');
-            document.getElementById('pricingResult').classList.add('hidden');
+            const markupMethod = document.getElementById('markupMethod');
+            const marginMethod = document.getElementById('marginMethod');
+            const fixedMethod = document.getElementById('fixedMethod');
+            const pricingResult = document.getElementById('pricingResult');
+            const savePricingBtn = document.getElementById('savePricingBtn');
+            
+            if (markupMethod) markupMethod.classList.add('hidden');
+            if (marginMethod) marginMethod.classList.add('hidden');
+            if (fixedMethod) fixedMethod.classList.add('hidden');
+            if (pricingResult) pricingResult.classList.add('hidden');
             
             // Show selected method
-            document.getElementById(method + 'Method').classList.remove('hidden');
+            if (method === 'markup' && markupMethod) {
+                markupMethod.classList.remove('hidden');
+            } else if (method === 'margin' && marginMethod) {
+                marginMethod.classList.remove('hidden');
+            } else if (method === 'fixed' && fixedMethod) {
+                fixedMethod.classList.remove('hidden');
+            }
             
             // Clear inputs
-            document.getElementById('markupPercent').value = '';
-            document.getElementById('marginPercent').value = '';
-            document.getElementById('fixedPrice').value = '';
+            const markupPercent = document.getElementById('markupPercent');
+            const marginPercent = document.getElementById('marginPercent');
+            const fixedPrice = document.getElementById('fixedPrice');
             
-            document.getElementById('savePricingBtn').disabled = true;
+            if (markupPercent) markupPercent.value = '';
+            if (marginPercent) marginPercent.value = '';
+            if (fixedPrice) fixedPrice.value = '';
+            
+            if (savePricingBtn) savePricingBtn.disabled = true;
         }
 
         function calculatePriceFromMarkup() {
@@ -4253,6 +4957,9 @@
         function showPricingResult(data) {
             const pricingResult = document.getElementById('pricingResult');
             const pricingCalculation = document.getElementById('pricingCalculation');
+            const savePricingBtn = document.getElementById('savePricingBtn');
+            
+            if (!pricingResult || !pricingCalculation) return;
             
             pricingResult.classList.remove('hidden');
             
@@ -4281,7 +4988,7 @@
                 ${data.profitPerUnit <= 0 ? '<div class="mt-2 text-red-600 text-xs">⚠️ ราคาขายต่ำกว่าต้นทุน จะขาดทุน!</div>' : ''}
             `;
             
-            document.getElementById('savePricingBtn').disabled = false;
+            if (savePricingBtn) savePricingBtn.disabled = false;
         }
 
         function savePricing() {
@@ -4573,7 +5280,7 @@
             document.getElementById('productionDate').value = today;
             
             // Show inventory section by default
-            showSection('inventory');
+            selectSection('inventory', '📦', 'คลังสินค้า', '📦 จัดการวัตถุดิบ');
             
             // Initialize filters
             filteredInventory = [...inventory];
@@ -4582,6 +5289,7 @@
                 productName,
                 ...pricing
             }));
+            filteredExpenses = [...expenses];
             
             // Update all displays
             updateInventoryDisplay();
@@ -4589,8 +5297,10 @@
             updateRecipeOptions();
             updateProductionOptions();
             updateSalesOptions();
+            updateExpensesOptions();
+            updatePricingOptions();
 
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96aedb83353745cc',t:'MTc1NDQ4NjY5OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96b6bf4d147545b1',t:'MTc1NDU2OTQyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
