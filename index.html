@@ -397,9 +397,67 @@
                     </h3>
                     <div class="space-y-3">
                         <input type="date" id="productionDate" class="w-full p-3 border rounded-lg text-sm" value="">
-                        <select id="productionRecipe" class="w-full p-3 border rounded-lg text-sm" onchange="updateProductionInfo()">
-                            <option value="">เลือกสูตรที่จะผลิต</option>
-                        </select>
+                        
+                        <!-- Recipe Search and Filter -->
+                        <div class="space-y-3">
+                            <!-- Category Filter -->
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="filterProductionRecipes('all')" class="production-recipe-filter-btn active px-3 py-1 rounded-full text-xs bg-indigo-500 text-white hover:bg-indigo-600">
+                                    ทั้งหมด
+                                </button>
+                                <button onclick="filterProductionRecipes('ขนมปัง')" class="production-recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                    🍞 ขนมปัง
+                                </button>
+                                <button onclick="filterProductionRecipes('โดนัท')" class="production-recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                    🍩 โดนัท
+                                </button>
+                                <button onclick="filterProductionRecipes('เค้ก')" class="production-recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                    🎂 เค้ก
+                                </button>
+                                <button onclick="filterProductionRecipes('คุกกี้')" class="production-recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                    🍪 คุกกี้
+                                </button>
+                                <button onclick="filterProductionRecipes('อื่นๆ')" class="production-recipe-filter-btn px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-700 hover:bg-gray-300">
+                                    🍰 อื่นๆ
+                                </button>
+                            </div>
+                            
+                            <!-- Recipe Search -->
+                            <div class="relative">
+                                <input type="text" id="productionRecipeSearch" placeholder="🔍 ค้นหาสูตร... (เช่น ช็อกโกแลต, วนิลลา, ครีม)" 
+                                       class="w-full p-3 pl-10 border rounded-lg text-sm bg-white shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                                       oninput="searchProductionRecipes()" 
+                                       onfocus="showProductionRecipeDropdown()"
+                                       onblur="hideProductionRecipeDropdown()">
+                                <div class="absolute left-3 top-3 text-gray-400">
+                                    🔍
+                                </div>
+                                <button onclick="clearProductionRecipeSearch()" id="clearProductionSearchBtn" 
+                                        class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 hidden">
+                                    ✕
+                                </button>
+                                
+                                <!-- Recipe Dropdown -->
+                                <div id="productionRecipeDropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-64 overflow-y-auto">
+                                    <div id="productionRecipeList" class="p-2">
+                                        <!-- Recipe options will be shown here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Recipe Display -->
+                            <div id="selectedRecipeDisplay" class="hidden bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium text-indigo-800" id="selectedRecipeName"></div>
+                                        <div class="text-sm text-indigo-600" id="selectedRecipeDetails"></div>
+                                    </div>
+                                    <button onclick="clearSelectedRecipe()" class="text-indigo-500 hover:text-indigo-700 p-1">
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         <input type="number" id="productionQuantity" placeholder="จำนวนที่ต้องการผลิต" class="w-full p-3 border rounded-lg text-sm" oninput="calculateIngredientNeeds()">
                         
                         <div id="ingredientNeeds" class="hidden bg-white p-4 rounded-lg border border-indigo-200">
@@ -585,34 +643,53 @@
                             </select>
                         </div>
                         
+                        <!-- รายการสินค้าที่ผลิตวันนี้ -->
+                        <div id="todayProductionList" class="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-4">
+                            <h4 class="font-medium text-blue-800 mb-3 text-sm">🏭 สินค้าที่ผลิตวันนี้</h4>
+                            <div id="todayProductionItems" class="space-y-2">
+                                <!-- Today's production items will be shown here -->
+                            </div>
+                        </div>
+
                         <!-- แสดงข้อมูลสินค้า -->
-                        <div id="productInfo" class="hidden bg-white p-3 rounded-lg border border-pink-200">
+                        <div id="productInfo" class="hidden bg-white p-3 rounded-lg border border-pink-200 mb-4">
                             <div id="productDetails" class="text-sm text-pink-700">
                                 <!-- Product details will be shown here -->
                             </div>
                         </div>
                         
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่เหลือ (ตอนปิดร้าน)</label>
-                                <input type="number" id="remainingQuantity" placeholder="จำนวนที่เหลือ" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSoldQuantity()">
-                                <p class="text-xs text-blue-600 mt-1">💡 ใส่จำนวนที่เหลือ ระบบจะคำนวณขายได้ให้</p>
+                        <!-- ฟอร์มกรอกข้อมูลการขาย -->
+                        <div class="bg-white p-4 rounded-lg border border-pink-200 space-y-4">
+                            <h4 class="font-medium text-pink-800 text-sm border-b border-pink-200 pb-2">📝 กรอกข้อมูลการขาย</h4>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนที่เหลือ (ตอนปิดร้าน)</label>
+                                    <input type="number" id="remainingQuantity" placeholder="จำนวนที่เหลือ" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSoldQuantity()">
+                                    <p class="text-xs text-blue-600 mt-1">💡 ใส่จำนวนที่เหลือ ระบบจะคำนวณขายได้ให้</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">ราคาขายต่อหน่วย (บาท)</label>
+                                    <input type="number" id="salePrice" placeholder="ราคาขายต่อหน่วย" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSaleTotal()">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">ราคาขายต่อหน่วย (บาท)</label>
-                                <input type="number" id="salePrice" placeholder="ราคาขายต่อหน่วย" class="w-full p-3 border rounded-lg text-sm" oninput="calculateSaleTotal()">
+                            
+                            <!-- แสดงการคำนวณ -->
+                            <div id="saleCalculation" class="hidden bg-green-100 p-3 rounded-lg border border-green-300">
+                                <h5 class="font-medium text-green-800 mb-2 text-sm">💰 สรุปการขาย</h5>
+                                <div id="saleDetails" class="text-sm text-green-700">
+                                    <!-- Sale calculation will be shown here -->
+                                </div>
                             </div>
+                            
+                            <!-- ปุ่มบันทึกการขาย -->
+                            <button onclick="recordSale()" id="recordSaleBtn" class="w-full bg-pink-500 text-white p-3 rounded-lg hover:bg-pink-600 text-sm font-medium disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors" disabled>
+                                <span class="flex items-center justify-center gap-2">
+                                    <span>💰</span>
+                                    <span>บันทึกการขาย</span>
+                                </span>
+                            </button>
                         </div>
-                        
-                        <!-- แสดงการคำนวณ -->
-                        <div id="saleCalculation" class="hidden bg-green-100 p-3 rounded-lg border border-green-300">
-                            <h5 class="font-medium text-green-800 mb-2 text-sm">💰 สรุปการขาย</h5>
-                            <div id="saleDetails" class="text-sm text-green-700">
-                                <!-- Sale calculation will be shown here -->
-                            </div>
-                        </div>
-                        
-                        <button onclick="recordSale()" id="recordSaleBtn" class="w-full bg-pink-500 text-white p-3 rounded-lg hover:bg-pink-600 text-sm font-medium" disabled>บันทึกการขาย</button>
                     </div>
                     
                     <div class="mt-6 p-4 bg-white rounded-lg border border-pink-200">
@@ -799,16 +876,38 @@
                     <div class="bg-teal-50 rounded-lg p-4">
                         <h3 class="text-lg font-semibold mb-4 text-teal-800">📅 เลือกวันที่</h3>
                         <input type="date" id="dailyReportDate" class="w-full p-3 border rounded-lg text-sm" onchange="generateDailyReport()">
-                        <div id="dailyStats" class="mt-4 space-y-3">
-                            <!-- Daily statistics will be shown here -->
+                        
+                        <!-- สรุปยอดขายแบบตาราง -->
+                        <div id="dailyStatsTable" class="mt-4 bg-white rounded-lg border border-teal-200 overflow-hidden">
+                            <div class="bg-teal-100 px-4 py-2 border-b border-teal-200">
+                                <h4 class="font-medium text-teal-800">📊 สรุปยอดขายประจำวัน</h4>
+                            </div>
+                            <div id="dailyStats" class="p-4">
+                                <!-- Daily statistics will be shown here -->
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Daily Charts -->
                     <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📈 สินค้าขายดี</h3>
-                        <div id="dailyTopProducts" class="space-y-2">
-                            <!-- Top products will be shown here -->
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">📈 วิเคราะห์การขาย</h3>
+                        
+                        <!-- Performance Chart -->
+                        <div id="dailyPerformanceChart" class="mb-6 bg-white rounded-lg border border-gray-200 p-4">
+                            <h4 class="font-medium text-gray-800 mb-3 text-sm">🎯 อัตราการขายสินค้า</h4>
+                            <div id="performanceChartContent" class="space-y-2">
+                                <!-- Performance chart will be shown here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Top Products Table -->
+                        <div id="dailyTopProductsTable" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <div class="bg-gray-100 px-4 py-2 border-b border-gray-200">
+                                <h4 class="font-medium text-gray-800">🏆 สินค้าขายดี Top 5</h4>
+                            </div>
+                            <div id="dailyTopProducts" class="p-4">
+                                <!-- Top products will be shown here -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1089,6 +1188,16 @@
             if (!button && !dropdown.contains(event.target)) {
                 dropdown.classList.add('hidden');
                 document.getElementById('dropdownArrow').style.transform = 'rotate(0deg)';
+            }
+            
+            // Close production recipe dropdown when clicking outside
+            const productionDropdown = document.getElementById('productionRecipeDropdown');
+            const productionSearch = document.getElementById('productionRecipeSearch');
+            
+            if (productionDropdown && productionSearch && 
+                !productionDropdown.contains(event.target) && 
+                event.target !== productionSearch) {
+                productionDropdown.classList.add('hidden');
             }
         });
 
@@ -1843,22 +1952,219 @@
         }
 
         // Production Management
+        let selectedProductionRecipe = null;
+        let currentProductionRecipeFilter = 'all';
+        let filteredProductionRecipes = [];
+
         function updateProductionOptions() {
             // Set today's date as default
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('productionDate').value = today;
             
-            // Update recipe options
-            const select = document.getElementById('productionRecipe');
-            select.innerHTML = '<option value="">เลือกสูตรที่จะผลิต</option>' + 
-                recipes.map(recipe => `<option value="${recipe.name}">${recipe.name} (ได้ ${recipe.yield} หน่วย)</option>`).join('');
+            // Initialize filtered recipes
+            filteredProductionRecipes = [...recipes];
+            updateProductionRecipeList();
             
             updateProductionHistory();
             updateTodayProductionSummary();
         }
 
+        function filterProductionRecipes(category) {
+            currentProductionRecipeFilter = category;
+            
+            // Update filter button styles
+            document.querySelectorAll('.production-recipe-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            event.target.classList.add('active', 'bg-indigo-500', 'text-white');
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            applyProductionRecipeFilter();
+        }
+
+        function applyProductionRecipeFilter() {
+            let filtered = [...recipes];
+            
+            // Apply search filter
+            const searchTerm = document.getElementById('productionRecipeSearch').value.toLowerCase().trim();
+            if (searchTerm) {
+                filtered = filtered.filter(recipe => {
+                    const recipeName = recipe.name.toLowerCase();
+                    const category = recipe.category.toLowerCase();
+                    
+                    // Search in recipe name, category, and ingredients
+                    let matchesIngredients = false;
+                    if (recipe.ingredients) {
+                        matchesIngredients = recipe.ingredients.some(ingredient => 
+                            ingredient.name.toLowerCase().includes(searchTerm)
+                        );
+                    }
+                    
+                    return recipeName.includes(searchTerm) || 
+                           category.includes(searchTerm) ||
+                           matchesIngredients ||
+                           calculateSimilarity(recipeName, searchTerm) > 0.5;
+                });
+            }
+            
+            // Apply category filter
+            if (currentProductionRecipeFilter !== 'all') {
+                filtered = filtered.filter(recipe => 
+                    recipe.category === currentProductionRecipeFilter
+                );
+            }
+            
+            filteredProductionRecipes = filtered;
+            updateProductionRecipeList();
+        }
+
+        function searchProductionRecipes() {
+            const searchTerm = document.getElementById('productionRecipeSearch').value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearProductionSearchBtn');
+            
+            // Show/hide clear button
+            if (searchTerm) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            
+            applyProductionRecipeFilter();
+            
+            // Show dropdown if there's a search term or focus
+            if (searchTerm || document.activeElement === document.getElementById('productionRecipeSearch')) {
+                showProductionRecipeDropdown();
+            }
+        }
+
+        function clearProductionRecipeSearch() {
+            document.getElementById('productionRecipeSearch').value = '';
+            document.getElementById('clearProductionSearchBtn').classList.add('hidden');
+            applyProductionRecipeFilter();
+            hideProductionRecipeDropdown();
+        }
+
+        function showProductionRecipeDropdown() {
+            const dropdown = document.getElementById('productionRecipeDropdown');
+            dropdown.classList.remove('hidden');
+            updateProductionRecipeList();
+        }
+
+        function hideProductionRecipeDropdown() {
+            // Add a small delay to allow clicking on dropdown items
+            setTimeout(() => {
+                const dropdown = document.getElementById('productionRecipeDropdown');
+                dropdown.classList.add('hidden');
+            }, 150);
+        }
+
+        function updateProductionRecipeList() {
+            const list = document.getElementById('productionRecipeList');
+            
+            if (filteredProductionRecipes.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center text-gray-500 py-4 text-sm">
+                        ${recipes.length === 0 ? 'ยังไม่มีสูตรในระบบ' : 'ไม่พบสูตรที่ค้นหา'}
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by relevance (exact matches first, then by name)
+            const searchTerm = document.getElementById('productionRecipeSearch').value.toLowerCase().trim();
+            const sortedRecipes = [...filteredProductionRecipes].sort((a, b) => {
+                if (searchTerm) {
+                    const aExact = a.name.toLowerCase().includes(searchTerm);
+                    const bExact = b.name.toLowerCase().includes(searchTerm);
+                    if (aExact && !bExact) return -1;
+                    if (!aExact && bExact) return 1;
+                }
+                return a.name.localeCompare(b.name, 'th');
+            });
+            
+            list.innerHTML = sortedRecipes.map(recipe => {
+                const categoryIcon = getCategoryIcon(recipe.category);
+                
+                // Highlight search term
+                let displayName = recipe.name;
+                if (searchTerm) {
+                    const regex = new RegExp(`(${searchTerm})`, 'gi');
+                    displayName = recipe.name.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+                }
+                
+                return `
+                    <div onclick="selectProductionRecipe('${recipe.name}')" 
+                         class="p-3 hover:bg-indigo-50 rounded-lg cursor-pointer border border-transparent hover:border-indigo-200 transition-all duration-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-lg">${categoryIcon}</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">${displayName}</div>
+                                    <div class="text-sm text-gray-600">
+                                        ${recipe.category} • ได้ ${recipe.yield} หน่วย • ต้นทุน ${recipe.costPerUnit.toFixed(2)} บาท/หน่วย
+                                    </div>
+                                    ${recipe.baseRecipeName ? `
+                                        <div class="text-xs text-blue-600 mt-1">
+                                            📋 จากสูตร: ${recipe.baseRecipeName}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-medium text-indigo-600">${recipe.totalCost.toFixed(2)} บาท</div>
+                                <div class="text-xs text-gray-500">ต้นทุนรวม</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectProductionRecipe(recipeName) {
+            selectedProductionRecipe = recipeName;
+            const recipe = recipes.find(r => r.name === recipeName);
+            if (!recipe) return;
+            
+            // Update search input
+            document.getElementById('productionRecipeSearch').value = recipeName;
+            document.getElementById('clearProductionSearchBtn').classList.remove('hidden');
+            
+            // Show selected recipe display
+            const selectedDisplay = document.getElementById('selectedRecipeDisplay');
+            const selectedName = document.getElementById('selectedRecipeName');
+            const selectedDetails = document.getElementById('selectedRecipeDetails');
+            
+            selectedDisplay.classList.remove('hidden');
+            selectedName.textContent = recipe.name;
+            selectedDetails.innerHTML = `
+                ${getCategoryIcon(recipe.category)} ${recipe.category} • 
+                ได้ ${recipe.yield} หน่วย • 
+                ต้นทุน ${recipe.costPerUnit.toFixed(2)} บาท/หน่วย
+                ${recipe.baseRecipeName ? ` • จากสูตร: ${recipe.baseRecipeName}` : ''}
+            `;
+            
+            // Hide dropdown
+            hideProductionRecipeDropdown();
+            
+            // Update production info
+            updateProductionInfo();
+        }
+
+        function clearSelectedRecipe() {
+            selectedProductionRecipe = null;
+            document.getElementById('productionRecipeSearch').value = '';
+            document.getElementById('clearProductionSearchBtn').classList.add('hidden');
+            document.getElementById('selectedRecipeDisplay').classList.add('hidden');
+            
+            // Clear production info
+            document.getElementById('ingredientNeeds').classList.add('hidden');
+            document.getElementById('startProductionBtn').disabled = true;
+        }
+
         function updateProductionInfo() {
-            const recipeName = document.getElementById('productionRecipe').value;
+            const recipeName = selectedProductionRecipe;
             const ingredientNeeds = document.getElementById('ingredientNeeds');
             
             if (!recipeName) {
@@ -1872,7 +2178,7 @@
         }
 
         function calculateIngredientNeeds() {
-            const recipeName = document.getElementById('productionRecipe').value;
+            const recipeName = selectedProductionRecipe;
             const quantity = parseFloat(document.getElementById('productionQuantity').value) || 0;
             
             if (!recipeName || !quantity) {
@@ -1939,12 +2245,12 @@
         }
 
         function startProduction() {
-            const recipeName = document.getElementById('productionRecipe').value;
+            const recipeName = selectedProductionRecipe;
             const quantity = parseFloat(document.getElementById('productionQuantity').value);
             const productionDate = document.getElementById('productionDate').value;
             
             if (!recipeName || !quantity || !productionDate) {
-                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                alert('กรุณาเลือกสูตรและกรอกข้อมูลให้ครบถ้วน');
                 return;
             }
             
@@ -2022,6 +2328,7 @@
             
             // Clear form
             document.getElementById('productionQuantity').value = '';
+            clearSelectedRecipe();
             document.getElementById('ingredientNeeds').classList.add('hidden');
             document.getElementById('startProductionBtn').disabled = true;
             
@@ -2989,8 +3296,161 @@
                     recipes.map(recipe => `<option value="${recipe.name}" data-cost="${recipe.costPerUnit}">${recipe.name} (ต้นทุน: ${recipe.costPerUnit.toFixed(2)} บาท)</option>`).join('');
             }
             
+            updateTodayProductionList();
             updateSalesHistory();
             updateTodaySummary();
+        }
+
+        function updateTodayProductionList() {
+            const todayProductionItems = document.getElementById('todayProductionItems');
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Get today's production grouped by product
+            const todayProductions = productions.filter(p => p.productionDate === today);
+            const productionSummary = {};
+            
+            todayProductions.forEach(prod => {
+                if (productionSummary[prod.recipeName]) {
+                    productionSummary[prod.recipeName] += prod.quantity;
+                } else {
+                    productionSummary[prod.recipeName] = prod.quantity;
+                }
+            });
+            
+            // Get today's sales to calculate remaining
+            const todaySales = sales.filter(sale => sale.date === new Date().toLocaleDateString('th-TH'));
+            const salesSummary = {};
+            
+            todaySales.forEach(sale => {
+                if (salesSummary[sale.productName]) {
+                    salesSummary[sale.productName] += sale.quantity;
+                } else {
+                    salesSummary[sale.productName] = sale.quantity;
+                }
+            });
+            
+            if (Object.keys(productionSummary).length === 0) {
+                todayProductionItems.innerHTML = `
+                    <div class="text-center text-blue-600 py-4">
+                        <div class="text-sm">ยังไม่มีการผลิตวันนี้</div>
+                        <div class="text-xs mt-1">ไปที่หน้าการผลิตเพื่อเริ่มผลิตสินค้า</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by remaining quantity (items with remaining stock first)
+            const sortedProducts = Object.entries(productionSummary).sort((a, b) => {
+                const remainingA = a[1] - (salesSummary[a[0]] || 0);
+                const remainingB = b[1] - (salesSummary[b[0]] || 0);
+                return remainingB - remainingA; // Descending order
+            });
+            
+            todayProductionItems.innerHTML = sortedProducts.map(([productName, produced]) => {
+                const sold = salesSummary[productName] || 0;
+                const remaining = produced - sold;
+                const sellThroughRate = produced > 0 ? (sold / produced * 100) : 0;
+                
+                // Determine status styling
+                let statusColor = 'text-green-600';
+                let statusBg = 'bg-green-100';
+                let statusIcon = '✅';
+                let statusText = 'มีสินค้า';
+                
+                if (remaining === 0) {
+                    statusColor = 'text-red-600';
+                    statusBg = 'bg-red-100';
+                    statusIcon = '🔴';
+                    statusText = 'ขายหมด';
+                } else if (remaining <= produced * 0.2) { // Less than 20% remaining
+                    statusColor = 'text-orange-600';
+                    statusBg = 'bg-orange-100';
+                    statusIcon = '⚠️';
+                    statusText = 'ใกล้หมด';
+                }
+                
+                return `
+                    <div class="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition-shadow">
+                        <div class="flex justify-between items-center">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium text-gray-800">${productName}</span>
+                                    <span class="text-xs px-2 py-1 rounded-full ${statusBg} ${statusColor} font-medium">
+                                        ${statusIcon} ${statusText}
+                                    </span>
+                                </div>
+                                
+                                <!-- Production vs Sales Stats -->
+                                <div class="mt-2 grid grid-cols-3 gap-3 text-xs">
+                                    <div class="text-center">
+                                        <div class="text-gray-500">ผลิต</div>
+                                        <div class="font-bold text-indigo-600">${produced}</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-gray-500">ขาย</div>
+                                        <div class="font-bold text-green-600">${sold}</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-gray-500">เหลือ</div>
+                                        <div class="font-bold ${statusColor}">${remaining}</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Progress Bar -->
+                                <div class="mt-2">
+                                    <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                        <span>อัตราการขาย</span>
+                                        <span>${sellThroughRate.toFixed(1)}%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="h-2 rounded-full transition-all duration-300 ${
+                                            sellThroughRate >= 80 ? 'bg-green-500' :
+                                            sellThroughRate >= 50 ? 'bg-yellow-500' :
+                                            sellThroughRate > 0 ? 'bg-orange-500' : 'bg-gray-400'
+                                        }" style="width: ${Math.min(sellThroughRate, 100)}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Action Button -->
+                            <div class="ml-4">
+                                ${remaining > 0 ? `
+                                    <button onclick="quickSelectProduct('${productName}', ${remaining})" 
+                                            class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600 transition-colors">
+                                        เลือก
+                                    </button>
+                                ` : `
+                                    <button onclick="quickSelectProduct('${productName}', 0)" 
+                                            class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 transition-colors">
+                                        บันทึก
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function quickSelectProduct(productName, remainingQuantity) {
+            // Set the product in the dropdown
+            document.getElementById('saleProduct').value = productName;
+            updateSaleInfo();
+            
+            // Auto-fill remaining quantity
+            document.getElementById('remainingQuantity').value = remainingQuantity;
+            calculateSoldQuantity();
+            
+            // Scroll to the form
+            document.getElementById('remainingQuantity').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            
+            // Focus on the price input
+            setTimeout(() => {
+                document.getElementById('salePrice').focus();
+            }, 500);
         }
 
         function updateSaleInfo() {
@@ -3265,6 +3725,7 @@
 
             localStorage.setItem('bakery_sales', JSON.stringify(sales));
             
+            updateTodayProductionList(); // Update the production list to reflect new sales
             updateSalesHistory();
             updateTodaySummary();
             
@@ -3487,40 +3948,51 @@
             
             // คำนวณกำไร/ขาดทุนสุทธิ
             const netProfit = totalRevenue - productionCost;
+            const profitMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100) : 0;
             
-            // Display statistics
+            // Display statistics as table
             const statsDiv = document.getElementById('dailyStats');
             statsDiv.innerHTML = `
-                <div class="space-y-3">
-                    <div class="p-3 bg-green-100 rounded-lg">
-                        <div class="text-sm text-green-700">ยอดขายรวม</div>
-                        <div class="text-xl font-bold text-green-800">${totalRevenue.toFixed(2)} บาท</div>
-                    </div>
-                    <div class="p-3 bg-orange-100 rounded-lg">
-                        <div class="text-sm text-orange-700">ต้นทุนการผลิต</div>
-                        <div class="text-xl font-bold text-orange-800">${productionCost.toFixed(2)} บาท</div>
-                    </div>
-                    <div class="p-3 ${netProfit >= 0 ? 'bg-green-100' : 'bg-red-100'} rounded-lg border-2 ${netProfit >= 0 ? 'border-green-300' : 'border-red-300'}">
-                        <div class="text-sm ${netProfit >= 0 ? 'text-green-700' : 'text-red-700'}">
-                            ${netProfit >= 0 ? '💰 กำไรสุทธิ' : '📉 ขาดทุนสุทธิ'}
-                        </div>
-                        <div class="text-xl font-bold ${netProfit >= 0 ? 'text-green-800' : 'text-red-800'}">${netProfit.toFixed(2)} บาท</div>
-                        <div class="text-xs ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'} mt-1">
-                            ยอดขาย - ต้นทุนการผลิต
-                        </div>
-                    </div>
-                    <div class="p-3 bg-purple-100 rounded-lg">
-                        <div class="text-sm text-purple-700">จำนวนสินค้าที่ขาย</div>
-                        <div class="text-xl font-bold text-purple-800">${totalItems} หน่วย</div>
-                    </div>
-                    <div class="p-3 bg-blue-100 rounded-lg">
-                        <div class="text-sm text-blue-700">กำไรจากการขาย</div>
-                        <div class="text-xl font-bold text-blue-800">${totalProfit.toFixed(2)} บาท</div>
-                        <div class="text-xs text-blue-600 mt-1">
-                            ราคาขาย - ต้นทุนสินค้า
-                        </div>
-                    </div>
-                </div>
+                <table class="w-full text-sm">
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-3 font-medium text-gray-700">💰 ยอดขายรวม</td>
+                            <td class="py-2 px-3 text-right font-bold text-green-600">${totalRevenue.toLocaleString()} บาท</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-3 font-medium text-gray-700">🏭 ต้นทุนการผลิต</td>
+                            <td class="py-2 px-3 text-right font-bold text-orange-600">${productionCost.toLocaleString()} บาท</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 ${netProfit >= 0 ? 'bg-green-50' : 'bg-red-50'}">
+                            <td class="py-2 px-3 font-medium ${netProfit >= 0 ? 'text-green-700' : 'text-red-700'}">
+                                ${netProfit >= 0 ? '📈 กำไรสุทธิ' : '📉 ขาดทุนสุทธิ'}
+                            </td>
+                            <td class="py-2 px-3 text-right font-bold ${netProfit >= 0 ? 'text-green-700' : 'text-red-700'}">
+                                ${netProfit.toLocaleString()} บาท
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-3 font-medium text-gray-700">📊 อัตรากำไร</td>
+                            <td class="py-2 px-3 text-right font-bold ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                ${profitMargin.toFixed(1)}%
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-3 font-medium text-gray-700">📦 จำนวนสินค้าที่ขาย</td>
+                            <td class="py-2 px-3 text-right font-bold text-purple-600">${totalItems.toLocaleString()} หน่วย</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-3 font-medium text-gray-700">💵 ราคาเฉลี่ย/หน่วย</td>
+                            <td class="py-2 px-3 text-right font-bold text-blue-600">
+                                ${totalItems > 0 ? (totalRevenue / totalItems).toFixed(2) : '0'} บาท
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-3 font-medium text-gray-700">🎯 จำนวนรายการขาย</td>
+                            <td class="py-2 px-3 text-right font-bold text-indigo-600">${dailySales.length} ครั้ง</td>
+                        </tr>
+                    </tbody>
+                </table>
             `;
             
             // Calculate production data for the day
@@ -3532,6 +4004,9 @@
                     productionData[prod.recipeName] = prod.quantity;
                 }
             });
+            
+            // Performance Chart
+            const performanceChartDiv = document.getElementById('performanceChartContent');
             
             // Top products with detailed sales breakdown and production comparison
             const productSales = {};
@@ -3570,170 +4045,93 @@
                 };
             }).sort((a, b) => b.sold - a.sold);
             
+            // Create performance chart (horizontal bar chart)
+            if (productAnalysis.length === 0) {
+                performanceChartDiv.innerHTML = '<div class="text-gray-500 text-center py-4">ไม่มีข้อมูลการขาย</div>';
+            } else {
+                const maxRevenue = Math.max(...productAnalysis.map(p => p.revenue));
+                performanceChartDiv.innerHTML = productAnalysis.slice(0, 5).map(product => {
+                    const barWidth = maxRevenue > 0 ? (product.revenue / maxRevenue * 100) : 0;
+                    const performanceColor = product.sellThroughRate >= 80 ? 'bg-green-500' :
+                                           product.sellThroughRate >= 50 ? 'bg-yellow-500' :
+                                           product.sellThroughRate > 0 ? 'bg-orange-500' : 'bg-red-500';
+                    
+                    return `
+                        <div class="mb-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-700">${product.name}</span>
+                                <span class="text-sm font-bold text-green-600">${product.revenue.toLocaleString()} บาท</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3 relative">
+                                <div class="${performanceColor} h-3 rounded-full transition-all duration-500" style="width: ${barWidth}%"></div>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-xs font-medium text-white">${product.sellThroughRate.toFixed(0)}%</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-600 mt-1">
+                                <span>ผลิต: ${product.produced} | ขาย: ${product.sold}</span>
+                                <span>กำไร: ${product.profit.toFixed(0)} บาท</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Top Products Table
             const topProductsDiv = document.getElementById('dailyTopProducts');
             if (productAnalysis.length === 0) {
                 topProductsDiv.innerHTML = '<div class="text-gray-500 text-center py-4">ไม่มีการผลิตหรือขายในวันนี้</div>';
             } else {
                 topProductsDiv.innerHTML = `
-                    <div class="space-y-4">
-                        <h4 class="font-medium text-gray-800 border-b pb-2">📊 วิเคราะห์การผลิตและการขาย</h4>
-                        ${productAnalysis.map((product, index) => {
-                            // Determine sell-through performance
-                            let performanceColor = 'text-gray-600';
-                            let performanceBg = 'bg-gray-50';
-                            let performanceIcon = '📊';
-                            
-                            if (product.sellThroughRate >= 80) {
-                                performanceColor = 'text-green-600';
-                                performanceBg = 'bg-green-50';
-                                performanceIcon = '🔥';
-                            } else if (product.sellThroughRate >= 50) {
-                                performanceColor = 'text-yellow-600';
-                                performanceBg = 'bg-yellow-50';
-                                performanceIcon = '📈';
-                            } else if (product.sellThroughRate > 0) {
-                                performanceColor = 'text-orange-600';
-                                performanceBg = 'bg-orange-50';
-                                performanceIcon = '📉';
-                            } else if (product.produced > 0) {
-                                performanceColor = 'text-red-600';
-                                performanceBg = 'bg-red-50';
-                                performanceIcon = '⚠️';
-                            }
-                            
-                            return `
-                                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
-                                    <!-- Product Header with Performance -->
-                                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b">
-                                        <div class="flex justify-between items-center">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                                    <span class="text-sm font-bold text-blue-600">${index + 1}</span>
-                                                </div>
-                                                <div>
-                                                    <div class="font-semibold text-gray-800">${product.name}</div>
-                                                    <div class="text-xs text-blue-600">${product.sales.length} ครั้งขาย</div>
-                                                </div>
-                                            </div>
-                                            <div class="text-right">
-                                                <div class="font-bold text-blue-600">${product.sold} หน่วย</div>
-                                                <div class="text-sm text-green-600">${product.revenue.toFixed(2)} บาท</div>
-                                            </div>
-                                        </div>
-                                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left font-medium text-gray-700">อันดับ</th>
+                                    <th class="px-3 py-2 text-left font-medium text-gray-700">สินค้า</th>
+                                    <th class="px-3 py-2 text-center font-medium text-gray-700">ผลิต</th>
+                                    <th class="px-3 py-2 text-center font-medium text-gray-700">ขาย</th>
+                                    <th class="px-3 py-2 text-center font-medium text-gray-700">อัตราขาย</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-700">ยอดขาย</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-700">กำไร</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${productAnalysis.slice(0, 10).map((product, index) => {
+                                    const performanceColor = product.sellThroughRate >= 80 ? 'text-green-600' :
+                                                           product.sellThroughRate >= 50 ? 'text-yellow-600' :
+                                                           product.sellThroughRate > 0 ? 'text-orange-600' : 'text-red-600';
+                                    const performanceIcon = product.sellThroughRate >= 80 ? '🔥' :
+                                                          product.sellThroughRate >= 50 ? '📈' :
+                                                          product.sellThroughRate > 0 ? '📊' : '⚠️';
                                     
-                                    <!-- Production vs Sales Analysis -->
-                                    <div class="p-4">
-                                        <!-- Performance Indicator -->
-                                        <div class="mb-4 p-3 ${performanceBg} rounded-lg border border-opacity-20">
-                                            <div class="flex items-center justify-between">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="text-lg">${performanceIcon}</span>
-                                                    <div>
-                                                        <div class="font-medium ${performanceColor}">
-                                                            อัตราการขาย ${product.sellThroughRate.toFixed(1)}%
-                                                        </div>
-                                                        <div class="text-xs text-gray-600">
-                                                            ${product.produced > 0 ? 
-                                                                `ผลิต ${product.produced} ขาย ${product.sold} หน่วย` : 
-                                                                product.sold > 0 ? 'ขายจากสต็อกเดิม' : 'ไม่มีการขาย'
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-right">
-                                                    ${product.produced > product.sold && product.produced > 0 ? `
-                                                        <div class="text-xs text-orange-600">
-                                                            เหลือ ${product.produced - product.sold} หน่วย
-                                                        </div>
-                                                    ` : ''}
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Visual Progress Bar -->
-                                            ${product.produced > 0 ? `
-                                                <div class="mt-2">
-                                                    <div class="flex justify-between text-xs text-gray-600 mb-1">
-                                                        <span>การขาย</span>
-                                                        <span>${product.sold}/${product.produced}</span>
-                                                    </div>
-                                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                                        <div class="h-2 rounded-full transition-all duration-300 ${
-                                                            product.sellThroughRate >= 80 ? 'bg-green-500' :
-                                                            product.sellThroughRate >= 50 ? 'bg-yellow-500' :
-                                                            product.sellThroughRate > 0 ? 'bg-orange-500' : 'bg-red-500'
-                                                        }" style="width: ${Math.min(product.sellThroughRate, 100)}%"></div>
-                                                    </div>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                        
-                                        <!-- Production & Sales Stats -->
-                                        <div class="grid grid-cols-2 gap-4 mb-4">
-                                            <div class="bg-indigo-50 rounded-lg p-3 border border-indigo-100">
-                                                <div class="flex items-center gap-2 mb-1">
-                                                    <span class="text-indigo-600">🏭</span>
-                                                    <div class="text-xs font-medium text-indigo-600 uppercase tracking-wide">ผลิต</div>
-                                                </div>
-                                                <div class="text-xl font-bold text-indigo-700">${product.produced}</div>
-                                                <div class="text-sm text-indigo-600">หน่วย</div>
-                                            </div>
-                                            <div class="bg-green-50 rounded-lg p-3 border border-green-100">
-                                                <div class="flex items-center gap-2 mb-1">
-                                                    <span class="text-green-600">💰</span>
-                                                    <div class="text-xs font-medium text-green-600 uppercase tracking-wide">ขาย</div>
-                                                </div>
-                                                <div class="text-xl font-bold text-green-700">${product.sold}</div>
-                                                <div class="text-sm text-green-600">หน่วย</div>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Sales Details (if any) -->
-                                        ${product.sales.length > 0 ? `
-                                            <div class="space-y-2">
-                                                <div class="text-sm font-medium text-gray-700 border-b pb-1">รายละเอียดการขาย</div>
-                                                ${product.sales.map(sale => `
-                                                    <div class="flex justify-between items-center text-sm py-2 px-3 bg-gray-50 rounded-lg">
-                                                        <div class="flex items-center gap-2">
-                                                            <span class="text-gray-600">${sale.time}</span>
-                                                            ${sale.autoGenerated ? '<span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">อัตโนมัติ</span>' : ''}
-                                                        </div>
-                                                        <div class="flex gap-4 text-xs">
-                                                            <span class="font-medium">${sale.quantity} หน่วย</span>
-                                                            <span class="text-blue-600">${sale.salePrice.toFixed(2)} บาท/หน่วย</span>
-                                                            <span class="text-green-600 font-medium">${sale.totalRevenue.toFixed(2)} บาท</span>
-                                                        </div>
-                                                    </div>
-                                                `).join('')}
-                                            </div>
-                                        ` : ''}
-                                        
-                                        <!-- Summary -->
-                                        <div class="mt-4 pt-3 border-t border-gray-200">
-                                            <div class="grid grid-cols-3 gap-4 text-center">
-                                                <div>
-                                                    <div class="text-xs text-gray-500 mb-1">ยอดขาย</div>
-                                                    <div class="font-bold text-green-600">${product.revenue.toFixed(2)} บาท</div>
-                                                </div>
-                                                <div>
-                                                    <div class="text-xs text-gray-500 mb-1">กำไร</div>
-                                                    <div class="font-bold ${product.profit > 0 ? 'text-green-600' : 'text-red-600'}">${product.profit.toFixed(2)} บาท</div>
-                                                </div>
-                                                <div>
-                                                    <div class="text-xs text-gray-500 mb-1">ประสิทธิภาพ</div>
-                                                    <div class="font-bold ${performanceColor}">
-                                                        ${product.sellThroughRate >= 80 ? 'ดีเยี่ยม' :
-                                                          product.sellThroughRate >= 50 ? 'ดี' :
-                                                          product.sellThroughRate > 0 ? 'ปานกลาง' :
-                                                          product.produced > 0 ? 'ต้องปรับปรุง' : 'ไม่มีข้อมูล'}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
+                                    return `
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-3 py-2 text-center">
+                                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full ${
+                                                    index === 0 ? 'bg-yellow-100 text-yellow-800' :
+                                                    index === 1 ? 'bg-gray-100 text-gray-800' :
+                                                    index === 2 ? 'bg-orange-100 text-orange-800' :
+                                                    'bg-blue-100 text-blue-800'
+                                                } text-xs font-bold">
+                                                    ${index + 1}
+                                                </span>
+                                            </td>
+                                            <td class="px-3 py-2 font-medium text-gray-800">${product.name}</td>
+                                            <td class="px-3 py-2 text-center text-indigo-600 font-medium">${product.produced}</td>
+                                            <td class="px-3 py-2 text-center text-green-600 font-medium">${product.sold}</td>
+                                            <td class="px-3 py-2 text-center ${performanceColor} font-medium">
+                                                ${performanceIcon} ${product.sellThroughRate.toFixed(1)}%
+                                            </td>
+                                            <td class="px-3 py-2 text-right text-green-600 font-bold">${product.revenue.toLocaleString()}</td>
+                                            <td class="px-3 py-2 text-right ${product.profit > 0 ? 'text-green-600' : 'text-red-600'} font-bold">
+                                                ${product.profit.toLocaleString()}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 `;
             }
@@ -5302,5 +5700,5 @@
 
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96b6bf4d147545b1',t:'MTc1NDU2OTQyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96bfb9c6b2de45bd',t:'MTc1NDY2MzU3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
