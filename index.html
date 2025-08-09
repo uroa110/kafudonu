@@ -470,7 +470,14 @@
                             </div>
                         </div>
                         
-                        <button onclick="startProduction()" id="startProductionBtn" class="w-full bg-indigo-500 text-white p-3 rounded-lg hover:bg-indigo-600 disabled:bg-gray-400 text-sm font-medium" disabled>เริ่มการผลิต</button>
+                        <div class="flex gap-2">
+                            <button onclick="clearProductionForm()" class="flex-1 bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-600 text-sm font-medium">
+                                🗑️ ล้างข้อมูล
+                            </button>
+                            <button onclick="startProduction()" id="startProductionBtn" class="flex-1 bg-indigo-500 text-white p-3 rounded-lg hover:bg-indigo-600 disabled:bg-gray-400 text-sm font-medium" disabled>
+                                🏭 เริ่มการผลิต
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="mt-6 p-4 bg-white rounded-lg border border-indigo-200">
@@ -683,12 +690,20 @@
                             </div>
                             
                             <!-- ปุ่มบันทึกการขาย -->
-                            <button onclick="recordSale()" id="recordSaleBtn" class="w-full bg-pink-500 text-white p-3 rounded-lg hover:bg-pink-600 text-sm font-medium disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors" disabled>
-                                <span class="flex items-center justify-center gap-2">
-                                    <span>💰</span>
-                                    <span>บันทึกการขาย</span>
-                                </span>
-                            </button>
+                            <div class="flex gap-2">
+                                <button onclick="clearSalesForm()" class="flex-1 bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-600 text-sm font-medium transition-colors">
+                                    <span class="flex items-center justify-center gap-2">
+                                        <span>🗑️</span>
+                                        <span>ล้างข้อมูล</span>
+                                    </span>
+                                </button>
+                                <button onclick="recordSale()" id="recordSaleBtn" class="flex-1 bg-pink-500 text-white p-3 rounded-lg hover:bg-pink-600 text-sm font-medium disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors" disabled>
+                                    <span class="flex items-center justify-center gap-2">
+                                        <span>💰</span>
+                                        <span>บันทึกการขาย</span>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -709,6 +724,19 @@
                             </div>
                             <div class="text-xs text-gray-600 mt-2">
                                 <div>💡 คำนวณจาก: ยอดขาย - ต้นทุนการผลิต</div>
+                            </div>
+                        </div>
+                        
+                        <!-- End of Day Button -->
+                        <div class="mt-4 pt-3 border-t border-pink-200">
+                            <button onclick="endOfDaySales()" id="endOfDayBtn" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-lg hover:from-purple-600 hover:to-pink-600 text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg">
+                                <span class="flex items-center justify-center gap-2">
+                                    <span>🔄</span>
+                                    <span>เสร็จสิ้นการขายวันนี้</span>
+                                </span>
+                            </button>
+                            <div class="text-xs text-gray-600 mt-2 text-center">
+                                💡 บันทึกข้อมูลและรีเซ็ตระบบเพื่อเตรียมพร้อมวันถัดไป
                             </div>
                         </div>
                     </div>
@@ -2161,6 +2189,36 @@
             // Clear production info
             document.getElementById('ingredientNeeds').classList.add('hidden');
             document.getElementById('startProductionBtn').disabled = true;
+        }
+
+        function clearProductionForm() {
+            // Clear selected recipe
+            clearSelectedRecipe();
+            
+            // Clear quantity input
+            document.getElementById('productionQuantity').value = '';
+            
+            // Reset date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('productionDate').value = today;
+            
+            // Hide ingredient needs section
+            document.getElementById('ingredientNeeds').classList.add('hidden');
+            
+            // Disable production button
+            document.getElementById('startProductionBtn').disabled = true;
+            
+            // Reset category filter to 'all'
+            currentProductionRecipeFilter = 'all';
+            document.querySelectorAll('.production-recipe-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            document.querySelector('.production-recipe-filter-btn').classList.add('active', 'bg-indigo-500', 'text-white');
+            document.querySelector('.production-recipe-filter-btn').classList.remove('bg-gray-200', 'text-gray-700');
+            
+            // Refresh recipe list
+            applyProductionRecipeFilter();
         }
 
         function updateProductionInfo() {
@@ -3861,6 +3919,27 @@
             `).join('');
         }
 
+        function clearSalesForm() {
+            // Clear product selection
+            document.getElementById('saleProduct').value = '';
+            
+            // Hide product info
+            document.getElementById('productInfo').classList.add('hidden');
+            
+            // Clear form inputs
+            document.getElementById('remainingQuantity').value = '';
+            document.getElementById('salePrice').value = '';
+            
+            // Hide calculation section
+            document.getElementById('saleCalculation').classList.add('hidden');
+            
+            // Disable record button
+            document.getElementById('recordSaleBtn').disabled = true;
+            
+            // Refresh today's production list to show current status
+            updateTodayProductionList();
+        }
+
         function updateTodaySummary() {
             const today = new Date().toLocaleDateString('th-TH');
             const todayISO = new Date().toISOString().split('T')[0];
@@ -3890,6 +3969,119 @@
                 netProfitElement.className = 'font-bold text-red-600';
             } else {
                 netProfitElement.className = 'font-bold text-gray-600';
+            }
+        }
+
+        // End of Day Sales Function
+        function endOfDaySales() {
+            const today = new Date().toLocaleDateString('th-TH');
+            const todayISO = new Date().toISOString().split('T')[0];
+            
+            // Get today's data
+            const todaySales = sales.filter(sale => sale.date === today);
+            const todayProductions = productions.filter(p => p.productionDate === todayISO);
+            
+            if (todayProductions.length === 0) {
+                alert('ยังไม่มีการผลิตในวันนี้ ไม่สามารถเสร็จสิ้นการขายได้');
+                return;
+            }
+            
+            // Calculate summary
+            const totalRevenue = todaySales.reduce((sum, sale) => sum + sale.totalRevenue, 0);
+            const totalProductionCost = todayProductions.reduce((sum, prod) => sum + prod.totalCost, 0);
+            const netProfit = totalRevenue - totalProductionCost;
+            
+            // Get production summary
+            const productionSummary = {};
+            todayProductions.forEach(prod => {
+                if (productionSummary[prod.recipeName]) {
+                    productionSummary[prod.recipeName] += prod.quantity;
+                } else {
+                    productionSummary[prod.recipeName] = prod.quantity;
+                }
+            });
+            
+            // Get sales summary
+            const salesSummary = {};
+            todaySales.forEach(sale => {
+                if (salesSummary[sale.productName]) {
+                    salesSummary[sale.productName] += sale.quantity;
+                } else {
+                    salesSummary[sale.productName] = sale.quantity;
+                }
+            });
+            
+            // Create detailed summary message
+            let summaryMessage = `📊 สรุปการขายประจำวัน ${today}\n\n`;
+            
+            // Production summary
+            summaryMessage += `🏭 การผลิต:\n`;
+            Object.entries(productionSummary).forEach(([product, quantity]) => {
+                const sold = salesSummary[product] || 0;
+                const remaining = quantity - sold;
+                const sellThroughRate = quantity > 0 ? ((sold / quantity) * 100).toFixed(1) : '0';
+                
+                summaryMessage += `• ${product}: ผลิต ${quantity} ขาย ${sold} เหลือ ${remaining} (${sellThroughRate}%)\n`;
+            });
+            
+            // Financial summary
+            summaryMessage += `\n💰 สรุปทางการเงิน:\n`;
+            summaryMessage += `• ยอดขายรวม: ${totalRevenue.toFixed(2)} บาท\n`;
+            summaryMessage += `• ต้นทุนการผลิต: ${totalProductionCost.toFixed(2)} บาท\n`;
+            summaryMessage += `• ${netProfit >= 0 ? 'กำไรสุทธิ' : 'ขาดทุนสุทธิ'}: ${Math.abs(netProfit).toFixed(2)} บาท\n`;
+            
+            if (todaySales.length > 0) {
+                summaryMessage += `• จำนวนการขาย: ${todaySales.length} ครั้ง\n`;
+                summaryMessage += `• ยอดขายเฉลี่ย/ครั้ง: ${(totalRevenue / todaySales.length).toFixed(2)} บาท\n`;
+            }
+            
+            summaryMessage += `\n🔄 ระบบจะบันทึกข้อมูลและรีเซ็ตฟอร์มเพื่อเตรียมพร้อมสำหรับวันถัดไป\n`;
+            summaryMessage += `\n⚠️ หมายเหตุ: ข้อมูลการขายและประวัติจะถูกเก็บไว้ในระบบ`;
+            
+            // Confirm action
+            if (!confirm(summaryMessage + '\n\nคุณต้องการเสร็จสิ้นการขายวันนี้หรือไม่?')) {
+                return;
+            }
+            
+            // Create end of day record for historical tracking
+            const endOfDayRecord = {
+                id: Date.now(),
+                date: today,
+                dateISO: todayISO,
+                productionSummary,
+                salesSummary,
+                totalRevenue,
+                totalProductionCost,
+                netProfit,
+                salesCount: todaySales.length,
+                timestamp: new Date().toLocaleString('th-TH')
+            };
+            
+            // Save end of day record
+            let endOfDayRecords = JSON.parse(localStorage.getItem('bakery_end_of_day_records') || '[]');
+            endOfDayRecords.push(endOfDayRecord);
+            localStorage.setItem('bakery_end_of_day_records', JSON.stringify(endOfDayRecords));
+            
+            // Clear forms for next day preparation
+            clearSalesForm();
+            clearProductionForm();
+            
+            // Update displays
+            updateTodayProductionList();
+            updateSalesHistory();
+            updateTodaySummary();
+            updateProductionHistory();
+            updateTodayProductionSummary();
+            
+            // Show success message
+            alert(`✅ เสร็จสิ้นการขายวันนี้แล้ว!\n\n` +
+                  `📊 บันทึกสรุปประจำวันเรียบร้อย\n` +
+                  `🔄 ระบบพร้อมสำหรับวันถัดไป\n\n` +
+                  `💡 คุณสามารถดูประวัติการขายและรายงานได้ในหน้ารายงาน`);
+            
+            // Optional: Switch to production section for next day preparation
+            if (confirm('ต้องการไปที่หน้าการผลิตเพื่อเตรียมสินค้าสำหรับวันถัดไปหรือไม่?')) {
+                selectSection('production', '🏭', 'การผลิต', '🏪 ผลิตและขาย');
             }
         }
 
@@ -4049,29 +4241,92 @@
             if (productAnalysis.length === 0) {
                 performanceChartDiv.innerHTML = '<div class="text-gray-500 text-center py-4">ไม่มีข้อมูลการขาย</div>';
             } else {
-                const maxRevenue = Math.max(...productAnalysis.map(p => p.revenue));
+                // Use sell-through rate for bar width instead of revenue
                 performanceChartDiv.innerHTML = productAnalysis.slice(0, 5).map(product => {
-                    const barWidth = maxRevenue > 0 ? (product.revenue / maxRevenue * 100) : 0;
-                    const performanceColor = product.sellThroughRate >= 80 ? 'bg-green-500' :
-                                           product.sellThroughRate >= 50 ? 'bg-yellow-500' :
-                                           product.sellThroughRate > 0 ? 'bg-orange-500' : 'bg-red-500';
+                    // Calculate bar width based on sell-through rate (0-100%)
+                    const barWidth = Math.min(product.sellThroughRate, 100);
+                    
+                    // Determine color based on performance
+                    let performanceColor = 'bg-red-500';
+                    let performanceText = 'ต่ำ';
+                    let performanceIcon = '⚠️';
+                    
+                    if (product.sellThroughRate >= 80) {
+                        performanceColor = 'bg-green-500';
+                        performanceText = 'ดีเยี่ยม';
+                        performanceIcon = '🔥';
+                    } else if (product.sellThroughRate >= 60) {
+                        performanceColor = 'bg-yellow-500';
+                        performanceText = 'ดี';
+                        performanceIcon = '📈';
+                    } else if (product.sellThroughRate >= 40) {
+                        performanceColor = 'bg-orange-500';
+                        performanceText = 'ปานกลาง';
+                        performanceIcon = '📊';
+                    } else if (product.sellThroughRate > 0) {
+                        performanceColor = 'bg-red-400';
+                        performanceText = 'ต่ำ';
+                        performanceIcon = '📉';
+                    }
                     
                     return `
-                        <div class="mb-3">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-sm font-medium text-gray-700">${product.name}</span>
+                        <div class="mb-4 p-3 bg-white rounded-lg border border-gray-200">
+                            <!-- Product Header -->
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-medium text-gray-800">${product.name}</span>
+                                    <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                                        ${performanceIcon} ${performanceText}
+                                    </span>
+                                </div>
                                 <span class="text-sm font-bold text-green-600">${product.revenue.toLocaleString()} บาท</span>
                             </div>
-                            <div class="w-full bg-gray-200 rounded-full h-3 relative">
-                                <div class="${performanceColor} h-3 rounded-full transition-all duration-500" style="width: ${barWidth}%"></div>
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <span class="text-xs font-medium text-white">${product.sellThroughRate.toFixed(0)}%</span>
+                            
+                            <!-- Performance Bar -->
+                            <div class="mb-2">
+                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                    <span>อัตราการขาย</span>
+                                    <span class="font-medium">${product.sellThroughRate.toFixed(1)}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-4 relative overflow-hidden">
+                                    <div class="${performanceColor} h-4 rounded-full transition-all duration-700 ease-out" 
+                                         style="width: ${barWidth}%"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <span class="text-xs font-bold text-white drop-shadow-sm">
+                                            ${product.sold}/${product.produced}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex justify-between text-xs text-gray-600 mt-1">
-                                <span>ผลิต: ${product.produced} | ขาย: ${product.sold}</span>
-                                <span>กำไร: ${product.profit.toFixed(0)} บาท</span>
+                            
+                            <!-- Stats Grid -->
+                            <div class="grid grid-cols-3 gap-2 text-xs">
+                                <div class="text-center">
+                                    <div class="text-gray-500">ผลิต</div>
+                                    <div class="font-bold text-indigo-600">${product.produced}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-500">ขาย</div>
+                                    <div class="font-bold text-green-600">${product.sold}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-gray-500">กำไร</div>
+                                    <div class="font-bold ${product.profit > 0 ? 'text-green-600' : 'text-red-600'}">
+                                        ${product.profit.toFixed(0)}฿
+                                    </div>
+                                </div>
                             </div>
+                            
+                            <!-- Additional Info -->
+                            ${product.produced > product.sold ? `
+                                <div class="mt-2 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded">
+                                    เหลือ ${product.produced - product.sold} หน่วย
+                                </div>
+                            ` : product.sold === product.produced && product.produced > 0 ? `
+                                <div class="mt-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                                    ✅ ขายหมดแล้ว
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 }).join('');
@@ -4145,11 +4400,18 @@
             const weekStart = getDateOfWeek(parseInt(year), parseInt(week));
             const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekEnd.getDate() + 6);
+            weekEnd.setHours(23, 59, 59, 999); // Set to end of day
+            
+            console.log('Week range:', weekStart.toLocaleDateString('th-TH'), 'to', weekEnd.toLocaleDateString('th-TH'));
             
             // Filter sales for the week
             const weeklySales = sales.filter(sale => {
                 const saleDate = parseThaiDate(sale.date);
-                return saleDate >= weekStart && saleDate <= weekEnd;
+                const isInRange = saleDate >= weekStart && saleDate <= weekEnd;
+                if (isInRange) {
+                    console.log('Sale in range:', sale.date, saleDate.toLocaleDateString('th-TH'));
+                }
+                return isInRange;
             });
             
             const totalRevenue = weeklySales.reduce((sum, sale) => sum + sale.totalRevenue, 0);
@@ -4159,7 +4421,12 @@
             // คำนวณต้นทุนการผลิตรายสัปดาห์
             const weeklyProductions = productions.filter(p => {
                 const prodDate = new Date(p.productionDate);
-                return prodDate >= weekStart && prodDate <= weekEnd;
+                prodDate.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
+                const isInRange = prodDate >= weekStart && prodDate <= weekEnd;
+                if (isInRange) {
+                    console.log('Production in range:', p.productionDate, prodDate.toLocaleDateString('th-TH'));
+                }
+                return isInRange;
             });
             const totalProductionCost = weeklyProductions.reduce((sum, prod) => sum + prod.totalCost, 0);
             const netProfit = totalRevenue - totalProductionCost;
@@ -4210,12 +4477,23 @@
             for (let i = 0; i < 7; i++) {
                 const currentDate = new Date(weekStart);
                 currentDate.setDate(currentDate.getDate() + i);
+                currentDate.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
                 const dateStr = currentDate.toLocaleDateString('th-TH');
                 const dateISO = currentDate.toISOString().split('T')[0];
                 const dayName = days[currentDate.getDay()];
                 
-                const daySales = weeklySales.filter(sale => sale.date === dateStr);
-                const dayProductions = weeklyProductions.filter(p => p.productionDate === dateISO);
+                console.log(`Day ${i + 1}: ${dayName} - ${dateStr} (${dateISO})`);
+                
+                const daySales = weeklySales.filter(sale => {
+                    const match = sale.date === dateStr;
+                    if (match) console.log(`  Sale found: ${sale.productName} - ${sale.date}`);
+                    return match;
+                });
+                const dayProductions = weeklyProductions.filter(p => {
+                    const match = p.productionDate === dateISO;
+                    if (match) console.log(`  Production found: ${p.recipeName} - ${p.productionDate}`);
+                    return match;
+                });
                 const dayRevenue = daySales.reduce((sum, sale) => sum + sale.totalRevenue, 0);
                 const dayItems = daySales.reduce((sum, sale) => sum + sale.quantity, 0);
                 
@@ -4639,17 +4917,26 @@
         }
 
         function getDateOfWeek(year, week) {
-            // Create January 4th of the given year (always in week 1)
-            const jan4 = new Date(year, 0, 4);
+            // Create January 1st of the given year
+            const jan1 = new Date(year, 0, 1);
             
-            // Find the Monday of week 1
-            const jan4Day = jan4.getDay() || 7; // Convert Sunday (0) to 7
-            const mondayOfWeek1 = new Date(jan4);
-            mondayOfWeek1.setDate(jan4.getDate() - jan4Day + 1);
+            // Find the first Monday of the year
+            const jan1Day = jan1.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            let daysToFirstMonday;
+            
+            if (jan1Day === 0) { // Sunday
+                daysToFirstMonday = 1;
+            } else if (jan1Day === 1) { // Monday
+                daysToFirstMonday = 0;
+            } else { // Tuesday to Saturday
+                daysToFirstMonday = 8 - jan1Day;
+            }
             
             // Calculate the Monday of the requested week
-            const mondayOfRequestedWeek = new Date(mondayOfWeek1);
-            mondayOfRequestedWeek.setDate(mondayOfWeek1.getDate() + (week - 1) * 7);
+            const firstMonday = new Date(year, 0, 1 + daysToFirstMonday);
+            const mondayOfRequestedWeek = new Date(firstMonday);
+            mondayOfRequestedWeek.setDate(firstMonday.getDate() + (week - 1) * 7);
+            mondayOfRequestedWeek.setHours(0, 0, 0, 0); // Set to start of day
             
             return mondayOfRequestedWeek;
         }
@@ -4668,7 +4955,9 @@
                     year = year - 543;
                 }
                 
-                return new Date(year, month, day);
+                const date = new Date(year, month, day);
+                date.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
+                return date;
             }
             return new Date();
         }
@@ -5700,5 +5989,5 @@
 
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96bfb9c6b2de45bd',t:'MTc1NDY2MzU3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96c68e62a57410da',t:'MTc1NDczNTE5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
