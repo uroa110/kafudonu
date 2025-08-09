@@ -1697,11 +1697,18 @@
                                         ${lowStock ? '<span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium">ใกล้หมด</span>' : ''}
                                     </div>
                                 </div>
-                                <button onclick="removeInventoryItem(${item.id})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </button>
+                                <div class="flex gap-1">
+                                    <button onclick="editInventoryQuantity(${item.id})" class="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="แก้ไขปริมาณ">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    <button onclick="removeInventoryItem(${item.id})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="ลบรายการ">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
@@ -1756,10 +1763,152 @@
             }).join('');
         }
 
-        function removeInventoryItem(id) {
-            inventory = inventory.filter(item => item.id !== id);
+        function editInventoryQuantity(id) {
+            const item = inventory.find(item => item.id === id);
+            if (!item) return;
+            
+            // Show modal for editing quantity
+            const currentPackages = Math.floor(item.quantity / item.packageQuantity);
+            const remainingUnits = item.quantity % item.packageQuantity;
+            
+            let message = `แก้ไขปริมาณ: ${item.name}\n\n`;
+            message += `ปัจจุบัน: ${item.quantity.toLocaleString()} ${item.unit}\n`;
+            message += `(${currentPackages} หน่วยซื้อ + ${remainingUnits.toLocaleString()} ${item.unit})\n\n`;
+            message += `1 หน่วยซื้อ = ${item.packageQuantity.toLocaleString()} ${item.unit}\n\n`;
+            
+            const action = prompt(
+                message + 
+                'เลือกการดำเนินการ:\n' +
+                '1 = เพิ่มปริมาณ\n' +
+                '2 = ลดปริมาณ\n' +
+                '3 = กำหนดปริมาณใหม่\n' +
+                '4 = ยกเลิก\n\n' +
+                'กรุณาใส่หมายเลข (1-4):'
+            );
+            
+            if (!action || action === '4') return;
+            
+            if (action === '1') {
+                // เพิ่มปริมาณ
+                const addAmount = prompt(
+                    `เพิ่มปริมาณ ${item.name}\n\n` +
+                    `วิธีที่ 1: ใส่จำนวนหน่วยซื้อ (เช่น 2 = เพิ่ม 2 หน่วยซื้อ)\n` +
+                    `วิธีที่ 2: ใส่จำนวน ${item.unit} โดยตรง (เช่น 1000 = เพิ่ม 1000 ${item.unit})\n\n` +
+                    `กรุณาใส่จำนวนที่ต้องการเพิ่ม:`
+                );
+                
+                if (!addAmount || isNaN(addAmount) || parseFloat(addAmount) <= 0) {
+                    alert('กรุณาใส่จำนวนที่ถูกต้อง');
+                    return;
+                }
+                
+                const amount = parseFloat(addAmount);
+                
+                // ถามว่าเป็นหน่วยซื้อหรือหน่วยปกติ
+                const isPackage = confirm(
+                    `ยืนยันการเพิ่มปริมาณ:\n\n` +
+                    `กด OK = เพิ่ม ${amount} หน่วยซื้อ (${(amount * item.packageQuantity).toLocaleString()} ${item.unit})\n` +
+                    `กด Cancel = เพิ่ม ${amount} ${item.unit} โดยตรง`
+                );
+                
+                const actualAmount = isPackage ? amount * item.packageQuantity : amount;
+                item.quantity += actualAmount;
+                
+                alert(`เพิ่มปริมาณสำเร็จ!\n\n` +
+                      `เพิ่ม: ${actualAmount.toLocaleString()} ${item.unit}\n` +
+                      `ปริมาณใหม่: ${item.quantity.toLocaleString()} ${item.unit}`);
+                      
+            } else if (action === '2') {
+                // ลดปริมาณ
+                const reduceAmount = prompt(
+                    `ลดปริมาณ ${item.name}\n\n` +
+                    `ปริมาณปัจจุบัน: ${item.quantity.toLocaleString()} ${item.unit}\n\n` +
+                    `วิธีที่ 1: ใส่จำนวนหน่วยซื้อ (เช่น 1 = ลด 1 หน่วยซื้อ)\n` +
+                    `วิธีที่ 2: ใส่จำนวน ${item.unit} โดยตรง (เช่น 500 = ลด 500 ${item.unit})\n\n` +
+                    `กรุณาใส่จำนวนที่ต้องการลด:`
+                );
+                
+                if (!reduceAmount || isNaN(reduceAmount) || parseFloat(reduceAmount) <= 0) {
+                    alert('กรุณาใส่จำนวนที่ถูกต้อง');
+                    return;
+                }
+                
+                const amount = parseFloat(reduceAmount);
+                
+                // ถามว่าเป็นหน่วยซื้อหรือหน่วยปกติ
+                const isPackage = confirm(
+                    `ยืนยันการลดปริมาณ:\n\n` +
+                    `กด OK = ลด ${amount} หน่วยซื้อ (${(amount * item.packageQuantity).toLocaleString()} ${item.unit})\n` +
+                    `กด Cancel = ลด ${amount} ${item.unit} โดยตรง`
+                );
+                
+                const actualAmount = isPackage ? amount * item.packageQuantity : amount;
+                
+                if (actualAmount >= item.quantity) {
+                    if (!confirm(`จำนวนที่ลดมากกว่าหรือเท่ากับปริมาณที่มี\nจะทำให้ปริมาณเป็น 0 หรือติดลบ\n\nต้องการดำเนินการต่อหรือไม่?`)) {
+                        return;
+                    }
+                }
+                
+                item.quantity = Math.max(0, item.quantity - actualAmount);
+                
+                alert(`ลดปริมาณสำเร็จ!\n\n` +
+                      `ลด: ${actualAmount.toLocaleString()} ${item.unit}\n` +
+                      `ปริมาณใหม่: ${item.quantity.toLocaleString()} ${item.unit}`);
+                      
+            } else if (action === '3') {
+                // กำหนดปริมาณใหม่
+                const newAmount = prompt(
+                    `กำหนดปริมาณใหม่ ${item.name}\n\n` +
+                    `ปริมาณปัจจุบัน: ${item.quantity.toLocaleString()} ${item.unit}\n\n` +
+                    `วิธีที่ 1: ใส่จำนวนหน่วยซื้อ (เช่น 5 = 5 หน่วยซื้อ)\n` +
+                    `วิธีที่ 2: ใส่จำนวน ${item.unit} โดยตรง (เช่น 2500 = 2500 ${item.unit})\n\n` +
+                    `กรุณาใส่ปริมาณใหม่:`
+                );
+                
+                if (!newAmount || isNaN(newAmount) || parseFloat(newAmount) < 0) {
+                    alert('กรุณาใส่จำนวนที่ถูกต้อง (ต้องไม่ติดลบ)');
+                    return;
+                }
+                
+                const amount = parseFloat(newAmount);
+                
+                // ถามว่าเป็นหน่วยซื้อหรือหน่วยปกติ
+                const isPackage = confirm(
+                    `ยืนยันการกำหนดปริมาณใหม่:\n\n` +
+                    `กด OK = กำหนดเป็น ${amount} หน่วยซื้อ (${(amount * item.packageQuantity).toLocaleString()} ${item.unit})\n` +
+                    `กด Cancel = กำหนดเป็น ${amount} ${item.unit} โดยตรง`
+                );
+                
+                const oldQuantity = item.quantity;
+                item.quantity = isPackage ? amount * item.packageQuantity : amount;
+                
+                alert(`กำหนดปริมาณใหม่สำเร็จ!\n\n` +
+                      `ปริมาณเดิม: ${oldQuantity.toLocaleString()} ${item.unit}\n` +
+                      `ปริมาณใหม่: ${item.quantity.toLocaleString()} ${item.unit}`);
+            } else {
+                alert('กรุณาเลือกตัวเลือกที่ถูกต้อง (1-4)');
+                return;
+            }
+            
+            // อัพเดทวันที่แก้ไข
+            item.lastUpdated = new Date().toLocaleDateString('th-TH');
+            
+            // บันทึกและอัพเดทการแสดงผล
             localStorage.setItem('bakery_inventory', JSON.stringify(inventory));
             updateInventoryDisplay();
+        }
+
+        function removeInventoryItem(id) {
+            const item = inventory.find(item => item.id === id);
+            if (!item) return;
+            
+            if (confirm(`คุณแน่ใจหรือไม่ที่จะลบ "${item.name}" ออกจากคลังสินค้า?`)) {
+                inventory = inventory.filter(item => item.id !== id);
+                localStorage.setItem('bakery_inventory', JSON.stringify(inventory));
+                updateInventoryDisplay();
+                alert(`ลบ "${item.name}" ออกจากคลังสินค้าแล้ว`);
+            }
         }
 
         // Purchase Management
@@ -5989,5 +6138,5 @@
 
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96c68e62a57410da',t:'MTc1NDczNTE5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96c75e3822ad45ab',t:'MTc1NDc0MzcwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
