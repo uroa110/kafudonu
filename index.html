@@ -2572,9 +2572,23 @@
                                     <div class="text-sm text-indigo-600 font-medium">${production.productionDate}</div>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-lg font-bold text-indigo-700">${production.quantity}</div>
-                                <div class="text-xs text-indigo-500">หน่วย</div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-right">
+                                    <div class="text-lg font-bold text-indigo-700">${production.quantity}</div>
+                                    <div class="text-xs text-indigo-500">หน่วย</div>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button onclick="editProduction(${production.id})" class="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors" title="แก้ไขจำนวน">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    <button onclick="removeProduction(${production.id})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="ลบรายการ">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3489,6 +3503,177 @@
                 updateRecipesList();
                 updateRecipeOptions(); // Update base recipe options
             }
+        }
+
+        // Production Reset and Management Functions
+        function resetTodayProduction() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayProductions = productions.filter(p => p.productionDate === today);
+            
+            if (todayProductions.length === 0) {
+                alert('ไม่มีการผลิตในวันนี้ที่จะรีเซ็ต');
+                return;
+            }
+            
+            let message = `คุณต้องการรีเซ็ตการผลิตวันนี้ (${new Date().toLocaleDateString('th-TH')}) หรือไม่?\n\n`;
+            message += `จะลบการผลิต ${todayProductions.length} รายการ:\n`;
+            
+            const productionSummary = {};
+            todayProductions.forEach(prod => {
+                if (productionSummary[prod.recipeName]) {
+                    productionSummary[prod.recipeName] += prod.quantity;
+                } else {
+                    productionSummary[prod.recipeName] = prod.quantity;
+                }
+            });
+            
+            Object.entries(productionSummary).forEach(([name, qty]) => {
+                message += `• ${name}: ${qty} หน่วย\n`;
+            });
+            
+            message += `\n⚠️ หมายเหตุ: วัตถุดิบที่ใช้ไปแล้วจะไม่ถูกคืนกลับ`;
+            
+            if (!confirm(message)) return;
+            
+            // Remove today's productions
+            productions = productions.filter(p => p.productionDate !== today);
+            localStorage.setItem('bakery_productions', JSON.stringify(productions));
+            
+            // Update displays
+            updateProductionHistory();
+            updateTodayProductionSummary();
+            updateTodayProductionList(); // Update sales page
+            
+            alert(`รีเซ็ตการผลิตวันนี้เรียบร้อยแล้ว!\n\nลบการผลิต ${todayProductions.length} รายการ`);
+        }
+
+        function resetAllProduction() {
+            if (productions.length === 0) {
+                alert('ไม่มีประวัติการผลิตที่จะรีเซ็ต');
+                return;
+            }
+            
+            let message = `⚠️ คุณต้องการรีเซ็ตประวัติการผลิตทั้งหมดหรือไม่?\n\n`;
+            message += `จะลบการผลิตทั้งหมด ${productions.length} รายการ\n\n`;
+            message += `🚨 การดำเนินการนี้ไม่สามารถย้อนกลับได้!\n`;
+            message += `📝 ข้อมูลการขายจะยังคงอยู่ แต่อาจมีปัญหาในการอ้างอิง\n\n`;
+            message += `💡 แนะนำ: ใช้ "รีเซ็ตวันนี้" แทนหากต้องการลบเฉพาะวันนี้`;
+            
+            if (!confirm(message)) return;
+            
+            // Double confirmation for safety
+            if (!confirm('ยืนยันอีกครั้ง: ลบประวัติการผลิตทั้งหมด?\n\nการดำเนินการนี้ไม่สามารถย้อนกลับได้!')) {
+                return;
+            }
+            
+            // Clear all productions
+            productions = [];
+            localStorage.setItem('bakery_productions', JSON.stringify(productions));
+            
+            // Update displays
+            updateProductionHistory();
+            updateTodayProductionSummary();
+            updateTodayProductionList(); // Update sales page
+            
+            alert('รีเซ็ตประวัติการผลิตทั้งหมดเรียบร้อยแล้ว!');
+        }
+
+        function editProduction(id) {
+            const production = productions.find(p => p.id === id);
+            if (!production) return;
+            
+            let message = `แก้ไขการผลิต: ${production.recipeName}\n\n`;
+            message += `วันที่ผลิต: ${production.productionDate}\n`;
+            message += `จำนวนปัจจุบัน: ${production.quantity} หน่วย\n`;
+            message += `ต้นทุน: ${production.totalCost.toFixed(2)} บาท\n\n`;
+            
+            const newQuantity = prompt(message + 'กรุณาใส่จำนวนใหม่:');
+            
+            if (!newQuantity || isNaN(newQuantity) || parseFloat(newQuantity) <= 0) {
+                if (newQuantity !== null) alert('กรุณาใส่จำนวนที่ถูกต้อง');
+                return;
+            }
+            
+            const quantity = parseFloat(newQuantity);
+            const oldQuantity = production.quantity;
+            
+            // Recalculate costs based on new quantity
+            const recipe = recipes.find(r => r.name === production.recipeName);
+            if (!recipe) {
+                alert('ไม่พบข้อมูลสูตร ไม่สามารถแก้ไขได้');
+                return;
+            }
+            
+            const multiplier = quantity / recipe.yield;
+            
+            // Calculate new costs
+            const ingredientsCost = production.usedIngredients.reduce((sum, ingredient) => {
+                const inventoryItem = inventory.find(item => item.name === ingredient.name);
+                const unitPrice = inventoryItem ? inventoryItem.unitPrice : 0;
+                const newAmount = ingredient.amount * (quantity / oldQuantity);
+                return sum + (newAmount * unitPrice);
+            }, 0);
+            
+            const baseCostForProduction = production.baseCost ? (production.baseCost * (quantity / oldQuantity)) : 0;
+            const totalCost = ingredientsCost + baseCostForProduction;
+            
+            // Update used ingredients amounts
+            const updatedUsedIngredients = production.usedIngredients.map(ingredient => ({
+                ...ingredient,
+                amount: ingredient.amount * (quantity / oldQuantity),
+                cost: ingredient.cost * (quantity / oldQuantity)
+            }));
+            
+            // Update production record
+            production.quantity = quantity;
+            production.usedIngredients = updatedUsedIngredients;
+            production.ingredientsCost = ingredientsCost;
+            production.baseCost = baseCostForProduction;
+            production.totalCost = totalCost;
+            production.costPerUnit = totalCost / quantity;
+            production.timestamp = new Date().toLocaleString('th-TH') + ' (แก้ไข)';
+            
+            // Note: We don't adjust inventory because ingredients were already deducted
+            // This is just updating the production record
+            
+            localStorage.setItem('bakery_productions', JSON.stringify(productions));
+            
+            // Update displays
+            updateProductionHistory();
+            updateTodayProductionSummary();
+            updateTodayProductionList(); // Update sales page
+            
+            alert(`แก้ไขการผลิตสำเร็จ!\n\n` +
+                  `${production.recipeName}\n` +
+                  `จำนวนเดิม: ${oldQuantity} หน่วย\n` +
+                  `จำนวนใหม่: ${quantity} หน่วย\n` +
+                  `ต้นทุนใหม่: ${totalCost.toFixed(2)} บาท\n\n` +
+                  `💡 หมายเหตุ: วัตถุดิบในคลังไม่ได้ถูกปรับ`);
+        }
+
+        function removeProduction(id) {
+            const production = productions.find(p => p.id === id);
+            if (!production) return;
+            
+            let message = `คุณต้องการลบการผลิตนี้หรือไม่?\n\n`;
+            message += `สินค้า: ${production.recipeName}\n`;
+            message += `วันที่: ${production.productionDate}\n`;
+            message += `จำนวน: ${production.quantity} หน่วย\n`;
+            message += `ต้นทุน: ${production.totalCost.toFixed(2)} บาท\n\n`;
+            message += `⚠️ หมายเหตุ: วัตถุดิบที่ใช้ไปแล้วจะไม่ถูกคืนกลับ`;
+            
+            if (!confirm(message)) return;
+            
+            // Remove production
+            productions = productions.filter(p => p.id !== id);
+            localStorage.setItem('bakery_productions', JSON.stringify(productions));
+            
+            // Update displays
+            updateProductionHistory();
+            updateTodayProductionSummary();
+            updateTodayProductionList(); // Update sales page
+            
+            alert(`ลบการผลิต "${production.recipeName}" เรียบร้อยแล้ว!`);
         }
 
         // Sales Management
@@ -6138,5 +6323,5 @@
 
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96c75e3822ad45ab',t:'MTc1NDc0MzcwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96cf007531caa190',t:'MTc1NDgyMzc1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
