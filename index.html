@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการเบเกอรี่</title>
+    <title>PUKU_BAKERY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
@@ -14,7 +14,7 @@
     <div class="container mx-auto px-4 py-6">
         <!-- Header -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h1 class="text-3xl font-bold text-orange-800 mb-2">🧁 ระบบจัดการเบเกอรี่</h1>
+            <h1 class="text-3xl font-bold text-orange-800 mb-2">🧁 PUKU_BAKERY</h1>
             <p class="text-gray-600">จัดการวัตถุดิบ สูตร การผลิต และการขายแบบครบวงจร</p>
         </div>
 
@@ -277,7 +277,35 @@
         <div id="reports" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
             <h2 class="text-2xl font-bold text-indigo-800 mb-4">📊 รายงานและสรุปผล</h2>
             
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <!-- Report Period Selection -->
+            <div class="bg-indigo-50 p-4 rounded-lg mb-6">
+                <h3 class="font-semibold text-indigo-800 mb-3">เลือกช่วงเวลา</h3>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button onclick="setReportPeriod('today')" class="report-period-btn bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">วันนี้</button>
+                    <button onclick="setReportPeriod('week')" class="report-period-btn bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">สัปดาห์นี้</button>
+                    <button onclick="setReportPeriod('month')" class="report-period-btn bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">เดือนนี้</button>
+                    <button onclick="setReportPeriod('custom')" class="report-period-btn bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">กำหนดเอง</button>
+                </div>
+                
+                <!-- Custom Date Range -->
+                <div id="customDateRange" class="hidden grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">วันที่เริ่มต้น</label>
+                        <input type="date" id="startDate" class="w-full p-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">วันที่สิ้นสุด</label>
+                        <input type="date" id="endDate" class="w-full p-2 border rounded-lg">
+                    </div>
+                </div>
+                
+                <div class="mt-3 text-sm text-indigo-600" id="reportPeriodText">
+                    ช่วงเวลา: วันนี้
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div class="bg-green-100 p-4 rounded-lg text-center">
                     <div class="text-2xl font-bold text-green-800" id="totalRevenue">0</div>
                     <div class="text-green-600">รายได้รวม (บาท)</div>
@@ -290,21 +318,44 @@
                     <div class="text-2xl font-bold text-blue-800" id="totalProfit">0</div>
                     <div class="text-blue-600">กำไรสุทธิ (บาท)</div>
                 </div>
+                <div class="bg-purple-100 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-purple-800" id="profitMargin">0%</div>
+                    <div class="text-purple-600">อัตรากำไร</div>
+                </div>
             </div>
             
-            <div class="grid md:grid-cols-2 gap-6">
+            <!-- Detailed Reports -->
+            <div class="grid lg:grid-cols-2 gap-6">
+                <!-- Product Performance -->
                 <div class="bg-indigo-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-indigo-800 mb-3">สินค้าขายดี</h3>
-                    <div id="bestSellers" class="space-y-2">
-                        <!-- Best sellers will be listed here -->
+                    <h3 class="font-semibold text-indigo-800 mb-3">📈 ประสิทธิภาพสินค้า</h3>
+                    <div id="productPerformance" class="space-y-3 max-h-96 overflow-y-auto">
+                        <!-- Product performance will be listed here -->
                     </div>
                 </div>
                 
+                <!-- Sales Summary -->
                 <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-gray-800 mb-3">สรุปรายวัน</h3>
-                    <div id="dailySummary" class="space-y-2">
-                        <!-- Daily summary will be shown here -->
+                    <h3 class="font-semibold text-gray-800 mb-3">📋 สรุปการขาย</h3>
+                    <div id="salesSummary" class="space-y-2">
+                        <!-- Sales summary will be shown here -->
                     </div>
+                </div>
+            </div>
+            
+            <!-- Production vs Sales Chart -->
+            <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+                <h3 class="font-semibold text-yellow-800 mb-3">🏭 การผลิต vs การขาย</h3>
+                <div id="productionVsSales" class="space-y-3">
+                    <!-- Production vs sales data will be shown here -->
+                </div>
+            </div>
+            
+            <!-- Daily Breakdown (for week/month periods) -->
+            <div id="dailyBreakdown" class="mt-6 bg-teal-50 p-4 rounded-lg hidden">
+                <h3 class="font-semibold text-teal-800 mb-3">📅 รายละเอียดรายวัน</h3>
+                <div id="dailyBreakdownContent" class="space-y-2 max-h-64 overflow-y-auto">
+                    <!-- Daily breakdown will be shown here -->
                 </div>
             </div>
         </div>
@@ -317,7 +368,9 @@
         let finishedProducts = JSON.parse(localStorage.getItem('finishedProducts') || '[]');
         let sales = JSON.parse(localStorage.getItem('sales') || '[]');
         let purchases = JSON.parse(localStorage.getItem('purchases') || '[]');
+        let productionHistory = JSON.parse(localStorage.getItem('productionHistory') || '[]');
         let currentRecipeIngredients = [];
+        let currentReportPeriod = 'today';
 
         // Autocomplete data storage
         let autocompleteData = JSON.parse(localStorage.getItem('autocompleteData') || '{}');
@@ -907,6 +960,16 @@
                 ingredient.quantity -= (recipeIng.amount * batchesNeeded);
             });
 
+            // Record production history
+            const production = {
+                productName: recipe.name,
+                quantity: pieces,
+                costPerUnit: recipe.costPerUnit,
+                totalCost: pieces * recipe.costPerUnit,
+                date: new Date().toISOString()
+            };
+            productionHistory.push(production);
+
             // Add finished product with cost per unit from recipe (not recalculated)
             const existingProduct = finishedProducts.find(p => p.name === recipe.name);
             if (existingProduct) {
@@ -1202,53 +1265,449 @@
             `).join('') || '<div class="text-gray-500 text-center">ยังไม่มีการขายวันนี้</div>';
         }
 
+        // Report Period Management
+        function setReportPeriod(period) {
+            currentReportPeriod = period;
+            
+            // Update button styles
+            document.querySelectorAll('.report-period-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-500', 'text-white');
+                btn.classList.add('bg-gray-200');
+            });
+            event.target.classList.remove('bg-gray-200');
+            event.target.classList.add('bg-indigo-500', 'text-white');
+            
+            // Show/hide custom date range
+            const customRange = document.getElementById('customDateRange');
+            if (period === 'custom') {
+                customRange.classList.remove('hidden');
+                // Set default dates
+                const today = new Date();
+                const weekAgo = new Date(today);
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
+                document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            } else {
+                customRange.classList.add('hidden');
+            }
+            
+            updateReportPeriodText();
+            updateReports();
+        }
+        
+        function updateReportPeriodText() {
+            const periodText = document.getElementById('reportPeriodText');
+            let text = '';
+            
+            switch(currentReportPeriod) {
+                case 'today':
+                    text = 'ช่วงเวลา: วันนี้';
+                    break;
+                case 'week':
+                    text = 'ช่วงเวลา: สัปดาห์นี้ (จันทร์-อาทิตย์)';
+                    break;
+                case 'month':
+                    text = 'ช่วงเวลา: เดือนนี้';
+                    break;
+                case 'custom':
+                    const startDate = document.getElementById('startDate').value;
+                    const endDate = document.getElementById('endDate').value;
+                    if (startDate && endDate) {
+                        text = `ช่วงเวลา: ${formatThaiDate(startDate)} - ${formatThaiDate(endDate)}`;
+                    } else {
+                        text = 'ช่วงเวลา: กำหนดเอง (กรุณาเลือกวันที่)';
+                    }
+                    break;
+            }
+            
+            periodText.textContent = text;
+        }
+        
+        function formatThaiDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('th-TH', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        function getDateRange() {
+            const now = new Date();
+            let startDate, endDate;
+            
+            switch(currentReportPeriod) {
+                case 'today':
+                    startDate = new Date(now);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(now);
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+                    
+                case 'week':
+                    // Get Monday of current week
+                    const monday = new Date(now);
+                    const day = monday.getDay();
+                    const diff = monday.getDate() - day + (day === 0 ? -6 : 1);
+                    monday.setDate(diff);
+                    monday.setHours(0, 0, 0, 0);
+                    
+                    startDate = monday;
+                    endDate = new Date(monday);
+                    endDate.setDate(endDate.getDate() + 6);
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+                    
+                case 'month':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+                    
+                case 'custom':
+                    const startInput = document.getElementById('startDate').value;
+                    const endInput = document.getElementById('endDate').value;
+                    if (!startInput || !endInput) return null;
+                    
+                    startDate = new Date(startInput);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(endInput);
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+                    
+                default:
+                    return null;
+            }
+            
+            return { startDate, endDate };
+        }
+        
+        function filterDataByDateRange(data, dateField = 'date') {
+            const range = getDateRange();
+            if (!range) return [];
+            
+            return data.filter(item => {
+                const itemDate = new Date(item[dateField]);
+                return itemDate >= range.startDate && itemDate <= range.endDate;
+            });
+        }
+        
         // Reports
         function updateReports() {
-            const today = new Date().toDateString();
-            const todaySales = sales.filter(sale => new Date(sale.date).toDateString() === today);
+            const filteredSales = filterDataByDateRange(sales);
+            const filteredProduction = filterDataByDateRange(productionHistory);
             
-            const totalRevenue = todaySales.reduce((sum, sale) => sum + sale.revenue, 0);
-            const totalCost = todaySales.reduce((sum, sale) => sum + sale.cost, 0);
+            const totalRevenue = filteredSales.reduce((sum, sale) => sum + sale.revenue, 0);
+            const totalCost = filteredSales.reduce((sum, sale) => sum + sale.cost, 0);
             const totalProfit = totalRevenue - totalCost;
+            const profitMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100) : 0;
             
+            // Update summary cards
             document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString();
             document.getElementById('totalCost').textContent = totalCost.toLocaleString();
             document.getElementById('totalProfit').textContent = totalProfit.toLocaleString();
+            document.getElementById('profitMargin').textContent = profitMargin.toFixed(1) + '%';
             
-            // Best sellers
+            updateProductPerformance(filteredSales, filteredProduction);
+            updateSalesSummary(filteredSales);
+            updateProductionVsSales(filteredSales, filteredProduction);
+            updateDailyBreakdown(filteredSales, filteredProduction);
+        }
+        
+        function updateProductPerformance(salesData, productionData) {
+            // Calculate production totals by product
+            const productionTotals = {};
+            productionData.forEach(prod => {
+                if (!productionTotals[prod.productName]) {
+                    productionTotals[prod.productName] = 0;
+                }
+                productionTotals[prod.productName] += prod.quantity;
+            });
+            
+            // Calculate sales totals by product
+            const salesTotals = {};
+            const salesRevenue = {};
+            const salesProfit = {};
+            
+            salesData.forEach(sale => {
+                if (!salesTotals[sale.productName]) {
+                    salesTotals[sale.productName] = 0;
+                    salesRevenue[sale.productName] = 0;
+                    salesProfit[sale.productName] = 0;
+                }
+                salesTotals[sale.productName] += sale.quantity;
+                salesRevenue[sale.productName] += sale.revenue;
+                salesProfit[sale.productName] += sale.profit;
+            });
+            
+            // Combine all products
+            const allProducts = new Set([...Object.keys(productionTotals), ...Object.keys(salesTotals)]);
+            
+            const performanceData = Array.from(allProducts).map(productName => {
+                const produced = productionTotals[productName] || 0;
+                const sold = salesTotals[productName] || 0;
+                const revenue = salesRevenue[productName] || 0;
+                const profit = salesProfit[productName] || 0;
+                const sellRate = produced > 0 ? ((sold / produced) * 100) : 0;
+                
+                return {
+                    name: productName,
+                    produced,
+                    sold,
+                    revenue,
+                    profit,
+                    sellRate
+                };
+            }).sort((a, b) => b.revenue - a.revenue);
+            
+            const container = document.getElementById('productPerformance');
+            container.innerHTML = performanceData.map(product => `
+                <div class="bg-white p-4 rounded-lg border">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="font-semibold text-gray-800">${product.name}</div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold ${product.sellRate >= 80 ? 'text-green-600' : product.sellRate >= 50 ? 'text-yellow-600' : 'text-red-600'}">
+                                ${product.sellRate.toFixed(1)}%
+                            </div>
+                            <div class="text-xs text-gray-500">อัตราการขาย</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <div class="text-gray-600">ผลิต: <span class="font-medium">${product.produced}</span> ชิ้น</div>
+                            <div class="text-gray-600">ขาย: <span class="font-medium">${product.sold}</span> ชิ้น</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-600">รายได้: <span class="font-medium">${product.revenue.toLocaleString()}</span> บาท</div>
+                            <div class="text-gray-600">กำไร: <span class="font-medium ${product.profit >= 0 ? 'text-green-600' : 'text-red-600'}">${product.profit.toLocaleString()}</span> บาท</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress bar for sell rate -->
+                    <div class="mt-3">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="h-2 rounded-full ${product.sellRate >= 80 ? 'bg-green-500' : product.sellRate >= 50 ? 'bg-yellow-500' : 'bg-red-500'}" 
+                                 style="width: ${Math.min(product.sellRate, 100)}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('') || '<div class="text-gray-500 text-center">ยังไม่มีข้อมูล</div>';
+        }
+        
+        function updateSalesSummary(salesData) {
+            const totalTransactions = salesData.length;
+            const totalItems = salesData.reduce((sum, sale) => sum + sale.quantity, 0);
+            const avgTransactionValue = totalTransactions > 0 ? (salesData.reduce((sum, sale) => sum + sale.revenue, 0) / totalTransactions) : 0;
+            
+            // Group by product
             const productSales = {};
-            todaySales.forEach(sale => {
+            salesData.forEach(sale => {
                 if (!productSales[sale.productName]) {
-                    productSales[sale.productName] = { quantity: 0, revenue: 0 };
+                    productSales[sale.productName] = { quantity: 0, revenue: 0, transactions: 0 };
                 }
                 productSales[sale.productName].quantity += sale.quantity;
                 productSales[sale.productName].revenue += sale.revenue;
+                productSales[sale.productName].transactions += 1;
             });
             
-            const bestSellers = Object.entries(productSales)
-                .sort((a, b) => b[1].quantity - a[1].quantity)
+            const topProducts = Object.entries(productSales)
+                .sort((a, b) => b[1].revenue - a[1].revenue)
                 .slice(0, 5);
             
-            document.getElementById('bestSellers').innerHTML = bestSellers.map(([name, data]) => `
-                <div class="bg-white p-2 rounded border">
-                    <div class="font-medium">${name}</div>
-                    <div class="text-sm text-gray-600">${data.quantity} ชิ้น - ${data.revenue.toLocaleString()} บาท</div>
-                </div>
-            `).join('') || '<div class="text-gray-500">ยังไม่มีข้อมูล</div>';
-            
-            // Daily summary
-            document.getElementById('dailySummary').innerHTML = `
-                <div class="bg-white p-3 rounded border">
-                    <div class="font-semibold mb-2">สรุปวันนี้</div>
-                    <div class="text-sm space-y-1">
-                        <div>ยอดขาย: ${todaySales.length} รายการ</div>
-                        <div>สินค้าขาย: ${Object.keys(productSales).length} รายการ</div>
-                        <div>รายได้: ${totalRevenue.toLocaleString()} บาท</div>
-                        <div>กำไร: ${totalProfit.toLocaleString()} บาท</div>
-                        <div>อัตรากำไร: ${totalRevenue > 0 ? ((totalProfit/totalRevenue)*100).toFixed(1) : 0}%</div>
+            const container = document.getElementById('salesSummary');
+            container.innerHTML = `
+                <div class="bg-white p-4 rounded-lg border mb-4">
+                    <div class="font-semibold mb-3">📊 สถิติการขาย</div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <div class="text-gray-600">รายการขาย: <span class="font-medium">${totalTransactions}</span></div>
+                            <div class="text-gray-600">ชิ้นรวม: <span class="font-medium">${totalItems}</span></div>
+                        </div>
+                        <div>
+                            <div class="text-gray-600">เฉลี่ย/รายการ: <span class="font-medium">${avgTransactionValue.toFixed(0)}</span> บาท</div>
+                            <div class="text-gray-600">สินค้าที่ขาย: <span class="font-medium">${Object.keys(productSales).length}</span> รายการ</div>
+                        </div>
                     </div>
                 </div>
-            `;
+                
+                <div class="bg-white p-4 rounded-lg border">
+                    <div class="font-semibold mb-3">🏆 สินค้าขายดี</div>
+                    <div class="space-y-2">
+                        ${topProducts.map(([name, data], index) => `
+                            <div class="flex justify-between items-center py-2 ${index < topProducts.length - 1 ? 'border-b' : ''}">
+                                <div>
+                                    <div class="font-medium">${index + 1}. ${name}</div>
+                                    <div class="text-sm text-gray-600">${data.quantity} ชิ้น, ${data.transactions} รายการ</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold text-green-600">${data.revenue.toLocaleString()} บาท</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` || '<div class="text-gray-500 text-center">ยังไม่มีข้อมูล</div>';
+        }
+        
+        function updateProductionVsSales(salesData, productionData) {
+            // Group production by product
+            const productionByProduct = {};
+            productionData.forEach(prod => {
+                if (!productionByProduct[prod.productName]) {
+                    productionByProduct[prod.productName] = { quantity: 0, cost: 0 };
+                }
+                productionByProduct[prod.productName].quantity += prod.quantity;
+                productionByProduct[prod.productName].cost += prod.totalCost;
+            });
+            
+            // Group sales by product
+            const salesByProduct = {};
+            salesData.forEach(sale => {
+                if (!salesByProduct[sale.productName]) {
+                    salesByProduct[sale.productName] = { quantity: 0, revenue: 0 };
+                }
+                salesByProduct[sale.productName].quantity += sale.quantity;
+                salesByProduct[sale.productName].revenue += sale.revenue;
+            });
+            
+            // Combine data
+            const allProducts = new Set([...Object.keys(productionByProduct), ...Object.keys(salesByProduct)]);
+            const comparisonData = Array.from(allProducts).map(productName => {
+                const production = productionByProduct[productName] || { quantity: 0, cost: 0 };
+                const sales = salesByProduct[productName] || { quantity: 0, revenue: 0 };
+                const remaining = production.quantity - sales.quantity;
+                const sellRate = production.quantity > 0 ? ((sales.quantity / production.quantity) * 100) : 0;
+                
+                return {
+                    name: productName,
+                    produced: production.quantity,
+                    sold: sales.quantity,
+                    remaining: remaining,
+                    sellRate: sellRate,
+                    productionCost: production.cost,
+                    salesRevenue: sales.revenue
+                };
+            }).sort((a, b) => b.produced - a.produced);
+            
+            const container = document.getElementById('productionVsSales');
+            container.innerHTML = comparisonData.map(product => `
+                <div class="bg-white p-4 rounded-lg border">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="font-semibold text-gray-800">${product.name}</div>
+                        <div class="text-sm ${product.sellRate >= 80 ? 'text-green-600' : product.sellRate >= 50 ? 'text-yellow-600' : 'text-red-600'}">
+                            ขายได้ ${product.sellRate.toFixed(1)}%
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4 text-center text-sm mb-3">
+                        <div class="bg-blue-50 p-2 rounded">
+                            <div class="font-bold text-blue-600">${product.produced}</div>
+                            <div class="text-blue-600">ผลิต</div>
+                        </div>
+                        <div class="bg-green-50 p-2 rounded">
+                            <div class="font-bold text-green-600">${product.sold}</div>
+                            <div class="text-green-600">ขาย</div>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <div class="font-bold text-gray-600">${product.remaining}</div>
+                            <div class="text-gray-600">เหลือ</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="text-gray-600">ต้นทุนผลิต: <span class="font-medium">${product.productionCost.toLocaleString()}</span> บาท</div>
+                        <div class="text-gray-600">รายได้ขาย: <span class="font-medium">${product.salesRevenue.toLocaleString()}</span> บาท</div>
+                    </div>
+                    
+                    <!-- Visual progress bar -->
+                    <div class="mt-3">
+                        <div class="flex text-xs text-gray-600 mb-1">
+                            <span>ขาย</span>
+                            <span class="ml-auto">เหลือ</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div class="h-full bg-green-500 float-left" style="width: ${product.sellRate}%"></div>
+                            <div class="h-full bg-gray-400" style="width: ${100 - product.sellRate}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('') || '<div class="text-gray-500 text-center">ยังไม่มีข้อมูล</div>';
+        }
+        
+        function updateDailyBreakdown(salesData, productionData) {
+            const container = document.getElementById('dailyBreakdown');
+            const contentContainer = document.getElementById('dailyBreakdownContent');
+            
+            // Only show daily breakdown for week and month periods
+            if (currentReportPeriod === 'today') {
+                container.classList.add('hidden');
+                return;
+            }
+            
+            container.classList.remove('hidden');
+            
+            // Group data by date
+            const dailyData = {};
+            
+            // Process sales data
+            salesData.forEach(sale => {
+                const date = new Date(sale.date).toDateString();
+                if (!dailyData[date]) {
+                    dailyData[date] = { sales: 0, revenue: 0, profit: 0, production: 0, productionCost: 0 };
+                }
+                dailyData[date].sales += sale.quantity;
+                dailyData[date].revenue += sale.revenue;
+                dailyData[date].profit += sale.profit;
+            });
+            
+            // Process production data
+            productionData.forEach(prod => {
+                const date = new Date(prod.date).toDateString();
+                if (!dailyData[date]) {
+                    dailyData[date] = { sales: 0, revenue: 0, profit: 0, production: 0, productionCost: 0 };
+                }
+                dailyData[date].production += prod.quantity;
+                dailyData[date].productionCost += prod.totalCost;
+            });
+            
+            // Sort by date (newest first)
+            const sortedDates = Object.keys(dailyData).sort((a, b) => new Date(b) - new Date(a));
+            
+            contentContainer.innerHTML = sortedDates.map(dateString => {
+                const data = dailyData[dateString];
+                const date = new Date(dateString);
+                const thaiDate = date.toLocaleDateString('th-TH', { 
+                    weekday: 'short',
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                return `
+                    <div class="bg-white p-3 rounded-lg border">
+                        <div class="font-semibold text-gray-800 mb-2">${thaiDate}</div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                            <div class="text-center">
+                                <div class="font-bold text-blue-600">${data.production}</div>
+                                <div class="text-blue-600">ผลิต (ชิ้น)</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-bold text-green-600">${data.sales}</div>
+                                <div class="text-green-600">ขาย (ชิ้น)</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-bold text-green-600">${data.revenue.toLocaleString()}</div>
+                                <div class="text-green-600">รายได้ (บาท)</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-bold ${data.profit >= 0 ? 'text-green-600' : 'text-red-600'}">${data.profit.toLocaleString()}</div>
+                                <div class="${data.profit >= 0 ? 'text-green-600' : 'text-red-600'}">กำไร (บาท)</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<div class="text-gray-500 text-center">ยังไม่มีข้อมูล</div>';
         }
 
         // Daily Reset Functions
@@ -1348,6 +1807,7 @@
             localStorage.setItem('finishedProducts', JSON.stringify(finishedProducts));
             localStorage.setItem('sales', JSON.stringify(sales));
             localStorage.setItem('purchases', JSON.stringify(purchases));
+            localStorage.setItem('productionHistory', JSON.stringify(productionHistory));
         }
 
         function updateAllDisplays() {
@@ -1408,6 +1868,21 @@
         
         // Auto-update purchase preview
         document.getElementById('purchaseQuantity').addEventListener('input', updatePurchasePreview);
+        
+        // Auto-update reports when custom dates change
+        document.getElementById('startDate').addEventListener('change', function() {
+            if (currentReportPeriod === 'custom') {
+                updateReportPeriodText();
+                updateReports();
+            }
+        });
+        
+        document.getElementById('endDate').addEventListener('change', function() {
+            if (currentReportPeriod === 'custom') {
+                updateReportPeriodText();
+                updateReports();
+            }
+        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98580b5ef1c72731',t:'MTc1ODk0NTEwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98589ba5c6a1d01f',t:'MTc1ODk1MTAxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
