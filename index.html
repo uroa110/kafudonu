@@ -21,6 +21,9 @@
         <!-- Navigation -->
         <div class="bg-white rounded-xl shadow-lg p-4 mb-6">
             <div class="flex flex-wrap gap-2">
+                <button onclick="showSection('purchase')" class="nav-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition-colors">
+                    🛒 ซื้อวัตถุดิบ
+                </button>
                 <button onclick="showSection('ingredients')" class="nav-btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
                     🛒 วัตถุดิบ
                 </button>
@@ -36,17 +39,49 @@
                 <button onclick="showSection('sales')" class="nav-btn bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors">
                     🛍️ ขาย
                 </button>
-                <button onclick="showSection('purchase')" class="nav-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition-colors">
-                    🛒 ซื้อวัตถุดิบ
-                </button>
                 <button onclick="showSection('reports')" class="nav-btn bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors">
                     📊 รายงาน
                 </button>
             </div>
         </div>
 
+        <!-- Purchase Section -->
+        <div id="purchase" class="section bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-teal-800 mb-4">🛒 ซื้อวัตถุดิบ</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-teal-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-teal-800 mb-3">สั่งซื้อวัตถุดิบ</h3>
+                    <div class="space-y-3">
+                        <select id="purchaseIngredient" class="w-full p-2 border rounded-lg">
+                            <option value="">เลือกวัตถุดิบ</option>
+                        </select>
+                        <input type="number" id="purchaseQuantity" placeholder="จำนวนที่ต้องการซื้อ (หน่วยซื้อ)" class="w-full p-2 border rounded-lg">
+                        <div id="purchasePreview" class="bg-white p-3 rounded border min-h-20">
+                            <div class="text-sm text-gray-500">เลือกวัตถุดิบเพื่อดูรายละเอียด</div>
+                        </div>
+                        <button onclick="makePurchase()" class="w-full bg-teal-500 text-white p-2 rounded-lg hover:bg-teal-600">
+                            ยืนยันการซื้อ
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-3">ประวัติการซื้อ (วันนี้)</h3>
+                    <div id="purchaseHistory" class="space-y-2 max-h-64 overflow-y-auto">
+                        <!-- Purchase history will be listed here -->
+                    </div>
+                    <div class="mt-4 p-3 bg-white rounded-lg">
+                        <div class="text-lg font-semibold text-teal-800">
+                            ยอดซื้อวันนี้: <span id="todayPurchaseTotal" class="text-teal-600">0</span> บาท
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Ingredients Section -->
-        <div id="ingredients" class="section bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div id="ingredients" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
             <h2 class="text-2xl font-bold text-blue-800 mb-4">🛒 จัดการวัตถุดิบ</h2>
             
             <div class="grid md:grid-cols-2 gap-6">
@@ -203,40 +238,7 @@
             </div>
         </div>
 
-        <!-- Purchase Section -->
-        <div id="purchase" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
-            <h2 class="text-2xl font-bold text-teal-800 mb-4">🛒 ซื้อวัตถุดิบ</h2>
-            
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-teal-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-teal-800 mb-3">สั่งซื้อวัตถุดิบ</h3>
-                    <div class="space-y-3">
-                        <select id="purchaseIngredient" class="w-full p-2 border rounded-lg">
-                            <option value="">เลือกวัตถุดิบ</option>
-                        </select>
-                        <input type="number" id="purchaseQuantity" placeholder="จำนวนที่ต้องการซื้อ (หน่วยซื้อ)" class="w-full p-2 border rounded-lg">
-                        <div id="purchasePreview" class="bg-white p-3 rounded border min-h-20">
-                            <div class="text-sm text-gray-500">เลือกวัตถุดิบเพื่อดูรายละเอียด</div>
-                        </div>
-                        <button onclick="makePurchase()" class="w-full bg-teal-500 text-white p-2 rounded-lg hover:bg-teal-600">
-                            ยืนยันการซื้อ
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-gray-800 mb-3">ประวัติการซื้อ (วันนี้)</h3>
-                    <div id="purchaseHistory" class="space-y-2 max-h-64 overflow-y-auto">
-                        <!-- Purchase history will be listed here -->
-                    </div>
-                    <div class="mt-4 p-3 bg-white rounded-lg">
-                        <div class="text-lg font-semibold text-teal-800">
-                            ยอดซื้อวันนี้: <span id="todayPurchaseTotal" class="text-teal-600">0</span> บาท
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Sales Section -->
         <div id="sales" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
@@ -351,4 +353,1061 @@
                 if (!suggestionBox) createSuggestionBox();
                 
                 suggestionBox.innerHTML = '';
-                cu
+                currentSuggestions = suggestions;
+                selectedIndex = -1;
+
+                if (suggestions.length === 0) {
+                    suggestionBox.style.display = 'none';
+                    return;
+                }
+
+                suggestions.forEach((suggestion, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'px-3 py-2 cursor-pointer hover:bg-blue-50 text-sm';
+                    item.textContent = suggestion;
+                    item.onclick = () => selectSuggestion(suggestion);
+                    suggestionBox.appendChild(item);
+                });
+
+                suggestionBox.style.display = 'block';
+            }
+
+            function selectSuggestion(suggestion) {
+                input.value = suggestion;
+                hideSuggestions();
+                input.focus();
+                input.dispatchEvent(new Event('input'));
+            }
+
+            function hideSuggestions() {
+                if (suggestionBox) {
+                    suggestionBox.style.display = 'none';
+                }
+                selectedIndex = -1;
+            }
+
+            function updateSelection() {
+                if (!suggestionBox) return;
+                
+                const items = suggestionBox.children;
+                for (let i = 0; i < items.length; i++) {
+                    items[i].classList.remove('bg-blue-100');
+                    if (i === selectedIndex) {
+                        items[i].classList.add('bg-blue-100');
+                    }
+                }
+            }
+
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase().trim();
+                if (value.length === 0) {
+                    hideSuggestions();
+                    return;
+                }
+
+                const filtered = dataArray.filter(item => 
+                    item.toLowerCase().includes(value) && item.toLowerCase() !== value
+                ).slice(0, 8);
+
+                showSuggestions(filtered);
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (!suggestionBox || suggestionBox.style.display === 'none') return;
+
+                switch(e.key) {
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        selectedIndex = Math.min(selectedIndex + 1, currentSuggestions.length - 1);
+                        updateSelection();
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        selectedIndex = Math.max(selectedIndex - 1, -1);
+                        updateSelection();
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (selectedIndex >= 0) {
+                            selectSuggestion(currentSuggestions[selectedIndex]);
+                        }
+                        break;
+                    case 'Escape':
+                        hideSuggestions();
+                        break;
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                setTimeout(hideSuggestions, 150);
+            });
+
+            input.addEventListener('focus', function() {
+                if (this.value.trim().length > 0) {
+                    this.dispatchEvent(new Event('input'));
+                }
+            });
+        }
+
+        function addToAutocomplete(category, value) {
+            if (!value || value.trim() === '') return;
+            
+            const trimmedValue = value.trim();
+            if (!autocompleteData[category].includes(trimmedValue)) {
+                autocompleteData[category].push(trimmedValue);
+                if (autocompleteData[category].length > 50) {
+                    autocompleteData[category] = autocompleteData[category].slice(-50);
+                }
+                localStorage.setItem('autocompleteData', JSON.stringify(autocompleteData));
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('purchase');
+            checkDailyReset();
+            updateAllDisplays();
+            startDailyResetTimer();
+            
+            // Setup autocomplete for all relevant fields
+            setupAutocomplete('ingredientName', autocompleteData.ingredientNames);
+            setupAutocomplete('ingredientUnit', autocompleteData.units);
+            setupAutocomplete('ingredientPurchaseUnit', autocompleteData.purchaseUnits);
+            setupAutocomplete('recipeName', autocompleteData.recipeNames);
+            setupAutocomplete('salePrice', autocompleteData.salePrices);
+        });
+
+        // Navigation
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionName).classList.remove('hidden');
+            
+            // Update displays when switching sections
+            if (sectionName === 'inventory') updateInventoryDisplay();
+            if (sectionName === 'recipes') updateRecipeSelects();
+            if (sectionName === 'production') updateProductionSelects();
+            if (sectionName === 'purchase') updatePurchaseSelects();
+            if (sectionName === 'sales') updateSalesSelects();
+            if (sectionName === 'reports') updateReports();
+        }
+
+        // Ingredients Management
+        function addIngredient() {
+            const name = document.getElementById('ingredientName').value;
+            const unit = document.getElementById('ingredientUnit').value;
+            const purchaseUnit = document.getElementById('ingredientPurchaseUnit').value;
+            const conversionRate = parseFloat(document.getElementById('ingredientConversionRate').value);
+            const purchaseQuantity = parseFloat(document.getElementById('ingredientQuantity').value);
+            const totalPrice = parseFloat(document.getElementById('ingredientTotalPrice').value);
+
+            if (!name || !unit || !purchaseUnit || !conversionRate || !purchaseQuantity || !totalPrice) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            // Add to autocomplete data
+            addToAutocomplete('ingredientNames', name);
+            addToAutocomplete('units', unit);
+            addToAutocomplete('purchaseUnits', purchaseUnit);
+
+            // Convert to base unit (หน่วยนับ)
+            const actualQuantity = purchaseQuantity * conversionRate;
+            const pricePerUnit = totalPrice / actualQuantity;
+
+            const existingIndex = ingredients.findIndex(ing => ing.name === name);
+            if (existingIndex >= 0) {
+                // Calculate weighted average price for existing ingredient
+                const existingTotal = ingredients[existingIndex].quantity * ingredients[existingIndex].price;
+                const newTotal = totalPrice;
+                const combinedQuantity = ingredients[existingIndex].quantity + actualQuantity;
+                const averagePrice = (existingTotal + newTotal) / combinedQuantity;
+                
+                ingredients[existingIndex].quantity = combinedQuantity;
+                ingredients[existingIndex].price = averagePrice;
+            } else {
+                ingredients.push({ 
+                    name, 
+                    unit, 
+                    purchaseUnit, 
+                    conversionRate, 
+                    price: pricePerUnit, 
+                    quantity: actualQuantity 
+                });
+            }
+
+            saveData();
+            updateAllDisplays();
+            clearIngredientForm();
+        }
+
+        function clearIngredientForm() {
+            document.getElementById('ingredientName').value = '';
+            document.getElementById('ingredientUnit').value = '';
+            document.getElementById('ingredientPurchaseUnit').value = '';
+            document.getElementById('ingredientConversionRate').value = '';
+            document.getElementById('ingredientQuantity').value = '';
+            document.getElementById('ingredientTotalPrice').value = '';
+            document.getElementById('pricePerUnit').innerHTML = 'ราคาต่อหน่วยจะแสดงที่นี่';
+        }
+
+        function updateIngredientsDisplay() {
+            const list = document.getElementById('ingredientsList');
+            list.innerHTML = ingredients.map(ing => `
+                <div class="bg-white p-3 rounded border flex justify-between items-center">
+                    <div>
+                        <div class="font-medium">${ing.name}</div>
+                        <div class="text-sm text-gray-600">${ing.quantity} ${ing.unit} @ ${ing.price.toFixed(4)} บาท/${ing.unit}</div>
+                        ${ing.purchaseUnit ? `<div class="text-xs text-gray-500">หน่วยซื้อ: ${ing.purchaseUnit} (1 ${ing.purchaseUnit} = ${ing.conversionRate} ${ing.unit})</div>` : ''}
+                    </div>
+                    <button onclick="removeIngredient('${ing.name}')" class="text-red-500 hover:text-red-700">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function removeIngredient(name) {
+            if (confirm(`ต้องการลบ ${name} หรือไม่?`)) {
+                ingredients = ingredients.filter(ing => ing.name !== name);
+                saveData();
+                updateAllDisplays();
+            }
+        }
+
+        // Inventory Display
+        function updateInventoryDisplay() {
+            const grid = document.getElementById('inventoryGrid');
+            const totalValue = ingredients.reduce((sum, ing) => sum + (ing.quantity * ing.price), 0);
+            
+            grid.innerHTML = ingredients.map(ing => `
+                <div class="bg-white p-4 rounded-lg border">
+                    <div class="font-semibold text-gray-800">${ing.name}</div>
+                    <div class="text-lg font-bold text-green-600">${ing.quantity} ${ing.unit}</div>
+                    <div class="text-sm text-gray-600">มูลค่า: ${(ing.quantity * ing.price).toLocaleString()} บาท</div>
+                    <div class="text-xs text-gray-500">ราคา: ${ing.price} บาท/${ing.unit}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('totalInventoryValue').textContent = totalValue.toLocaleString();
+        }
+
+        // Recipe Management
+        function updateRecipeSelects() {
+            const select = document.getElementById('recipeIngredient');
+            select.innerHTML = '<option value="">เลือกวัตถุดิบ</option>' + 
+                ingredients.map(ing => `<option value="${ing.name}">${ing.name} (${ing.unit})</option>`).join('');
+            
+            // Update base recipe select
+            const baseSelect = document.getElementById('baseRecipe');
+            const baseRecipes = recipes.filter(recipe => recipe.isBase);
+            baseSelect.innerHTML = '<option value="">สร้างสูตรใหม่ทั้งหมด</option>' + 
+                baseRecipes.map((recipe, index) => `<option value="${recipes.indexOf(recipe)}">${recipe.name} (สูตรหลัก)</option>`).join('');
+        }
+
+        function loadBaseRecipe() {
+            const baseRecipeIndex = document.getElementById('baseRecipe').value;
+            if (baseRecipeIndex === '') {
+                alert('กรุณาเลือกสูตรหลักก่อน');
+                return;
+            }
+
+            const baseRecipe = recipes[baseRecipeIndex];
+            if (!baseRecipe) {
+                alert('ไม่พบสูตรหลักที่เลือก');
+                return;
+            }
+
+            // Load base recipe ingredients
+            currentRecipeIngredients = [...baseRecipe.ingredients.map(ing => ({...ing}))];
+            
+            // Set yield to same as base recipe
+            document.getElementById('recipeYield').value = baseRecipe.yield;
+            
+            updateRecipeIngredientsDisplay();
+            alert(`โหลดสูตรหลัก "${baseRecipe.name}" สำเร็จ! สามารถเพิ่มวัตถุดิบเพิ่มเติมได้`);
+        }
+
+        function addIngredientToRecipe() {
+            const ingredientName = document.getElementById('recipeIngredient').value;
+            const amount = parseFloat(document.getElementById('recipeIngredientAmount').value);
+
+            if (!ingredientName || !amount) {
+                alert('กรุณาเลือกวัตถุดิบและระบุจำนวน');
+                return;
+            }
+
+            const ingredient = ingredients.find(ing => ing.name === ingredientName);
+            if (!ingredient) {
+                alert('ไม่พบวัตถุดิบนี้');
+                return;
+            }
+
+            const existingIndex = currentRecipeIngredients.findIndex(ing => ing.name === ingredientName);
+            if (existingIndex >= 0) {
+                currentRecipeIngredients[existingIndex].amount = amount;
+            } else {
+                currentRecipeIngredients.push({
+                    name: ingredientName,
+                    amount: amount,
+                    unit: ingredient.unit,
+                    price: ingredient.price
+                });
+            }
+
+            updateRecipeIngredientsDisplay();
+            document.getElementById('recipeIngredient').value = '';
+            document.getElementById('recipeIngredientAmount').value = '';
+        }
+
+        function updateRecipeIngredientsDisplay() {
+            const container = document.getElementById('recipeIngredients');
+            const totalCost = currentRecipeIngredients.reduce((sum, ing) => sum + (ing.amount * ing.price), 0);
+            
+            container.innerHTML = currentRecipeIngredients.map(ing => `
+                <div class="flex justify-between items-center py-1 border-b">
+                    <span>${ing.name}: ${ing.amount} ${ing.unit}</span>
+                    <div>
+                        <span class="text-sm text-gray-600">${(ing.amount * ing.price).toFixed(2)} บาท</span>
+                        <button onclick="removeRecipeIngredient('${ing.name}')" class="ml-2 text-red-500">×</button>
+                    </div>
+                </div>
+            `).join('') + `
+                <div class="pt-2 font-semibold">ต้นทุนรวม: ${totalCost.toFixed(2)} บาท</div>
+            `;
+        }
+
+        function removeRecipeIngredient(name) {
+            currentRecipeIngredients = currentRecipeIngredients.filter(ing => ing.name !== name);
+            updateRecipeIngredientsDisplay();
+        }
+
+        function saveRecipe() {
+            const name = document.getElementById('recipeName').value;
+            const yield = parseInt(document.getElementById('recipeYield').value);
+            const isBase = document.getElementById('isBaseRecipe').checked;
+            const baseRecipeIndex = document.getElementById('baseRecipe').value;
+
+            if (!name || !yield || currentRecipeIngredients.length === 0) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            // Add to autocomplete data
+            addToAutocomplete('recipeNames', name);
+
+            const totalCost = currentRecipeIngredients.reduce((sum, ing) => sum + (ing.amount * ing.price), 0);
+            const costPerUnit = totalCost / yield;
+
+            const recipe = {
+                name,
+                yield,
+                ingredients: [...currentRecipeIngredients],
+                totalCost,
+                costPerUnit,
+                isBase: isBase,
+                baseRecipeIndex: baseRecipeIndex !== '' ? parseInt(baseRecipeIndex) : null,
+                baseRecipeName: baseRecipeIndex !== '' ? recipes[baseRecipeIndex].name : null
+            };
+
+            recipes.push(recipe);
+
+            saveData();
+            updateRecipesDisplay();
+            updateRecipeSelects(); // Update base recipe options
+            clearRecipeForm();
+            
+            const recipeType = isBase ? 'สูตรหลัก' : (baseRecipeIndex !== '' ? 'สูตรแปรผัน' : 'สูตรปกติ');
+            alert(`บันทึก${recipeType} "${name}" สำเร็จ!`);
+        }
+
+        function clearRecipeForm() {
+            document.getElementById('recipeName').value = '';
+            document.getElementById('recipeYield').value = '';
+            document.getElementById('baseRecipe').value = '';
+            document.getElementById('isBaseRecipe').checked = false;
+            currentRecipeIngredients = [];
+            updateRecipeIngredientsDisplay();
+        }
+
+        let currentRecipeFilter = 'all';
+
+        function filterRecipes(filter) {
+            currentRecipeFilter = filter;
+            updateRecipesDisplay();
+            
+            // Update button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+                btn.classList.add('bg-gray-200');
+            });
+            event.target.classList.remove('bg-gray-200');
+            event.target.classList.add('bg-blue-500', 'text-white');
+        }
+
+        function updateRecipesDisplay() {
+            const list = document.getElementById('recipesList');
+            let filteredRecipes = recipes;
+            
+            if (currentRecipeFilter === 'base') {
+                filteredRecipes = recipes.filter(recipe => recipe.isBase);
+            } else if (currentRecipeFilter === 'variation') {
+                filteredRecipes = recipes.filter(recipe => recipe.baseRecipeIndex !== null);
+            }
+            
+            list.innerHTML = filteredRecipes.map((recipe, index) => {
+                const actualIndex = recipes.indexOf(recipe);
+                const recipeTypeIcon = recipe.isBase ? '🎯' : (recipe.baseRecipeIndex !== null ? '🎨' : '📝');
+                const recipeTypeText = recipe.isBase ? 'สูตรหลัก' : (recipe.baseRecipeIndex !== null ? `แปรผันจาก: ${recipe.baseRecipeName}` : 'สูตรปกติ');
+                
+                return `
+                    <div class="bg-white p-3 rounded border ${recipe.isBase ? 'border-blue-300 bg-blue-50' : (recipe.baseRecipeIndex !== null ? 'border-green-300 bg-green-50' : '')}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-semibold flex items-center gap-2">
+                                    ${recipeTypeIcon} ${recipe.name}
+                                </div>
+                                <div class="text-xs text-gray-500 mb-1">${recipeTypeText}</div>
+                                <div class="text-sm text-gray-600">ได้: ${recipe.yield} ชิ้น</div>
+                                <div class="text-sm text-gray-600">ต้นทุน/ชิ้น: ${recipe.costPerUnit.toFixed(2)} บาท</div>
+                                <div class="text-xs text-gray-500 mt-1">วัตถุดิบ: ${recipe.ingredients.length} รายการ</div>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="duplicateRecipe(${actualIndex})" class="text-blue-500 hover:text-blue-700 text-sm" title="ทำสำเนา">📋</button>
+                                <button onclick="removeRecipe(${actualIndex})" class="text-red-500 hover:text-red-700">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<div class="text-gray-500 text-center">ไม่มีสูตรในหมวดนี้</div>';
+        }
+
+        function duplicateRecipe(index) {
+            const recipe = recipes[index];
+            if (!recipe) return;
+            
+            const newName = prompt(`ชื่อสูตรใหม่:`, `${recipe.name} (สำเนา)`);
+            if (!newName) return;
+            
+            // Create duplicate with new name
+            const duplicatedRecipe = {
+                ...recipe,
+                name: newName,
+                isBase: false, // Duplicated recipes are not base recipes by default
+                baseRecipeIndex: recipe.isBase ? index : recipe.baseRecipeIndex, // If duplicating a base recipe, set it as base
+                baseRecipeName: recipe.isBase ? recipe.name : recipe.baseRecipeName
+            };
+            
+            recipes.push(duplicatedRecipe);
+            saveData();
+            updateRecipesDisplay();
+            updateRecipeSelects();
+            alert(`ทำสำเนาสูตร "${newName}" สำเร็จ!`);
+        }
+
+        function removeRecipe(index) {
+            const recipe = recipes[index];
+            const hasVariations = recipes.some(r => r.baseRecipeIndex === index);
+            
+            let confirmMessage = `ต้องการลบสูตร "${recipe.name}" หรือไม่?`;
+            if (hasVariations) {
+                confirmMessage += '\n\n⚠️ สูตรนี้มีสูตรแปรผันที่อ้างอิง หากลบจะทำให้สูตรแปรผันเหล่านั้นกลายเป็นสูตรปกติ';
+            }
+            
+            if (confirm(confirmMessage)) {
+                // Update variations that reference this recipe
+                recipes.forEach(r => {
+                    if (r.baseRecipeIndex === index) {
+                        r.baseRecipeIndex = null;
+                        r.baseRecipeName = null;
+                    } else if (r.baseRecipeIndex > index) {
+                        r.baseRecipeIndex--; // Adjust index after deletion
+                    }
+                });
+                
+                recipes.splice(index, 1);
+                saveData();
+                updateRecipesDisplay();
+                updateRecipeSelects();
+            }
+        }
+
+        // Production Management
+        function updateProductionSelects() {
+            const select = document.getElementById('productionRecipe');
+            select.innerHTML = '<option value="">เลือกสูตร</option>' + 
+                recipes.map((recipe, index) => `<option value="${index}">${recipe.name}</option>`).join('');
+            
+            select.onchange = updateProductionPreview;
+        }
+
+        function updateProductionPreview() {
+            const recipeIndex = document.getElementById('productionRecipe').value;
+            const pieces = parseInt(document.getElementById('productionPieces').value) || 0;
+            const preview = document.getElementById('productionPreview');
+
+            if (recipeIndex === '') {
+                preview.innerHTML = '<div class="text-sm text-gray-500">เลือกสูตรเพื่อดูรายละเอียด</div>';
+                return;
+            }
+
+            const recipe = recipes[recipeIndex];
+            const batchesNeeded = pieces / recipe.yield;
+            const canProduce = checkCanProduce(recipe, batchesNeeded);
+            const totalCostFromRecipe = pieces * recipe.costPerUnit;
+            
+            preview.innerHTML = `
+                <div class="space-y-2">
+                    <div class="font-semibold">${recipe.name}</div>
+                    <div class="bg-blue-50 p-2 rounded">
+                        <div class="text-sm text-blue-800">ข้อมูลจากสูตร:</div>
+                        <div class="text-sm">• สูตรนี้ทำได้ ${recipe.yield} ชิ้น</div>
+                        <div class="text-sm">• ต้นทุนต่อชิ้น: ${recipe.costPerUnit.toFixed(2)} บาท</div>
+                    </div>
+                    <div>จำนวนที่ต้องการผลิต: ${pieces} ชิ้น</div>
+                    <div>ต้นทุนรวม: ${totalCostFromRecipe.toFixed(2)} บาท (${recipe.costPerUnit.toFixed(2)} × ${pieces})</div>
+                    <div class="text-sm ${canProduce ? 'text-green-600' : 'text-red-600'}">
+                        ${canProduce ? '✅ วัตถุดิบเพียงพอ' : '❌ วัตถุดิบไม่เพียงพอ'}
+                    </div>
+                    ${!canProduce ? `
+                        <div class="text-xs text-red-500 bg-red-50 p-2 rounded">
+                            ต้องการ ${batchesNeeded.toFixed(2)} ชุดสูตร แต่วัตถุดิบไม่เพียงพอ
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function checkCanProduce(recipe, batches) {
+            return recipe.ingredients.every(recipeIng => {
+                const ingredient = ingredients.find(ing => ing.name === recipeIng.name);
+                return ingredient && ingredient.quantity >= (recipeIng.amount * batches);
+            });
+        }
+
+        function startProduction() {
+            const recipeIndex = document.getElementById('productionRecipe').value;
+            const pieces = parseInt(document.getElementById('productionPieces').value);
+
+            if (recipeIndex === '' || !pieces || pieces <= 0) {
+                alert('กรุณาเลือกสูตรและระบุจำนวนชิ้นที่ต้องการผลิต');
+                return;
+            }
+
+            const recipe = recipes[recipeIndex];
+            const batchesNeeded = pieces / recipe.yield;
+            
+            if (!checkCanProduce(recipe, batchesNeeded)) {
+                alert('วัตถุดิบไม่เพียงพอสำหรับการผลิต');
+                return;
+            }
+
+            // Deduct ingredients based on the proportion needed
+            recipe.ingredients.forEach(recipeIng => {
+                const ingredient = ingredients.find(ing => ing.name === recipeIng.name);
+                ingredient.quantity -= (recipeIng.amount * batchesNeeded);
+            });
+
+            // Add finished product with cost per unit from recipe (not recalculated)
+            const existingProduct = finishedProducts.find(p => p.name === recipe.name);
+            if (existingProduct) {
+                // Use weighted average if different cost per unit
+                const totalQuantity = existingProduct.quantity + pieces;
+                const totalCost = (existingProduct.quantity * existingProduct.costPerUnit) + (pieces * recipe.costPerUnit);
+                existingProduct.costPerUnit = totalCost / totalQuantity;
+                existingProduct.quantity = totalQuantity;
+            } else {
+                finishedProducts.push({
+                    name: recipe.name,
+                    quantity: pieces,
+                    costPerUnit: recipe.costPerUnit // Use cost from recipe, not recalculated
+                });
+            }
+
+            saveData();
+            updateAllDisplays();
+            alert(`ผลิต ${recipe.name} สำเร็จ! ได้ ${pieces} ชิ้น\nต้นทุนต่อชิ้น: ${recipe.costPerUnit.toFixed(2)} บาท (จากสูตร)`);
+            
+            // Clear form
+            document.getElementById('productionRecipe').value = '';
+            document.getElementById('productionPieces').value = '';
+            updateProductionPreview();
+        }
+
+        function updateFinishedProductsDisplay() {
+            const container = document.getElementById('finishedProducts');
+            container.innerHTML = finishedProducts.map((product, index) => `
+                <div class="bg-white p-3 rounded border flex justify-between items-center">
+                    <div>
+                        <div class="font-medium">${product.name}</div>
+                        <div class="text-sm text-gray-600">${product.quantity} ชิ้น</div>
+                        <div class="text-xs text-gray-500">ต้นทุน: ${product.costPerUnit.toFixed(2)} บาท/ชิ้น</div>
+                    </div>
+                    <button onclick="removeFinishedProduct(${index})" class="text-red-500 hover:text-red-700">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function removeFinishedProduct(index) {
+            if (confirm('ต้องการลบสินค้านี้หรือไม่?')) {
+                finishedProducts.splice(index, 1);
+                saveData();
+                updateFinishedProductsDisplay();
+            }
+        }
+
+        // Purchase Management
+        function updatePurchaseSelects() {
+            const select = document.getElementById('purchaseIngredient');
+            select.innerHTML = '<option value="">เลือกวัตถุดิบ</option>' + 
+                ingredients.map((ingredient, index) => `<option value="${index}">${ingredient.name} (${ingredient.unit})</option>`).join('');
+            
+            select.onchange = updatePurchasePreview;
+            updatePurchaseHistory();
+        }
+
+        function updatePurchasePreview() {
+            const ingredientIndex = document.getElementById('purchaseIngredient').value;
+            const purchaseQuantity = parseFloat(document.getElementById('purchaseQuantity').value) || 0;
+            const preview = document.getElementById('purchasePreview');
+
+            if (ingredientIndex === '') {
+                preview.innerHTML = '<div class="text-sm text-gray-500">เลือกวัตถุดิบเพื่อดูรายละเอียด</div>';
+                return;
+            }
+
+            const ingredient = ingredients[ingredientIndex];
+            const actualQuantity = purchaseQuantity * (ingredient.conversionRate || 1);
+            const pricePerPurchaseUnit = ingredient.price * (ingredient.conversionRate || 1);
+            const totalCost = purchaseQuantity * pricePerPurchaseUnit;
+            
+            preview.innerHTML = `
+                <div class="space-y-2">
+                    <div class="font-semibold">${ingredient.name}</div>
+                    ${ingredient.purchaseUnit ? `
+                        <div class="text-sm bg-blue-50 p-2 rounded">
+                            <div>หน่วยซื้อ: ${ingredient.purchaseUnit}</div>
+                            <div>1 ${ingredient.purchaseUnit} = ${ingredient.conversionRate} ${ingredient.unit}</div>
+                            <div>ราคา: ${pricePerPurchaseUnit.toFixed(2)} บาท/${ingredient.purchaseUnit}</div>
+                        </div>
+                        <div class="text-sm">จำนวนที่ซื้อ: ${purchaseQuantity} ${ingredient.purchaseUnit}</div>
+                        <div class="text-sm">เท่ากับ: ${actualQuantity} ${ingredient.unit}</div>
+                    ` : `
+                        <div class="text-sm">ราคาต่อหน่วย: ${ingredient.price.toFixed(4)} บาท/${ingredient.unit}</div>
+                        <div class="text-sm">จำนวนที่ซื้อ: ${purchaseQuantity} ${ingredient.unit}</div>
+                    `}
+                    <div class="text-lg font-bold text-teal-600">ราคารวม: ${totalCost.toFixed(2)} บาท</div>
+                    <div class="text-sm text-gray-600">คงเหลือปัจจุบัน: ${ingredient.quantity} ${ingredient.unit}</div>
+                    <div class="text-sm text-green-600">หลังซื้อจะมี: ${(ingredient.quantity + actualQuantity).toFixed(2)} ${ingredient.unit}</div>
+                </div>
+            `;
+        }
+
+        function makePurchase() {
+            const ingredientIndex = document.getElementById('purchaseIngredient').value;
+            const purchaseQuantity = parseFloat(document.getElementById('purchaseQuantity').value);
+
+            if (ingredientIndex === '' || !purchaseQuantity || purchaseQuantity <= 0) {
+                alert('กรุณาเลือกวัตถุดิบและระบุจำนวนที่ต้องการซื้อ');
+                return;
+            }
+
+            const ingredient = ingredients[ingredientIndex];
+            const actualQuantity = purchaseQuantity * (ingredient.conversionRate || 1);
+            const pricePerPurchaseUnit = ingredient.price * (ingredient.conversionRate || 1);
+            const totalCost = purchaseQuantity * pricePerPurchaseUnit;
+
+            // Record purchase
+            const purchase = {
+                ingredientName: ingredient.name,
+                purchaseQuantity: purchaseQuantity,
+                purchaseUnit: ingredient.purchaseUnit || ingredient.unit,
+                actualQuantity: actualQuantity,
+                unit: ingredient.unit,
+                pricePerUnit: ingredient.price,
+                pricePerPurchaseUnit: pricePerPurchaseUnit,
+                totalCost: totalCost,
+                date: new Date().toISOString()
+            };
+
+            purchases.push(purchase);
+
+            // Update ingredient quantity
+            ingredient.quantity += actualQuantity;
+
+            saveData();
+            updateAllDisplays();
+            
+            const purchaseUnitText = ingredient.purchaseUnit || ingredient.unit;
+            const actualUnitText = ingredient.purchaseUnit ? ` (${actualQuantity} ${ingredient.unit})` : '';
+            alert(`ซื้อ ${ingredient.name} จำนวน ${purchaseQuantity} ${purchaseUnitText}${actualUnitText} สำเร็จ!\nราคารวม: ${totalCost.toFixed(2)} บาท`);
+            
+            // Clear form
+            document.getElementById('purchaseIngredient').value = '';
+            document.getElementById('purchaseQuantity').value = '';
+            updatePurchasePreview();
+        }
+
+        function updatePurchaseHistory() {
+            const today = new Date().toDateString();
+            const todayPurchases = purchases.filter(purchase => new Date(purchase.date).toDateString() === today);
+            
+            const container = document.getElementById('purchaseHistory');
+            const totalToday = todayPurchases.reduce((sum, purchase) => sum + purchase.totalCost, 0);
+            
+            container.innerHTML = todayPurchases.map(purchase => `
+                <div class="bg-white p-3 rounded border">
+                    <div class="font-medium">${purchase.ingredientName}</div>
+                    <div class="text-sm text-gray-600">
+                        ${purchase.purchaseQuantity || purchase.quantity} ${purchase.purchaseUnit || purchase.unit}
+                        ${purchase.actualQuantity && purchase.actualQuantity !== purchase.purchaseQuantity ? ` (${purchase.actualQuantity} ${purchase.unit})` : ''}
+                        = ${purchase.totalCost.toFixed(2)} บาท
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        ${new Date(purchase.date).toLocaleTimeString('th-TH')}
+                    </div>
+                </div>
+            `).join('') || '<div class="text-gray-500 text-center">ยังไม่มีการซื้อวันนี้</div>';
+            
+            document.getElementById('todayPurchaseTotal').textContent = totalToday.toLocaleString();
+        }
+
+        // Sales Management
+        function updateSalesSelects() {
+            const select = document.getElementById('saleProduct');
+            select.innerHTML = '<option value="">เลือกสินค้า</option>' + 
+                finishedProducts.map((product, index) => `<option value="${index}">${product.name} (${product.quantity} ชิ้น)</option>`).join('');
+            
+            select.onchange = updateSalePreview;
+        }
+
+        function updateSalePreview() {
+            const productIndex = document.getElementById('saleProduct').value;
+            const remainingQuantity = parseInt(document.getElementById('remainingQuantity').value) || 0;
+            const price = parseFloat(document.getElementById('salePrice').value) || 0;
+            const preview = document.getElementById('salePreview');
+
+            if (productIndex === '') {
+                preview.innerHTML = '<div class="text-sm text-gray-500">เลือกสินค้าเพื่อดูรายละเอียด</div>';
+                return;
+            }
+
+            const product = finishedProducts[productIndex];
+            const soldQuantity = product.quantity - remainingQuantity;
+            const revenue = soldQuantity * price;
+            const cost = soldQuantity * product.costPerUnit;
+            const profit = revenue - cost;
+            
+            if (remainingQuantity > product.quantity) {
+                preview.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="font-semibold">${product.name}</div>
+                        <div class="text-sm text-red-600">❌ จำนวนที่เหลือมากกว่าที่มีอยู่</div>
+                        <div class="text-sm">มีอยู่: ${product.quantity} ชิ้น</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            preview.innerHTML = `
+                <div class="space-y-1">
+                    <div class="font-semibold">${product.name}</div>
+                    <div class="text-sm bg-blue-50 p-2 rounded">
+                        <div>มีอยู่: ${product.quantity} ชิ้น</div>
+                        <div>เหลือ: ${remainingQuantity} ชิ้น</div>
+                        <div class="font-semibold text-blue-600">ขายได้: ${soldQuantity} ชิ้น</div>
+                    </div>
+                    ${soldQuantity > 0 ? `
+                        <div class="text-sm">รายได้: ${revenue.toFixed(2)} บาท</div>
+                        <div class="text-sm">ต้นทุน: ${cost.toFixed(2)} บาท</div>
+                        <div class="text-sm font-semibold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            กำไร: ${profit.toFixed(2)} บาท
+                        </div>
+                    ` : '<div class="text-sm text-gray-500">ไม่มีการขาย</div>'}
+                </div>
+            `;
+        }
+
+        function recordSale() {
+            const productIndex = document.getElementById('saleProduct').value;
+            const remainingQuantity = parseInt(document.getElementById('remainingQuantity').value);
+            const price = parseFloat(document.getElementById('salePrice').value);
+
+            if (productIndex === '' || remainingQuantity === undefined || !price) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            const product = finishedProducts[productIndex];
+            
+            if (remainingQuantity > product.quantity) {
+                alert('จำนวนที่เหลือมากกว่าสินค้าที่มีอยู่');
+                return;
+            }
+
+            const soldQuantity = product.quantity - remainingQuantity;
+            
+            if (soldQuantity <= 0) {
+                alert('ไม่มีการขาย (จำนวนที่เหลือเท่ากับที่มีอยู่)');
+                return;
+            }
+
+            // Add to autocomplete data
+            addToAutocomplete('salePrices', price.toString());
+
+            // Record sale
+            const sale = {
+                productName: product.name,
+                quantity: soldQuantity,
+                price,
+                revenue: soldQuantity * price,
+                cost: soldQuantity * product.costPerUnit,
+                profit: (soldQuantity * price) - (soldQuantity * product.costPerUnit),
+                date: new Date().toISOString()
+            };
+
+            sales.push(sale);
+
+            // Update product quantity to remaining amount
+            product.quantity = remainingQuantity;
+            if (product.quantity === 0) {
+                finishedProducts.splice(productIndex, 1);
+            }
+
+            saveData();
+            updateAllDisplays();
+            alert(`บันทึกการขาย ${product.name} สำเร็จ!\nขายได้: ${soldQuantity} ชิ้น\nเหลือ: ${remainingQuantity} ชิ้น`);
+            
+            // Clear form
+            document.getElementById('saleProduct').value = '';
+            document.getElementById('remainingQuantity').value = '';
+            document.getElementById('salePrice').value = '';
+            updateSalePreview();
+        }
+
+        function updateSalesHistory() {
+            const today = new Date().toDateString();
+            const todaySales = sales.filter(sale => new Date(sale.date).toDateString() === today);
+            
+            const container = document.getElementById('salesHistory');
+            container.innerHTML = todaySales.map(sale => `
+                <div class="bg-white p-3 rounded border">
+                    <div class="font-medium">${sale.productName}</div>
+                    <div class="text-sm text-gray-600">
+                        ${sale.quantity} ชิ้น × ${sale.price} บาท = ${sale.revenue} บาท
+                    </div>
+                    <div class="text-sm ${sale.profit >= 0 ? 'text-green-600' : 'text-red-600'}">
+                        กำไร: ${sale.profit.toFixed(2)} บาท
+                    </div>
+                </div>
+            `).join('') || '<div class="text-gray-500 text-center">ยังไม่มีการขายวันนี้</div>';
+        }
+
+        // Reports
+        function updateReports() {
+            const today = new Date().toDateString();
+            const todaySales = sales.filter(sale => new Date(sale.date).toDateString() === today);
+            
+            const totalRevenue = todaySales.reduce((sum, sale) => sum + sale.revenue, 0);
+            const totalCost = todaySales.reduce((sum, sale) => sum + sale.cost, 0);
+            const totalProfit = totalRevenue - totalCost;
+            
+            document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString();
+            document.getElementById('totalCost').textContent = totalCost.toLocaleString();
+            document.getElementById('totalProfit').textContent = totalProfit.toLocaleString();
+            
+            // Best sellers
+            const productSales = {};
+            todaySales.forEach(sale => {
+                if (!productSales[sale.productName]) {
+                    productSales[sale.productName] = { quantity: 0, revenue: 0 };
+                }
+                productSales[sale.productName].quantity += sale.quantity;
+                productSales[sale.productName].revenue += sale.revenue;
+            });
+            
+            const bestSellers = Object.entries(productSales)
+                .sort((a, b) => b[1].quantity - a[1].quantity)
+                .slice(0, 5);
+            
+            document.getElementById('bestSellers').innerHTML = bestSellers.map(([name, data]) => `
+                <div class="bg-white p-2 rounded border">
+                    <div class="font-medium">${name}</div>
+                    <div class="text-sm text-gray-600">${data.quantity} ชิ้น - ${data.revenue.toLocaleString()} บาท</div>
+                </div>
+            `).join('') || '<div class="text-gray-500">ยังไม่มีข้อมูล</div>';
+            
+            // Daily summary
+            document.getElementById('dailySummary').innerHTML = `
+                <div class="bg-white p-3 rounded border">
+                    <div class="font-semibold mb-2">สรุปวันนี้</div>
+                    <div class="text-sm space-y-1">
+                        <div>ยอดขาย: ${todaySales.length} รายการ</div>
+                        <div>สินค้าขาย: ${Object.keys(productSales).length} รายการ</div>
+                        <div>รายได้: ${totalRevenue.toLocaleString()} บาท</div>
+                        <div>กำไร: ${totalProfit.toLocaleString()} บาท</div>
+                        <div>อัตรากำไร: ${totalRevenue > 0 ? ((totalProfit/totalRevenue)*100).toFixed(1) : 0}%</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Daily Reset Functions
+        function checkDailyReset() {
+            const lastResetDate = localStorage.getItem('lastResetDate');
+            const today = new Date();
+            const resetTime = new Date(today);
+            resetTime.setHours(5, 0, 0, 0); // 5:00 AM
+            
+            // If current time is before 5 AM, check against yesterday's reset
+            if (today.getHours() < 5) {
+                resetTime.setDate(resetTime.getDate() - 1);
+            }
+            
+            const resetTimeString = resetTime.toDateString();
+            
+            if (!lastResetDate || lastResetDate !== resetTimeString) {
+                performDailyReset();
+                localStorage.setItem('lastResetDate', resetTimeString);
+            }
+        }
+        
+        function performDailyReset() {
+            // Clear finished products (production reset)
+            finishedProducts = [];
+            
+            // Keep ingredients, recipes, sales history, and purchase history
+            // Only reset the production inventory
+            
+            saveData();
+            console.log('🔄 Daily reset performed at', new Date().toLocaleString('th-TH'));
+            
+            // Show notification if user is active
+            if (document.visibilityState === 'visible') {
+                alert('🌅 ระบบได้ทำการรีเซ็ตสินค้าพร้อมขายเรียบร้อยแล้ว (5:00 น.)\nเริ่มต้นวันใหม่!');
+            }
+        }
+        
+        function startDailyResetTimer() {
+            // Update countdown display every minute
+            function updateCountdown() {
+                const countdownElement = document.getElementById('resetCountdown');
+                if (countdownElement) {
+                    countdownElement.textContent = `รีเซ็ตครั้งถัดไป: ${formatTimeUntilReset()}`;
+                }
+            }
+            
+            // Initial update
+            updateCountdown();
+            
+            // Check every second for reset time and update countdown every minute
+            setInterval(() => {
+                const now = new Date();
+                
+                // Update countdown every minute (when seconds = 0)
+                if (now.getSeconds() === 0) {
+                    updateCountdown();
+                }
+                
+                // Check for reset time
+                if (now.getHours() === 5 && now.getMinutes() === 0 && now.getSeconds() === 0) {
+                    checkDailyReset();
+                    updateAllDisplays();
+                    updateCountdown(); // Update countdown after reset
+                }
+            }, 1000);
+        }
+        
+        function getNextResetTime() {
+            const now = new Date();
+            const nextReset = new Date(now);
+            nextReset.setHours(5, 0, 0, 0);
+            
+            // If it's already past 5 AM today, set for tomorrow
+            if (now.getHours() >= 5) {
+                nextReset.setDate(nextReset.getDate() + 1);
+            }
+            
+            return nextReset;
+        }
+        
+        function formatTimeUntilReset() {
+            const now = new Date();
+            const nextReset = getNextResetTime();
+            const diff = nextReset - now;
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            return `${hours} ชั่วโมง ${minutes} นาที`;
+        }
+
+        // Data persistence
+        function saveData() {
+            localStorage.setItem('ingredients', JSON.stringify(ingredients));
+            localStorage.setItem('recipes', JSON.stringify(recipes));
+            localStorage.setItem('finishedProducts', JSON.stringify(finishedProducts));
+            localStorage.setItem('sales', JSON.stringify(sales));
+            localStorage.setItem('purchases', JSON.stringify(purchases));
+        }
+
+        function updateAllDisplays() {
+            updateIngredientsDisplay();
+            updateInventoryDisplay();
+            updateRecipesDisplay();
+            updateFinishedProductsDisplay();
+            updateSalesHistory();
+            updateRecipeSelects();
+            updateProductionSelects();
+            updateSalesSelects();
+        }
+
+        // Price per unit calculation
+        function updatePricePerUnit() {
+            const purchaseQuantity = parseFloat(document.getElementById('ingredientQuantity').value) || 0;
+            const totalPrice = parseFloat(document.getElementById('ingredientTotalPrice').value) || 0;
+            const unit = document.getElementById('ingredientUnit').value;
+            const purchaseUnit = document.getElementById('ingredientPurchaseUnit').value;
+            const conversionRate = parseFloat(document.getElementById('ingredientConversionRate').value) || 1;
+            
+            if (purchaseQuantity > 0 && totalPrice > 0 && conversionRate > 0) {
+                const actualQuantity = purchaseQuantity * conversionRate;
+                const pricePerUnit = totalPrice / actualQuantity;
+                const pricePerPurchaseUnit = totalPrice / purchaseQuantity;
+                
+                document.getElementById('pricePerUnit').innerHTML = `
+                    <div class="space-y-1">
+                        <div class="font-semibold text-blue-600">
+                            ราคาต่อ${unit || 'หน่วยนับ'}: ${pricePerUnit.toFixed(4)} บาท
+                        </div>
+                        ${purchaseUnit ? `
+                            <div class="text-sm text-gray-600">
+                                ราคาต่อ${purchaseUnit}: ${pricePerPurchaseUnit.toFixed(2)} บาท
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                ${purchaseQuantity} ${purchaseUnit} = ${actualQuantity} ${unit}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                document.getElementById('pricePerUnit').innerHTML = 'ราคาต่อหน่วยจะแสดงที่นี่';
+            }
+        }
+
+        // Auto-update production preview when pieces change
+        document.getElementById('productionPieces').addEventListener('input', updateProductionPreview);
+        document.getElementById('remainingQuantity').addEventListener('input', updateSalePreview);
+        document.getElementById('salePrice').addEventListener('input', updateSalePreview);
+        
+        // Auto-calculate price per unit
+        document.getElementById('ingredientQuantity').addEventListener('input', updatePricePerUnit);
+        document.getElementById('ingredientTotalPrice').addEventListener('input', updatePricePerUnit);
+        document.getElementById('ingredientUnit').addEventListener('input', updatePricePerUnit);
+        document.getElementById('ingredientPurchaseUnit').addEventListener('input', updatePricePerUnit);
+        document.getElementById('ingredientConversionRate').addEventListener('input', updatePricePerUnit);
+        
+        // Auto-update purchase preview
+        document.getElementById('purchaseQuantity').addEventListener('input', updatePurchasePreview);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98580b5ef1c72731',t:'MTc1ODk0NTEwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
