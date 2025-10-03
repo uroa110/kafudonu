@@ -677,33 +677,58 @@ function doGet(e) {
             resultDiv.innerHTML = '<div class="text-blue-600">🔄 กำลังทดสอบการเชื่อมต่อ...</div>';
 
             try {
-                const testData = {
-                    type: 'test',
-                    message: 'Connection test from PUKU_BAKERY',
-                    timestamp: new Date().toISOString()
-                };
-
+                // First try a simple GET request to test basic connectivity
+                console.log('Testing URL:', url);
+                
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(testData),
-                    signal: controller.signal,
-                    mode: 'cors'
-                });
+                // Try GET request first (simpler)
+                let response;
+                try {
+                    response = await fetch(url, {
+                        method: 'GET',
+                        signal: controller.signal,
+                        mode: 'cors',
+                        cache: 'no-cache'
+                    });
+                    clearTimeout(timeoutId);
+                } catch (getError) {
+                    console.log('GET failed, trying POST:', getError.message);
+                    
+                    // If GET fails, try POST with test data
+                    const testData = {
+                        type: 'test',
+                        message: 'Connection test from PUKU_BAKERY',
+                        timestamp: new Date().toISOString()
+                    };
 
-                clearTimeout(timeoutId);
+                    const postController = new AbortController();
+                    const postTimeoutId = setTimeout(() => postController.abort(), 15000);
+
+                    response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(testData),
+                        signal: postController.signal,
+                        mode: 'cors',
+                        cache: 'no-cache'
+                    });
+                    clearTimeout(postTimeoutId);
+                }
+
                 const result = await response.text();
                 
                 console.log('Response status:', response.status);
                 console.log('Response text:', result);
                 
-                if (response.ok && (result.includes('Success') || result.includes('OK'))) {
-                    resultDiv.innerHTML = '<div class="text-green-600">✅ เชื่อมต่อสำเร็จ!</div>';
+                if (response.ok && (result.includes('Success') || result.includes('OK') || result.includes('running'))) {
+                    resultDiv.innerHTML = `
+                        <div class="text-green-600">✅ เชื่อมต่อสำเร็จ!</div>
+                        <div class="text-sm text-green-500 mt-1">Google Apps Script ทำงานปกติ</div>
+                    `;
                     isConnected = true;
                     sheetsUrl = url;
                 } else {
@@ -722,22 +747,61 @@ function doGet(e) {
                     isConnected = false;
                 }
             } catch (error) {
+                console.error('Connection error:', error);
+                
                 let errorMessage = error.message;
+                let troubleshooting = '';
+                
                 if (error.name === 'AbortError') {
                     errorMessage = 'การเชื่อมต่อใช้เวลานานเกินไป (Timeout)';
+                    troubleshooting = `
+                        <div class="text-sm text-blue-600 mt-2">🔧 วิธีแก้ไข Timeout:</div>
+                        <div class="text-xs text-gray-600">
+                            • ตรวจสอบ Internet connection<br>
+                            • URL อาจไม่ถูกต้อง<br>
+                            • Google Apps Script อาจยังไม่ได้ Deploy<br>
+                            • ลอง Deploy ใหม่อีกครั้ง
+                        </div>
+                    `;
+                } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMessage = 'ไม่สามารถเชื่อมต่อได้ (Network Error)';
+                    troubleshooting = `
+                        <div class="text-sm text-blue-600 mt-2">🔧 วิธีแก้ไข Network Error:</div>
+                        <div class="text-xs text-gray-600">
+                            <strong>1. ตรวจสอบ URL:</strong><br>
+                            • ต้องขึ้นต้นด้วย https://script.google.com/macros/s/<br>
+                            • ต้องลงท้ายด้วย /exec<br><br>
+                            
+                            <strong>2. ตรวจสอบการ Deploy:</strong><br>
+                            • ใน Google Apps Script กด Deploy → Manage deployments<br>
+                            • ตรวจสอบว่า Type = Web app<br>
+                            • Execute as = Me (${Utilities.getEffectiveUser().getEmail() || 'your-email'})<br>
+                            • Who has access = Anyone<br><br>
+                            
+                            <strong>3. ลอง Deploy ใหม่:</strong><br>
+                            • กด New deployment<br>
+                            • เลือก Type: Web app<br>
+                            • กด Deploy และอนุญาต permissions<br>
+                            • คัดลอก URL ใหม่มาใส่
+                        </div>
+                    `;
                 } else if (error.message.includes('CORS')) {
-                    errorMessage = 'ปัญหา CORS - ตรวจสอบการตั้งค่า Google Apps Script';
+                    errorMessage = 'ปัญหา CORS - การตั้งค่า Google Apps Script ไม่ถูกต้อง';
+                    troubleshooting = `
+                        <div class="text-sm text-blue-600 mt-2">🔧 วิธีแก้ไข CORS:</div>
+                        <div class="text-xs text-gray-600">
+                            • ตั้งค่า "Who has access" เป็น "Anyone"<br>
+                            • Deploy ใหม่หลังเปลี่ยนการตั้งค่า<br>
+                            • อนุญาต permissions ทั้งหมดที่ Google ขอ
+                        </div>
+                    `;
                 }
                 
                 resultDiv.innerHTML = `
                     <div class="text-red-600">❌ เชื่อมต่อไม่สำเร็จ: ${errorMessage}</div>
-                    <div class="text-sm text-blue-600 mt-2">💡 วิธีแก้ไข:</div>
-                    <div class="text-xs text-gray-600">
-                        • ตรวจสอบ URL ให้ถูกต้อง<br>
-                        • Deploy ใหม่เป็น Web App<br>
-                        • ตั้งค่า Execute as: Me<br>
-                        • ตั้งค่า Who has access: Anyone<br>
-                        • อนุญาต permissions ทั้งหมด
+                    ${troubleshooting}
+                    <div class="text-xs text-gray-500 mt-2 p-2 bg-gray-100 rounded">
+                        Technical error: ${error.message}
                     </div>
                 `;
                 isConnected = false;
@@ -2479,5 +2543,5 @@ function doGet(e) {
             updateSalesSelects();
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988c6e2534cdd334',t:'MTc1OTQ5NDQxMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988c780d50d8d334',t:'MTc1OTQ5NDgxNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
