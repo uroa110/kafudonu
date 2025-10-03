@@ -7,7 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Sarabun', sans-serif; }
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-orange-50 to-amber-50 min-h-screen">
@@ -16,6 +19,12 @@
         <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
             <h1 class="text-3xl font-bold text-orange-800 mb-2">🧁 PUKU_BAKERY</h1>
             <p class="text-gray-600">จัดการวัตถุดิบ สูตร การผลิต และการขายแบบครบวงจร</p>
+            <div id="sheetsStatus" class="mt-2 text-sm">
+                <span id="connectionStatus" class="inline-flex items-center">
+                    <span class="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                    <span class="text-gray-500">ยังไม่เชื่อมต่อ Google Sheets</span>
+                </span>
+            </div>
         </div>
 
         <!-- Navigation -->
@@ -41,6 +50,9 @@
                 </button>
                 <button onclick="showSection('reports')" class="nav-btn bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors">
                     📊 รายงาน
+                </button>
+                <button onclick="showSection('settings')" class="nav-btn bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    ⚙️ ตั้งค่า
                 </button>
             </div>
         </div>
@@ -97,9 +109,9 @@
                         <div class="relative">
                             <input type="text" id="ingredientPurchaseUnit" placeholder="หน่วยซื้อ (ถุง/กิโล/ขวด)" class="w-full p-2 border rounded-lg">
                         </div>
-                        <input type="number" id="ingredientConversionRate" placeholder="1 หน่วยซื้อ = ? หน่วยนับ (เช่น 1000)" class="w-full p-2 border rounded-lg">
-                        <input type="number" id="ingredientQuantity" placeholder="จำนวนที่ซื้อ (หน่วยซื้อ)" class="w-full p-2 border rounded-lg">
-                        <input type="number" id="ingredientTotalPrice" placeholder="ราคารวม (เช่น 35)" class="w-full p-2 border rounded-lg">
+                        <input type="number" id="ingredientConversionRate" placeholder="1 หน่วยซื้อ = ? หน่วยนับ (เช่น 1000)" class="w-full p-2 border rounded-lg" oninput="calculatePricePerUnit()">
+                        <input type="number" id="ingredientQuantity" placeholder="จำนวนที่ซื้อ (หน่วยซื้อ)" class="w-full p-2 border rounded-lg" oninput="calculatePricePerUnit()">
+                        <input type="number" id="ingredientTotalPrice" placeholder="ราคารวม (เช่น 35)" class="w-full p-2 border rounded-lg" oninput="calculatePricePerUnit()">
                         <div id="pricePerUnit" class="bg-gray-100 p-2 rounded-lg text-center text-gray-600 min-h-10 flex items-center justify-center">
                             ราคาต่อหน่วยจะแสดงที่นี่
                         </div>
@@ -219,7 +231,7 @@
                         <select id="productionRecipe" class="w-full p-2 border rounded-lg">
                             <option value="">เลือกสูตร</option>
                         </select>
-                        <input type="number" id="productionPieces" placeholder="จำนวนชิ้นที่ต้องการผลิต" class="w-full p-2 border rounded-lg">
+                        <input type="number" id="productionPieces" placeholder="จำนวนชิ้นที่ต้องการผลิต" class="w-full p-2 border rounded-lg" oninput="updateProductionPreview()">
                         <div id="productionPreview" class="bg-white p-3 rounded border min-h-20">
                             <div class="text-sm text-gray-500">เลือกสูตรเพื่อดูรายละเอียด</div>
                         </div>
@@ -238,8 +250,6 @@
             </div>
         </div>
 
-
-
         <!-- Sales Section -->
         <div id="sales" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
             <h2 class="text-2xl font-bold text-pink-800 mb-4">🛍️ การขาย</h2>
@@ -251,9 +261,9 @@
                         <select id="saleProduct" class="w-full p-2 border rounded-lg">
                             <option value="">เลือกสินค้า</option>
                         </select>
-                        <input type="number" id="remainingQuantity" placeholder="จำนวนที่เหลือ" class="w-full p-2 border rounded-lg">
+                        <input type="number" id="remainingQuantity" placeholder="จำนวนที่เหลือ" class="w-full p-2 border rounded-lg" oninput="updateSalePreview()">
                         <div class="relative">
-                            <input type="number" id="salePrice" placeholder="ราคาขายต่อชิ้น" class="w-full p-2 border rounded-lg">
+                            <input type="number" id="salePrice" placeholder="ราคาขายต่อชิ้น" class="w-full p-2 border rounded-lg" oninput="updateSalePreview()">
                         </div>
                         <div id="salePreview" class="bg-white p-3 rounded border">
                             <div class="text-sm text-gray-500">เลือกสินค้าเพื่อดูรายละเอียด</div>
@@ -291,11 +301,11 @@
                 <div id="customDateRange" class="hidden grid md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">วันที่เริ่มต้น</label>
-                        <input type="date" id="startDate" class="w-full p-2 border rounded-lg">
+                        <input type="date" id="startDate" class="w-full p-2 border rounded-lg" onchange="updateReportPeriodText(); updateReports();">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">วันที่สิ้นสุด</label>
-                        <input type="date" id="endDate" class="w-full p-2 border rounded-lg">
+                        <input type="date" id="endDate" class="w-full p-2 border rounded-lg" onchange="updateReportPeriodText(); updateReports();">
                     </div>
                 </div>
                 
@@ -359,6 +369,158 @@
                 </div>
             </div>
         </div>
+
+        <!-- Settings Section -->
+        <div id="settings" class="section bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">⚙️ ตั้งค่าระบบ</h2>
+            
+            <!-- Google Sheets Integration -->
+            <div class="bg-blue-50 p-6 rounded-lg mb-6">
+                <h3 class="text-xl font-semibold text-blue-800 mb-4">📊 เชื่อมต่อ Google Sheets</h3>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-medium text-blue-700 mb-3">🔗 การตั้งค่า</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">URL ของ Google Apps Script</label>
+                                <input type="url" id="sheetsUrl" placeholder="https://script.google.com/macros/s/..." 
+                                       class="w-full p-2 border rounded-lg text-sm">
+                                <div class="text-xs text-gray-500 mt-1">
+                                    วาง URL ที่ได้จาก Google Apps Script Web App
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button onclick="testConnection()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm">
+                                    ทดสอบการเชื่อมต่อ
+                                </button>
+                                <button onclick="saveSettings()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 text-sm">
+                                    บันทึกการตั้งค่า
+                                </button>
+                            </div>
+                            
+                            <div id="connectionResult" class="text-sm"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-blue-700 mb-3">📋 สถานะการส่งข้อมูล</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between items-center p-2 bg-white rounded border">
+                                <span>การซื้อวัตถุดิบ</span>
+                                <span id="purchaseSync" class="text-gray-500">●</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded border">
+                                <span>การผลิต</span>
+                                <span id="productionSync" class="text-gray-500">●</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded border">
+                                <span>การขาย</span>
+                                <span id="salesSync" class="text-gray-500">●</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded border">
+                                <span>คลังวัตถุดิบ</span>
+                                <span id="inventorySync" class="text-gray-500">●</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button onclick="syncAllData()" class="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 text-sm">
+                                📤 ส่งข้อมูลทั้งหมดไป Sheets
+                            </button>
+                            <div class="text-xs text-gray-500 mt-1 text-center">
+                                ส่งข้อมูลย้อนหลังทั้งหมดไป Google Sheets
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Setup Instructions -->
+            <div class="bg-yellow-50 p-6 rounded-lg">
+                <h3 class="text-xl font-semibold text-yellow-800 mb-4">📝 วิธีการตั้งค่า Google Sheets</h3>
+                
+                <div class="space-y-4 text-sm">
+                    <div class="bg-white p-4 rounded-lg border-l-4 border-yellow-500">
+                        <h4 class="font-semibold text-yellow-800 mb-2">ขั้นตอนที่ 1: สร้าง Google Sheets</h4>
+                        <ol class="list-decimal list-inside space-y-1 text-gray-700">
+                            <li>ไปที่ <a href="https://sheets.google.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Google Sheets</a></li>
+                            <li>สร้าง Spreadsheet ใหม่ชื่อ "PUKU_BAKERY_DATA"</li>
+                            <li>สร้าง Sheet 4 แผ่น: "การซื้อ", "การผลิต", "การขาย", "คลังวัตถุดิบ"</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg border-l-4 border-blue-500">
+                        <h4 class="font-semibold text-blue-800 mb-2">ขั้นตอนที่ 2: สร้าง Google Apps Script</h4>
+                        <ol class="list-decimal list-inside space-y-1 text-gray-700">
+                            <li>ไปที่ <a href="https://script.google.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Google Apps Script</a></li>
+                            <li>สร้าง New Project</li>
+                            <li>คัดลอกโค้ดด้านล่างไปวาง</li>
+                            <li>Deploy → New Deployment → Type: Web App</li>
+                            <li>Execute as: Me, Access: Anyone</li>
+                            <li>คัดลอก URL ที่ได้มาใส่ด้านบน</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg border-l-4 border-green-500">
+                        <h4 class="font-semibold text-green-800 mb-2">โค้ด Google Apps Script</h4>
+                        <div class="bg-gray-100 p-3 rounded text-xs font-mono overflow-x-auto">
+<pre>function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const spreadsheet = SpreadsheetApp.openById('YOUR_SHEET_ID_HERE');
+    
+    switch(data.type) {
+      case 'purchase':
+        const purchaseSheet = spreadsheet.getSheetByName('การซื้อ');
+        purchaseSheet.appendRow([
+          new Date(data.date), data.ingredientName, data.quantity, 
+          data.unit, data.pricePerUnit, data.totalCost
+        ]);
+        break;
+        
+      case 'production':
+        const productionSheet = spreadsheet.getSheetByName('การผลิต');
+        productionSheet.appendRow([
+          new Date(data.date), data.productName, data.quantity, 
+          data.costPerUnit, data.totalCost
+        ]);
+        break;
+        
+      case 'sale':
+        const salesSheet = spreadsheet.getSheetByName('การขาย');
+        salesSheet.appendRow([
+          new Date(data.date), data.productName, data.quantity, 
+          data.price, data.revenue, data.profit
+        ]);
+        break;
+        
+      case 'inventory':
+        const inventorySheet = spreadsheet.getSheetByName('คลังวัตถุดิบ');
+        inventorySheet.clear();
+        inventorySheet.appendRow(['วัตถุดิบ', 'จำนวน', 'หน่วย', 'ราคา/หน่วย', 'มูลค่า']);
+        data.inventory.forEach(item => {
+          inventorySheet.appendRow([
+            item.name, item.quantity, item.unit, item.price, item.value
+          ]);
+        });
+        break;
+    }
+    
+    return ContentService.createTextOutput('Success');
+  } catch (error) {
+    return ContentService.createTextOutput('Error: ' + error.toString());
+  }
+}</pre>
+                        </div>
+                        <div class="text-xs text-red-600 mt-2">
+                            ⚠️ อย่าลืมเปลี่ยน 'YOUR_SHEET_ID_HERE' เป็น ID ของ Google Sheets ของคุณ
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -374,6 +536,11 @@
         let editingRecipeIndex = -1;
         let isEditMode = false;
 
+        // Google Sheets settings
+        let sheetsSettings = JSON.parse(localStorage.getItem('sheetsSettings') || '{}');
+        let sheetsUrl = sheetsSettings.url || '';
+        let isConnected = false;
+
         // Autocomplete data storage
         let autocompleteData = JSON.parse(localStorage.getItem('autocompleteData') || '{}');
         if (!autocompleteData.ingredientNames) autocompleteData.ingredientNames = [];
@@ -381,6 +548,198 @@
         if (!autocompleteData.purchaseUnits) autocompleteData.purchaseUnits = ['ถุง', 'กิโล', 'ขวด', 'กล่อง', 'แพ็ค', 'ลัง', 'หลอด', 'ซอง'];
         if (!autocompleteData.recipeNames) autocompleteData.recipeNames = [];
         if (!autocompleteData.salePrices) autocompleteData.salePrices = [];
+
+        // Google Sheets Integration Functions
+        async function sendToSheets(data) {
+            if (!sheetsUrl || !isConnected) {
+                console.log('Google Sheets not configured or not connected');
+                return false;
+            }
+
+            try {
+                const response = await fetch(sheetsUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.text();
+                if (result.includes('Success')) {
+                    updateSyncStatus(data.type, 'success');
+                    return true;
+                } else {
+                    updateSyncStatus(data.type, 'error');
+                    console.error('Sheets sync error:', result);
+                    return false;
+                }
+            } catch (error) {
+                updateSyncStatus(data.type, 'error');
+                console.error('Sheets sync error:', error);
+                return false;
+            }
+        }
+
+        function updateSyncStatus(type, status) {
+            const statusMap = {
+                'purchase': 'purchaseSync',
+                'production': 'productionSync',
+                'sale': 'salesSync',
+                'inventory': 'inventorySync'
+            };
+
+            const element = document.getElementById(statusMap[type]);
+            if (element) {
+                element.className = status === 'success' ? 'text-green-500' : 
+                                  status === 'error' ? 'text-red-500' : 'text-gray-500';
+                element.textContent = status === 'success' ? '✓' : 
+                                    status === 'error' ? '✗' : '●';
+            }
+        }
+
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connectionStatus');
+            const statusSpan = statusElement.querySelector('span:first-child');
+            const textSpan = statusElement.querySelector('span:last-child');
+
+            if (isConnected) {
+                statusSpan.className = 'w-2 h-2 bg-green-500 rounded-full mr-2';
+                textSpan.textContent = 'เชื่อมต่อ Google Sheets แล้ว';
+                textSpan.className = 'text-green-600';
+            } else {
+                statusSpan.className = 'w-2 h-2 bg-gray-400 rounded-full mr-2';
+                textSpan.textContent = 'ยังไม่เชื่อมต่อ Google Sheets';
+                textSpan.className = 'text-gray-500';
+            }
+        }
+
+        async function testConnection() {
+            const url = document.getElementById('sheetsUrl').value;
+            const resultDiv = document.getElementById('connectionResult');
+
+            if (!url) {
+                resultDiv.innerHTML = '<div class="text-red-600">กรุณาใส่ URL ของ Google Apps Script</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="text-blue-600">กำลังทดสอบการเชื่อมต่อ...</div>';
+
+            try {
+                const testData = {
+                    type: 'test',
+                    message: 'Connection test from PUKU_BAKERY',
+                    timestamp: new Date().toISOString()
+                };
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.text();
+                
+                if (result.includes('Success') || response.ok) {
+                    resultDiv.innerHTML = '<div class="text-green-600">✅ เชื่อมต่อสำเร็จ!</div>';
+                    isConnected = true;
+                    sheetsUrl = url;
+                } else {
+                    resultDiv.innerHTML = '<div class="text-red-600">❌ เชื่อมต่อไม่สำเร็จ: ' + result + '</div>';
+                    isConnected = false;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="text-red-600">❌ เชื่อมต่อไม่สำเร็จ: ' + error.message + '</div>';
+                isConnected = false;
+            }
+
+            updateConnectionStatus();
+        }
+
+        function saveSettings() {
+            const url = document.getElementById('sheetsUrl').value;
+            
+            sheetsSettings = {
+                url: url,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            localStorage.setItem('sheetsSettings', JSON.stringify(sheetsSettings));
+            sheetsUrl = url;
+            
+            alert('บันทึกการตั้งค่าเรียบร้อย!');
+        }
+
+        async function syncAllData() {
+            if (!sheetsUrl || !isConnected) {
+                alert('กรุณาตั้งค่าและทดสอบการเชื่อมต่อก่อน');
+                return;
+            }
+
+            const confirmSync = confirm('ต้องการส่งข้อมูลทั้งหมดไป Google Sheets หรือไม่?\n\nข้อมูลที่จะส่ง:\n- การซื้อวัตถุดิบทั้งหมด\n- การผลิตทั้งหมด\n- การขายทั้งหมด\n- ข้อมูลคลังปัจจุบัน');
+            
+            if (!confirmSync) return;
+
+            try {
+                // Send all purchases
+                for (const purchase of purchases) {
+                    await sendToSheets({
+                        type: 'purchase',
+                        date: purchase.date,
+                        ingredientName: purchase.ingredientName,
+                        quantity: purchase.actualQuantity || purchase.quantity,
+                        unit: purchase.unit,
+                        pricePerUnit: purchase.pricePerUnit,
+                        totalCost: purchase.totalCost
+                    });
+                }
+
+                // Send all production
+                for (const production of productionHistory) {
+                    await sendToSheets({
+                        type: 'production',
+                        date: production.date,
+                        productName: production.productName,
+                        quantity: production.quantity,
+                        costPerUnit: production.costPerUnit,
+                        totalCost: production.totalCost
+                    });
+                }
+
+                // Send all sales
+                for (const sale of sales) {
+                    await sendToSheets({
+                        type: 'sale',
+                        date: sale.date,
+                        productName: sale.productName,
+                        quantity: sale.quantity,
+                        price: sale.price,
+                        revenue: sale.revenue,
+                        profit: sale.profit
+                    });
+                }
+
+                // Send current inventory
+                const inventoryData = ingredients.map(ing => ({
+                    name: ing.name,
+                    quantity: ing.quantity,
+                    unit: ing.unit,
+                    price: ing.price,
+                    value: ing.quantity * ing.price
+                }));
+
+                await sendToSheets({
+                    type: 'inventory',
+                    inventory: inventoryData
+                });
+
+                alert('ส่งข้อมูลทั้งหมดไป Google Sheets เรียบร้อย!');
+            } catch (error) {
+                alert('เกิดข้อผิดพลาดในการส่งข้อมูล: ' + error.message);
+            }
+        }
 
         // Autocomplete functionality
         function setupAutocomplete(inputId, dataArray) {
@@ -524,6 +883,15 @@
             updateAllDisplays();
             startDailyResetTimer();
             
+            // Load settings
+            if (sheetsSettings.url) {
+                document.getElementById('sheetsUrl').value = sheetsSettings.url;
+                sheetsUrl = sheetsSettings.url;
+                // Auto-test connection if URL exists
+                setTimeout(testConnection, 1000);
+            }
+            updateConnectionStatus();
+            
             // Setup autocomplete for all relevant fields
             setupAutocomplete('ingredientName', autocompleteData.ingredientNames);
             setupAutocomplete('ingredientUnit', autocompleteData.units);
@@ -592,6 +960,17 @@
                 });
             }
 
+            // Send to Google Sheets
+            sendToSheets({
+                type: 'purchase',
+                date: new Date().toISOString(),
+                ingredientName: name,
+                quantity: actualQuantity,
+                unit: unit,
+                pricePerUnit: pricePerUnit,
+                totalCost: totalPrice
+            });
+
             saveData();
             updateAllDisplays();
             clearIngredientForm();
@@ -644,6 +1023,22 @@
             `).join('');
             
             document.getElementById('totalInventoryValue').textContent = totalValue.toLocaleString();
+
+            // Send inventory update to Sheets
+            if (isConnected) {
+                const inventoryData = ingredients.map(ing => ({
+                    name: ing.name,
+                    quantity: ing.quantity,
+                    unit: ing.unit,
+                    price: ing.price,
+                    value: ing.quantity * ing.price
+                }));
+
+                sendToSheets({
+                    type: 'inventory',
+                    inventory: inventoryData
+                });
+            }
         }
 
         // Recipe Management
@@ -1127,6 +1522,16 @@
             };
             productionHistory.push(production);
 
+            // Send to Google Sheets
+            sendToSheets({
+                type: 'production',
+                date: production.date,
+                productName: production.productName,
+                quantity: production.quantity,
+                costPerUnit: production.costPerUnit,
+                totalCost: production.totalCost
+            });
+
             // Add finished product with cost per unit from recipe (not recalculated)
             const existingProduct = finishedProducts.find(p => p.name === recipe.name);
             if (existingProduct) {
@@ -1250,6 +1655,17 @@
             };
 
             purchases.push(purchase);
+
+            // Send to Google Sheets
+            sendToSheets({
+                type: 'purchase',
+                date: purchase.date,
+                ingredientName: purchase.ingredientName,
+                quantity: purchase.actualQuantity,
+                unit: purchase.unit,
+                pricePerUnit: purchase.pricePerUnit,
+                totalCost: purchase.totalCost
+            });
 
             // Update ingredient quantity
             ingredient.quantity += actualQuantity;
@@ -1386,6 +1802,17 @@
             };
 
             sales.push(sale);
+
+            // Send to Google Sheets
+            sendToSheets({
+                type: 'sale',
+                date: sale.date,
+                productName: sale.productName,
+                quantity: sale.quantity,
+                price: sale.price,
+                revenue: sale.revenue,
+                profit: sale.profit
+            });
 
             // Update product quantity to remaining amount
             product.quantity = remainingQuantity;
@@ -1750,42 +2177,41 @@
             const container = document.getElementById('productionVsSales');
             container.innerHTML = comparisonData.map(product => `
                 <div class="bg-white p-4 rounded-lg border">
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="flex justify-between items-start mb-3">
                         <div class="font-semibold text-gray-800">${product.name}</div>
-                        <div class="text-sm ${product.sellRate >= 80 ? 'text-green-600' : product.sellRate >= 50 ? 'text-yellow-600' : 'text-red-600'}">
-                            ขายได้ ${product.sellRate.toFixed(1)}%
+                        <div class="text-right">
+                            <div class="text-lg font-bold ${product.sellRate >= 80 ? 'text-green-600' : product.sellRate >= 50 ? 'text-yellow-600' : 'text-red-600'}">
+                                ${product.sellRate.toFixed(1)}%
+                            </div>
+                            <div class="text-xs text-gray-500">ขายได้</div>
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-3 gap-4 text-center text-sm mb-3">
-                        <div class="bg-blue-50 p-2 rounded">
-                            <div class="font-bold text-blue-600">${product.produced}</div>
-                            <div class="text-blue-600">ผลิต</div>
+                    <div class="grid grid-cols-3 gap-4 text-sm mb-3">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">${product.produced}</div>
+                            <div class="text-xs text-gray-500">ผลิต</div>
                         </div>
-                        <div class="bg-green-50 p-2 rounded">
-                            <div class="font-bold text-green-600">${product.sold}</div>
-                            <div class="text-green-600">ขาย</div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">${product.sold}</div>
+                            <div class="text-xs text-gray-500">ขาย</div>
                         </div>
-                        <div class="bg-gray-50 p-2 rounded">
-                            <div class="font-bold text-gray-600">${product.remaining}</div>
-                            <div class="text-gray-600">เหลือ</div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold ${product.remaining > 0 ? 'text-orange-600' : 'text-gray-400'}">${product.remaining}</div>
+                            <div class="text-xs text-gray-500">เหลือ</div>
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div class="text-gray-600">ต้นทุนผลิต: <span class="font-medium">${product.productionCost.toLocaleString()}</span> บาท</div>
-                        <div class="text-gray-600">รายได้ขาย: <span class="font-medium">${product.salesRevenue.toLocaleString()}</span> บาท</div>
+                    <div class="text-sm text-gray-600">
+                        <div>ต้นทุนผลิต: ${product.productionCost.toLocaleString()} บาท</div>
+                        <div>รายได้จากขาย: ${product.salesRevenue.toLocaleString()} บาท</div>
                     </div>
                     
-                    <!-- Visual progress bar -->
+                    <!-- Progress bar -->
                     <div class="mt-3">
-                        <div class="flex text-xs text-gray-600 mb-1">
-                            <span>ขาย</span>
-                            <span class="ml-auto">เหลือ</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                            <div class="h-full bg-green-500 float-left" style="width: ${product.sellRate}%"></div>
-                            <div class="h-full bg-gray-400" style="width: ${100 - product.sellRate}%"></div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="h-2 rounded-full ${product.sellRate >= 80 ? 'bg-green-500' : product.sellRate >= 50 ? 'bg-yellow-500' : 'bg-red-500'}" 
+                                 style="width: ${Math.min(product.sellRate, 100)}%"></div>
                         </div>
                     </div>
                 </div>
@@ -1793,16 +2219,15 @@
         }
         
         function updateDailyBreakdown(salesData, productionData) {
-            const container = document.getElementById('dailyBreakdown');
-            const contentContainer = document.getElementById('dailyBreakdownContent');
+            const dailyBreakdownDiv = document.getElementById('dailyBreakdown');
             
             // Only show daily breakdown for week and month periods
-            if (currentReportPeriod === 'today') {
-                container.classList.add('hidden');
+            if (currentReportPeriod !== 'week' && currentReportPeriod !== 'month') {
+                dailyBreakdownDiv.classList.add('hidden');
                 return;
             }
             
-            container.classList.remove('hidden');
+            dailyBreakdownDiv.classList.remove('hidden');
             
             // Group data by date
             const dailyData = {};
@@ -1828,38 +2253,34 @@
                 dailyData[date].productionCost += prod.totalCost;
             });
             
-            // Sort by date (newest first)
+            // Sort by date
             const sortedDates = Object.keys(dailyData).sort((a, b) => new Date(b) - new Date(a));
             
-            contentContainer.innerHTML = sortedDates.map(dateString => {
-                const data = dailyData[dateString];
-                const date = new Date(dateString);
-                const thaiDate = date.toLocaleDateString('th-TH', { 
-                    weekday: 'short',
-                    year: 'numeric', 
+            const container = document.getElementById('dailyBreakdownContent');
+            container.innerHTML = sortedDates.map(date => {
+                const data = dailyData[date];
+                const formattedDate = new Date(date).toLocaleDateString('th-TH', { 
+                    weekday: 'short', 
                     month: 'short', 
                     day: 'numeric' 
                 });
                 
                 return `
                     <div class="bg-white p-3 rounded-lg border">
-                        <div class="font-semibold text-gray-800 mb-2">${thaiDate}</div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                            <div class="text-center">
-                                <div class="font-bold text-blue-600">${data.production}</div>
-                                <div class="text-blue-600">ผลิต (ชิ้น)</div>
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="font-semibold text-teal-800">${formattedDate}</div>
+                            <div class="text-sm ${data.profit >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                กำไร: ${data.profit.toLocaleString()} บาท
                             </div>
-                            <div class="text-center">
-                                <div class="font-bold text-green-600">${data.sales}</div>
-                                <div class="text-green-600">ขาย (ชิ้น)</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <div class="text-gray-600">ผลิต: ${data.production} ชิ้น</div>
+                                <div class="text-gray-600">ต้นทุน: ${data.productionCost.toLocaleString()} บาท</div>
                             </div>
-                            <div class="text-center">
-                                <div class="font-bold text-green-600">${data.revenue.toLocaleString()}</div>
-                                <div class="text-green-600">รายได้ (บาท)</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="font-bold ${data.profit >= 0 ? 'text-green-600' : 'text-red-600'}">${data.profit.toLocaleString()}</div>
-                                <div class="${data.profit >= 0 ? 'text-green-600' : 'text-red-600'}">กำไร (บาท)</div>
+                            <div>
+                                <div class="text-gray-600">ขาย: ${data.sales} ชิ้น</div>
+                                <div class="text-gray-600">รายได้: ${data.revenue.toLocaleString()} บาท</div>
                             </div>
                         </div>
                     </div>
@@ -1867,97 +2288,87 @@
             }).join('') || '<div class="text-gray-500 text-center">ยังไม่มีข้อมูล</div>';
         }
 
-        // Daily Reset Functions
+        // Daily Reset System
         function checkDailyReset() {
-            const lastResetDate = localStorage.getItem('lastResetDate');
-            const today = new Date();
-            const resetTime = new Date(today);
-            resetTime.setHours(5, 0, 0, 0); // 5:00 AM
+            const lastReset = localStorage.getItem('lastReset');
+            const today = new Date().toDateString();
             
-            // If current time is before 5 AM, check against yesterday's reset
-            if (today.getHours() < 5) {
-                resetTime.setDate(resetTime.getDate() - 1);
-            }
-            
-            const resetTimeString = resetTime.toDateString();
-            
-            if (!lastResetDate || lastResetDate !== resetTimeString) {
-                performDailyReset();
-                localStorage.setItem('lastResetDate', resetTimeString);
+            if (lastReset !== today) {
+                // Check if it's past 5 AM
+                const now = new Date();
+                const resetTime = new Date();
+                resetTime.setHours(5, 0, 0, 0);
+                
+                if (now >= resetTime) {
+                    performDailyReset();
+                    localStorage.setItem('lastReset', today);
+                }
             }
         }
         
         function performDailyReset() {
-            // Clear finished products (production reset)
+            // Reset finished products (clear all)
             finishedProducts = [];
             
-            // Keep ingredients, recipes, sales history, and purchase history
-            // Only reset the production inventory
+            // Keep other data (ingredients, recipes, sales history, production history, purchases)
+            // Only reset the finished products inventory
             
             saveData();
-            console.log('🔄 Daily reset performed at', new Date().toLocaleString('th-TH'));
-            
-            // Show notification if user is active
-            if (document.visibilityState === 'visible') {
-                alert('🌅 ระบบได้ทำการรีเซ็ตสินค้าพร้อมขายเรียบร้อยแล้ว (5:00 น.)\nเริ่มต้นวันใหม่!');
-            }
+            console.log('Daily reset performed at', new Date().toLocaleString());
         }
         
         function startDailyResetTimer() {
-            // Update countdown display every minute
             function updateCountdown() {
+                const now = new Date();
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(5, 0, 0, 0);
+                
+                const diff = tomorrow - now;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                
                 const countdownElement = document.getElementById('resetCountdown');
                 if (countdownElement) {
-                    countdownElement.textContent = `รีเซ็ตครั้งถัดไป: ${formatTimeUntilReset()}`;
+                    countdownElement.textContent = `รีเซ็ตใน ${hours} ชั่วโมง ${minutes} นาที`;
                 }
             }
             
-            // Initial update
             updateCountdown();
-            
-            // Check every second for reset time and update countdown every minute
-            setInterval(() => {
-                const now = new Date();
-                
-                // Update countdown every minute (when seconds = 0)
-                if (now.getSeconds() === 0) {
-                    updateCountdown();
-                }
-                
-                // Check for reset time
-                if (now.getHours() === 5 && now.getMinutes() === 0 && now.getSeconds() === 0) {
-                    checkDailyReset();
-                    updateAllDisplays();
-                    updateCountdown(); // Update countdown after reset
-                }
-            }, 1000);
-        }
-        
-        function getNextResetTime() {
-            const now = new Date();
-            const nextReset = new Date(now);
-            nextReset.setHours(5, 0, 0, 0);
-            
-            // If it's already past 5 AM today, set for tomorrow
-            if (now.getHours() >= 5) {
-                nextReset.setDate(nextReset.getDate() + 1);
-            }
-            
-            return nextReset;
-        }
-        
-        function formatTimeUntilReset() {
-            const now = new Date();
-            const nextReset = getNextResetTime();
-            const diff = nextReset - now;
-            
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            
-            return `${hours} ชั่วโมง ${minutes} นาที`;
+            setInterval(updateCountdown, 60000); // Update every minute
         }
 
-        // Data persistence
+        // Price calculation helper
+        function calculatePricePerUnit() {
+            const conversionRate = parseFloat(document.getElementById('ingredientConversionRate').value) || 0;
+            const quantity = parseFloat(document.getElementById('ingredientQuantity').value) || 0;
+            const totalPrice = parseFloat(document.getElementById('ingredientTotalPrice').value) || 0;
+            
+            const display = document.getElementById('pricePerUnit');
+            
+            if (conversionRate > 0 && quantity > 0 && totalPrice > 0) {
+                const actualQuantity = quantity * conversionRate;
+                const pricePerUnit = totalPrice / actualQuantity;
+                const unit = document.getElementById('ingredientUnit').value || 'หน่วย';
+                const purchaseUnit = document.getElementById('ingredientPurchaseUnit').value || 'หน่วยซื้อ';
+                
+                display.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-blue-600">${pricePerUnit.toFixed(4)} บาท/${unit}</div>
+                        <div class="text-sm text-gray-600">
+                            ${quantity} ${purchaseUnit} × ${conversionRate} = ${actualQuantity} ${unit}
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            ${totalPrice} ÷ ${actualQuantity} = ${pricePerUnit.toFixed(4)} บาท/${unit}
+                        </div>
+                    </div>
+                `;
+            } else {
+                display.innerHTML = '<div class="text-center text-gray-500">ราคาต่อหน่วยจะแสดงที่นี่</div>';
+            }
+        }
+
+        // Data management
         function saveData() {
             localStorage.setItem('ingredients', JSON.stringify(ingredients));
             localStorage.setItem('recipes', JSON.stringify(recipes));
@@ -1972,74 +2383,13 @@
             updateInventoryDisplay();
             updateRecipesDisplay();
             updateFinishedProductsDisplay();
+            updatePurchaseHistory();
             updateSalesHistory();
             updateRecipeSelects();
             updateProductionSelects();
+            updatePurchaseSelects();
             updateSalesSelects();
         }
-
-        // Price per unit calculation
-        function updatePricePerUnit() {
-            const purchaseQuantity = parseFloat(document.getElementById('ingredientQuantity').value) || 0;
-            const totalPrice = parseFloat(document.getElementById('ingredientTotalPrice').value) || 0;
-            const unit = document.getElementById('ingredientUnit').value;
-            const purchaseUnit = document.getElementById('ingredientPurchaseUnit').value;
-            const conversionRate = parseFloat(document.getElementById('ingredientConversionRate').value) || 1;
-            
-            if (purchaseQuantity > 0 && totalPrice > 0 && conversionRate > 0) {
-                const actualQuantity = purchaseQuantity * conversionRate;
-                const pricePerUnit = totalPrice / actualQuantity;
-                const pricePerPurchaseUnit = totalPrice / purchaseQuantity;
-                
-                document.getElementById('pricePerUnit').innerHTML = `
-                    <div class="space-y-1">
-                        <div class="font-semibold text-blue-600">
-                            ราคาต่อ${unit || 'หน่วยนับ'}: ${pricePerUnit.toFixed(4)} บาท
-                        </div>
-                        ${purchaseUnit ? `
-                            <div class="text-sm text-gray-600">
-                                ราคาต่อ${purchaseUnit}: ${pricePerPurchaseUnit.toFixed(2)} บาท
-                            </div>
-                            <div class="text-sm text-gray-600">
-                                ${purchaseQuantity} ${purchaseUnit} = ${actualQuantity} ${unit}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            } else {
-                document.getElementById('pricePerUnit').innerHTML = 'ราคาต่อหน่วยจะแสดงที่นี่';
-            }
-        }
-
-        // Auto-update production preview when pieces change
-        document.getElementById('productionPieces').addEventListener('input', updateProductionPreview);
-        document.getElementById('remainingQuantity').addEventListener('input', updateSalePreview);
-        document.getElementById('salePrice').addEventListener('input', updateSalePreview);
-        
-        // Auto-calculate price per unit
-        document.getElementById('ingredientQuantity').addEventListener('input', updatePricePerUnit);
-        document.getElementById('ingredientTotalPrice').addEventListener('input', updatePricePerUnit);
-        document.getElementById('ingredientUnit').addEventListener('input', updatePricePerUnit);
-        document.getElementById('ingredientPurchaseUnit').addEventListener('input', updatePricePerUnit);
-        document.getElementById('ingredientConversionRate').addEventListener('input', updatePricePerUnit);
-        
-        // Auto-update purchase preview
-        document.getElementById('purchaseQuantity').addEventListener('input', updatePurchasePreview);
-        
-        // Auto-update reports when custom dates change
-        document.getElementById('startDate').addEventListener('change', function() {
-            if (currentReportPeriod === 'custom') {
-                updateReportPeriodText();
-                updateReports();
-            }
-        });
-        
-        document.getElementById('endDate').addEventListener('change', function() {
-            if (currentReportPeriod === 'custom') {
-                updateReportPeriodText();
-                updateReports();
-            }
-        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'986f93fe153bd03c',t:'MTc1OTE5MTg3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988c547da488d334',t:'MTc1OTQ5MzM2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
