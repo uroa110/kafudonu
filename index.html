@@ -455,12 +455,22 @@
                         <h4 class="font-semibold text-blue-800 mb-2">ขั้นตอนที่ 2: สร้าง Google Apps Script</h4>
                         <ol class="list-decimal list-inside space-y-1 text-gray-700">
                             <li>ไปที่ <a href="https://script.google.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Google Apps Script</a></li>
-                            <li>สร้าง New Project</li>
-                            <li>คัดลอกโค้ดด้านล่างไปวาง</li>
-                            <li>Deploy → New Deployment → Type: Web App</li>
-                            <li>Execute as: Me, Access: Anyone</li>
-                            <li>คัดลอก URL ที่ได้มาใส่ด้านบน</li>
+                            <li>สร้าง New Project ตั้งชื่อ "PUKU_BAKERY_API"</li>
+                            <li>ลบโค้ดเดิมออกหมด แล้วคัดลอกโค้ดด้านล่างไปวาง</li>
+                            <li><strong>แก้ไข SHEET_ID:</strong> เปลี่ยน 'YOUR_SHEET_ID_HERE' เป็น ID ของ Google Sheets</li>
+                            <li>กด Save (Ctrl+S)</li>
+                            <li>กด Deploy → New Deployment</li>
+                            <li>Type: <strong>Web app</strong></li>
+                            <li>Execute as: <strong>Me</strong></li>
+                            <li>Who has access: <strong>Anyone</strong></li>
+                            <li>กด Deploy และอนุญาต permissions ทั้งหมด</li>
+                            <li>คัดลอก Web app URL มาใส่ด้านบน</li>
                         </ol>
+                        <div class="mt-3 p-2 bg-yellow-100 rounded text-sm">
+                            <strong>💡 หา Sheet ID:</strong> ใน URL ของ Google Sheets<br>
+                            <code class="text-xs">https://docs.google.com/spreadsheets/d/<span class="bg-yellow-300">1ABC...XYZ</span>/edit</code><br>
+                            ส่วนที่เป็นตัวหนาคือ Sheet ID
+                        </div>
                     </div>
                     
                     <div class="bg-white p-4 rounded-lg border-l-4 border-green-500">
@@ -468,12 +478,29 @@
                         <div class="bg-gray-100 p-3 rounded text-xs font-mono overflow-x-auto">
 <pre>function doPost(e) {
   try {
+    // Handle test requests
+    if (!e.postData || !e.postData.contents) {
+      return ContentService.createTextOutput('Success - Test OK');
+    }
+    
     const data = JSON.parse(e.postData.contents);
-    const spreadsheet = SpreadsheetApp.openById('YOUR_SHEET_ID_HERE');
+    
+    // Handle test type
+    if (data.type === 'test') {
+      return ContentService.createTextOutput('Success - Connection OK');
+    }
+    
+    // Replace with your actual Google Sheets ID
+    const SHEET_ID = 'YOUR_SHEET_ID_HERE';
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
     
     switch(data.type) {
       case 'purchase':
-        const purchaseSheet = spreadsheet.getSheetByName('การซื้อ');
+        let purchaseSheet = spreadsheet.getSheetByName('การซื้อ');
+        if (!purchaseSheet) {
+          purchaseSheet = spreadsheet.insertSheet('การซื้อ');
+          purchaseSheet.appendRow(['วันที่', 'วัตถุดิบ', 'จำนวน', 'หน่วย', 'ราคา/หน่วย', 'ราคารวม']);
+        }
         purchaseSheet.appendRow([
           new Date(data.date), data.ingredientName, data.quantity, 
           data.unit, data.pricePerUnit, data.totalCost
@@ -481,7 +508,11 @@
         break;
         
       case 'production':
-        const productionSheet = spreadsheet.getSheetByName('การผลิต');
+        let productionSheet = spreadsheet.getSheetByName('การผลิต');
+        if (!productionSheet) {
+          productionSheet = spreadsheet.insertSheet('การผลิต');
+          productionSheet.appendRow(['วันที่', 'สินค้า', 'จำนวน', 'ต้นทุน/ชิ้น', 'ต้นทุนรวม']);
+        }
         productionSheet.appendRow([
           new Date(data.date), data.productName, data.quantity, 
           data.costPerUnit, data.totalCost
@@ -489,7 +520,11 @@
         break;
         
       case 'sale':
-        const salesSheet = spreadsheet.getSheetByName('การขาย');
+        let salesSheet = spreadsheet.getSheetByName('การขาย');
+        if (!salesSheet) {
+          salesSheet = spreadsheet.insertSheet('การขาย');
+          salesSheet.appendRow(['วันที่', 'สินค้า', 'จำนวน', 'ราคา', 'รายได้', 'กำไร']);
+        }
         salesSheet.appendRow([
           new Date(data.date), data.productName, data.quantity, 
           data.price, data.revenue, data.profit
@@ -497,21 +532,32 @@
         break;
         
       case 'inventory':
-        const inventorySheet = spreadsheet.getSheetByName('คลังวัตถุดิบ');
+        let inventorySheet = spreadsheet.getSheetByName('คลังวัตถุดิบ');
+        if (!inventorySheet) {
+          inventorySheet = spreadsheet.insertSheet('คลังวัตถุดิบ');
+        }
         inventorySheet.clear();
-        inventorySheet.appendRow(['วัตถุดิบ', 'จำนวน', 'หน่วย', 'ราคา/หน่วย', 'มูลค่า']);
+        inventorySheet.appendRow(['วัตถุดิบ', 'จำนวน', 'หน่วย', 'ราคา/หน่วย', 'มูลค่า', 'อัปเดต']);
         data.inventory.forEach(item => {
           inventorySheet.appendRow([
-            item.name, item.quantity, item.unit, item.price, item.value
+            item.name, item.quantity, item.unit, item.price, item.value, new Date()
           ]);
         });
         break;
+        
+      default:
+        return ContentService.createTextOutput('Error: Unknown data type');
     }
     
     return ContentService.createTextOutput('Success');
   } catch (error) {
+    console.error('Error:', error);
     return ContentService.createTextOutput('Error: ' + error.toString());
   }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput('PUKU_BAKERY Google Apps Script is running!');
 }</pre>
                         </div>
                         <div class="text-xs text-red-600 mt-2">
@@ -623,7 +669,12 @@
                 return;
             }
 
-            resultDiv.innerHTML = '<div class="text-blue-600">กำลังทดสอบการเชื่อมต่อ...</div>';
+            if (!url.includes('script.google.com')) {
+                resultDiv.innerHTML = '<div class="text-red-600">❌ URL ไม่ถูกต้อง กรุณาใช้ URL จาก Google Apps Script</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="text-blue-600">🔄 กำลังทดสอบการเชื่อมต่อ...</div>';
 
             try {
                 const testData = {
@@ -632,26 +683,63 @@
                     timestamp: new Date().toISOString()
                 };
 
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(testData)
+                    body: JSON.stringify(testData),
+                    signal: controller.signal,
+                    mode: 'cors'
                 });
 
+                clearTimeout(timeoutId);
                 const result = await response.text();
                 
-                if (result.includes('Success') || response.ok) {
+                console.log('Response status:', response.status);
+                console.log('Response text:', result);
+                
+                if (response.ok && (result.includes('Success') || result.includes('OK'))) {
                     resultDiv.innerHTML = '<div class="text-green-600">✅ เชื่อมต่อสำเร็จ!</div>';
                     isConnected = true;
                     sheetsUrl = url;
                 } else {
-                    resultDiv.innerHTML = '<div class="text-red-600">❌ เชื่อมต่อไม่สำเร็จ: ' + result + '</div>';
+                    resultDiv.innerHTML = `
+                        <div class="text-red-600">❌ เชื่อมต่อไม่สำเร็จ</div>
+                        <div class="text-sm text-gray-600 mt-1">Status: ${response.status}</div>
+                        <div class="text-sm text-gray-600">Response: ${result.substring(0, 200)}${result.length > 200 ? '...' : ''}</div>
+                        <div class="text-sm text-blue-600 mt-2">💡 ตรวจสอบ:</div>
+                        <div class="text-xs text-gray-600">
+                            • URL ถูกต้องหรือไม่<br>
+                            • Deploy เป็น Web App แล้วหรือไม่<br>
+                            • Execute as: Me, Access: Anyone<br>
+                            • อนุญาต permissions ครบหรือไม่
+                        </div>
+                    `;
                     isConnected = false;
                 }
             } catch (error) {
-                resultDiv.innerHTML = '<div class="text-red-600">❌ เชื่อมต่อไม่สำเร็จ: ' + error.message + '</div>';
+                let errorMessage = error.message;
+                if (error.name === 'AbortError') {
+                    errorMessage = 'การเชื่อมต่อใช้เวลานานเกินไป (Timeout)';
+                } else if (error.message.includes('CORS')) {
+                    errorMessage = 'ปัญหา CORS - ตรวจสอบการตั้งค่า Google Apps Script';
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="text-red-600">❌ เชื่อมต่อไม่สำเร็จ: ${errorMessage}</div>
+                    <div class="text-sm text-blue-600 mt-2">💡 วิธีแก้ไข:</div>
+                    <div class="text-xs text-gray-600">
+                        • ตรวจสอบ URL ให้ถูกต้อง<br>
+                        • Deploy ใหม่เป็น Web App<br>
+                        • ตั้งค่า Execute as: Me<br>
+                        • ตั้งค่า Who has access: Anyone<br>
+                        • อนุญาต permissions ทั้งหมด
+                    </div>
+                `;
                 isConnected = false;
             }
 
@@ -2391,5 +2479,5 @@
             updateSalesSelects();
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988c547da488d334',t:'MTc1OTQ5MzM2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988c6e2534cdd334',t:'MTc1OTQ5NDQxMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
